@@ -153,6 +153,7 @@ if __name__ == '__main__':
                         'clear_first': False,
                         'wipe_data': False,
                         'test_mode': True,
+                        'migrate_schema': False,
                         }
                     try:
                         main(**kwargs) # Try to run all jobs in the module.
