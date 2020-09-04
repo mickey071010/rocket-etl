@@ -189,6 +189,9 @@ def get_resource_parameter(site,resource_id,parameter=None,API_key=None):
     else:
         return metadata[parameter]
 
+def get_package_id(job, test_mode):
+    return job.package if not test_mode else TEST_PACKAGE_ID
+
 def find_resource_id(package_id,resource_name):
     # Get the resource ID given the package ID and resource name.
     from engine.credentials import site, API_key
@@ -567,7 +570,8 @@ class Job:
         # that abruptly end mid-line.
         locators_by_destination = {}
         for destination in self.destinations:
-            package_id = self.package if not test_mode else TEST_PACKAGE_ID # Should this be done elsewhere?
+            package_id = get_package_id(self, test_mode)
+
             # [ ] Maybe the use_local_files and test_mode and any other parameters should be applied in a discrete stage between initialization and running.
 
             if destination == 'ckan_filestore':
