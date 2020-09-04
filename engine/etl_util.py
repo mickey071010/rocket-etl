@@ -385,12 +385,20 @@ def get_package_by_id(package_id):
 
 def post_process(resource_id):
     # Create a DataTable view if the resource has a datastore.
-    resource = get_resource_by_id(resource_id)
-    package_id = resource['package_id']
-    package = get_package_by_id(package_id)
-    create_data_table_view(resource)
-    add_tag(package, '_etl')
-    update_etl_timestamp(package, resource)
+    try:
+        resource = get_resource_by_id(resource_id)
+    except ckanapi.errors.NotFound:
+        print("Unable to perform resource-level post-processing, as this resource does not exist.")
+    else:
+        package_id = resource['package_id']
+        create_data_table_view(resource)
+        try:
+            package = get_package_by_id(package_id)
+        except ckanapi.errors.NotFound:
+            print("Unable to perform package-level post-processing, as this package does not exist.")
+        else:
+            add_tag(package, '_etl')
+            update_etl_timestamp(package, resource)
 
 
 def lookup_parcel(parcel_id):
