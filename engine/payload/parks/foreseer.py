@@ -25,7 +25,6 @@ class ForeseerSchema(pl.BaseSchema):
         ordered = True
 
 def write_to_csv(filename, list_of_dicts, keys):
-    ic(list_of_dicts)
     with open(filename, 'w') as output_file:
         dict_writer = csv.DictWriter(output_file, keys, extrasaction='ignore', lineterminator='\n')
         dict_writer.writeheader()
@@ -60,18 +59,6 @@ def select_point(devices, params, timestamp):
 
 def pull_measuremets_from_foreseer(jobject, **kwparameters):
     if not kwparameters['use_local_files']:
-        #r = requests.get("https://foreseer.pittsburghparks.org/WebViews/JSON/export.py?realtimeonly=true", auth=HTTPBasicAuth(FORESEER_USER, FORESEER_PASSWORD))
-        r = requests.get("https://foreseer.pittsburghparks.org/WebViews/JSON/export.py", auth=HTTPBasicAuth(FORESEER_USER, FORESEER_PASSWORD))
-        d = r.json()
-        import json
-        with open('export.json', 'w') as f:
-            f.write(json.dumps(d))
-
-        timestamp = parse(d['server']['serverTime'])
-        devices = d['deviceList']
-
-        dicts = []
-        headers = ['datetime', 'measurement_name', 'value', 'units']
         point_parameters = [{'device_name': 'PowerMeter-Sub09', 'point_number': 832, 'measurement_name': 'Total Energy Production of the Environmental Center'},
                 {'device_name': 'PowerMeter-MainSub', 'point_number': 985, 'measurement_name': 'Total Energy Usage of the Environmental Center'},
                 {'device_name': 'PowerMeter-Sub02', 'point_number': 619, 'measurement_name': 'Barn Energy Usage'},
@@ -82,9 +69,19 @@ def pull_measuremets_from_foreseer(jobject, **kwparameters):
                 {'device_name': 'BraeSystem', 'point_number': 891, 'measurement_name': 'Water System Pressure'},
                 {'device_name': 'BraeSystem', 'point_number': 892, 'measurement_name': 'Cistern Level', 'default_units': '%'},
                 ]
+        list_of_device_names = ','.join(list(set([p['device_name'] for p in point_parameters])))
+        #required_channels = 'pointDescription,pointAlarmStateString,pointUnits,pointUID,pointArchiveType,pointValue'
+        r = requests.get(f"https://foreseer.pittsburghparks.org/WebViews/JSON/export.py?devices={list_of_device_names}&device_props=false", auth=HTTPBasicAuth(FORESEER_USER, FORESEER_PASSWORD))
+        d = r.json()
+
+        timestamp = parse(d['server']['serverTime'])
+        devices = d['deviceList']
+
+        dicts = []
         for params in point_parameters:
             dicts.append(select_point(devices, params, timestamp))
 
+        headers = ['datetime', 'measurement_name', 'value', 'units']
         write_to_csv(jobject.local_cache_filepath, dicts, headers)
 
 foreseer_package_id = TEST_PACKAGE_ID # Production version of            data package
