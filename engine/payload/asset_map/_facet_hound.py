@@ -2883,8 +2883,57 @@ class AddressingLandmarksSchema(GeocodedAssetSchema):
 
 class HotelsSchema(AddressingLandmarksSchema):
     job_code = 'hotels'
-    asset_type = fields.String(dump_only=True, default='hotels') # [ ] Add hotels to AssetType
+    asset_type = fields.String(dump_only=True, default='hotels')
 
+class PreventionPointSchema(AssetSchema):
+    job_code = 'prevention_point'
+    asset_type = fields.String(dump_only=True, default='drug_treatment')
+    ntee_code = fields.String(dump_only=True, default='f20')
+    name = fields.String(load_from='location_name')
+    asset_name = fields.String(load_from='location_name')
+    localizability = fields.String(dump_only=True, default='fixed') # The locations are fixed, but since they are
+    # mostly white vans parking somewhere, it seems like they could also be "mobile" or something else.
+    street_address = fields.String(load_from='street_address', allow_none=True)
+    city = fields.String(load_from='city', allow_none=True)
+    state = fields.String(load_from='state', allow_none=True)
+    zip_code = fields.String(load_from='zip_code', allow_none=True)
+    latitude = fields.Float(load_from='latitude', allow_none=True)
+    longitude = fields.Float(load_from='longitude', allow_none=True)
+    directions = fields.String(load_from='directions', allow_none=True)
+    services = fields.String(load_from='services')
+    organization_name = fields.String(load_from='organization_name')
+    hours_of_operation = fields.String(load_from='days', allow_none=True)
+    periodicity = fields.String(dump_only=True, default='weekly') # Could have values like 'permanent', 'annual', 'seasonal', 'monthly', 'one-time', 'seasonal', 'weekly'
+    geocoding_properties = fields.String(load_from='geocoding_properties', allow_none=True)
+    data_source_name = fields.String(default="Scraped from Prevention Point Pittsburgh web site")
+    data_source_url = fields.String(default='https://www.pppgh.org/services/')
+    tags = fields.String(default='possibly_outdated', allow_none=True)
+
+    @post_load
+    def fix_asset_name(self, data):
+        f0 = 'organization_name'
+        f = 'asset_name'
+        parts = []
+        if data[f0] not in [None, '']:
+            parts.append(data[f0])
+        if data[f] not in [None, '']:
+            parts.append(data[f])
+        data[f] = ' '.join(parts)
+        assert data[f] is not None
+
+    @pre_load
+    def fix_hours(self, data):
+        f0 = 'days'
+        f = 'time_range'
+        parts = []
+        if data[f0] not in [None, '']:
+            parts.append(data[f0])
+        if data[f] not in [None, '']:
+            parts.append(data[f])
+        data[f] = ', '.join(parts)
+        assert data[f] is not None
+
+#when,neighborhood,time_range,where_description,street_address_or_intersection
 # dfg
 
 job_dicts = [
@@ -3663,6 +3712,18 @@ job_dicts = [
         'primary_key_fields': ['address_id'], # A strong primary key
         'destinations': ['file'],
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'Allegheny_County__Addressing_Landmarks-hotels.csv',
+    },
+    {
+        'update': 2,
+        'job_code': PreventionPointSchema().job_code, #'prevention_point' This is medical assistance for substance users.
+        'source_type': 'local',
+        'source_file': ASSET_MAP_SOURCE_DIR + 'scraped/www.pppgh.org-services.csv',
+        'encoding': 'utf-8-sig',
+        'schema': PreventionPointSchema,
+        'always_wipe_data': True,
+        #'primary_key_fields': None,
+        'destinations': ['file'],
+        'destination_file': ASSET_MAP_PROCESSED_DIR + 'PreventionPoint.csv',
     },
 ]
 
