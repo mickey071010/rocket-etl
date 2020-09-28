@@ -391,10 +391,13 @@ class CKANDatastoreLoader(CKANLoader):
         if str(upsert_status)[0] in ['4', '5']:
             raise RuntimeError('Upsert failed with status code {}.'.format(str(upsert_status)))
         elif str(update_status)[0] in ['4', '5']:
-            time.sleep(1)
+            time.sleep(5)
             update_status = self.update_metadata(self.resource_id) # Try again.
             if str(update_status)[0] in ['4', '5']:
-                raise RuntimeError('Metadata update failed (twice) with status code {}'.format(str(update_status)))
+                time.sleep(10)
+                update_status = self.update_metadata(self.resource_id) # Try one more time.
+                if str(update_status)[0] in ['4', '5']:
+                    raise RuntimeError('Metadata update failed (three times) with final status code {}'.format(str(update_status)))
         else:
             return upsert_status, update_status
 
