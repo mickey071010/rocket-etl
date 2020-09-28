@@ -389,10 +389,14 @@ class CKANDatastoreLoader(CKANLoader):
             raise RuntimeError('Upsert failed with status code {}. This may be because of a conflict between datastore fields/keys and specified primary keys. Or maybe you are trying to insert a row into a resource with an existing row with the same primary key or keys. But check the more informative explanation above.'.format(str(upsert_status)))
 
         if str(upsert_status)[0] in ['4', '5']:
-            raise RuntimeError('Upsert failed with status code {}.'.format(str(upsert_status)))
+            time.sleep(10)
+            upsert_status = self.upsert(self.resource_id, data, self.method) # Try data update again.
+            if str(upsert_status)[0] in ['4', '5']:
+                raise RuntimeError('Upsert failed with status code {}.'.format(str(upsert_status)))
+
         elif str(update_status)[0] in ['4', '5']:
             time.sleep(5)
-            update_status = self.update_metadata(self.resource_id) # Try again.
+            update_status = self.update_metadata(self.resource_id) # Try metadata update again.
             if str(update_status)[0] in ['4', '5']:
                 time.sleep(10)
                 update_status = self.update_metadata(self.resource_id) # Try one more time.
