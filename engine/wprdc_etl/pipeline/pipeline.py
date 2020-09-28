@@ -28,7 +28,8 @@ class Pipeline(object):
             conn=None, conn_name=None,
             chunk_size=2500, start_from_chunk=0,
             strict_load=True,
-            retry_without_last_line=False
+            retry_without_last_line=False,
+            ignore_empty_rows=False
     ):
         '''
         Arguments:
@@ -68,6 +69,7 @@ class Pipeline(object):
         self.log_status = log_status
         self.conn_name = conn_name
         self.strict_load = strict_load
+        self.ignore_empty_rows = ignore_empty_rows
 
         if conn:
             self.conn = conn
@@ -189,7 +191,10 @@ class Pipeline(object):
                 loaded.errors.__str__(), data
             )
             if self.strict_load:
-                raise RuntimeError(error_message)
+                if self.ignore_empty_rows and all([v==None for v in data.values()]):
+                    print("Ignoring empty row.")
+                else:
+                    raise RuntimeError(error_message)
             else:
                 print(error_message)
         else:

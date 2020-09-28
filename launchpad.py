@@ -79,6 +79,7 @@ def main(**kwargs):
     wipe_data = kwargs.get('wipe_data', False)
     migrate_schema = kwargs.get('migrate_schema', False)
     test_mode = kwargs.get('test_mode', False)
+    ignore_empty_rows = kwargs.get('ignore_empty_rows', False)
     if selected_job_codes == []:
         selected_jobs = [Job(job_dict) for job_dict in job_dicts]
     else:
@@ -154,6 +155,7 @@ if __name__ == '__main__':
                         'wipe_data': False,
                         'test_mode': True,
                         'migrate_schema': False,
+                        'ignore_empty_rows': False,
                         }
                     try:
                         main(**kwargs) # Try to run all jobs in the module.
@@ -191,6 +193,7 @@ if __name__ == '__main__':
         clear_first = False
         wipe_data = False
         migrate_schema = False
+        ignore_empty_rows = False
         logging = False
         test_mode = not PRODUCTION # Use PRODUCTION boolean from parameters/local_parameters.py to set whether test_mode defaults to True or False
         wake_me_when_found = False
@@ -213,6 +216,9 @@ if __name__ == '__main__':
                     args.remove(arg)
                 elif arg in ['migrate_schema']:
                     migrate_schema = True
+                    args.remove(arg)
+                elif arg in ['ignore_empty_rows']:
+                    ignore_empty_rows = True
                     args.remove(arg)
                 elif arg in ['log']:
                     logging = True
@@ -249,6 +255,7 @@ if __name__ == '__main__':
                 'clear_first': clear_first,
                 'wipe_data': wipe_data,
                 'migrate_schema': migrate_schema,
+                'ignore_empty_rows': ignore_empty_rows,
                 'test_mode': test_mode,
                 }
             main(**kwargs)
