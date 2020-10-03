@@ -220,26 +220,6 @@ class CrashSchema(pl.BaseSchema):
         if data['cons_zone_spd_lim'] is not None:
             data['cons_zone_spd_lim'] = int(float(data['cons_zone_spd_lim']))
 
-        #    data['party_type'] = '' # If you make these values
-        #    # None instead of empty strings, CKAN somehow
-        #    # interprets each None as a different key value,
-        #    # so multiple rows will be inserted under the same
-        #    # DTD/tax year/lien description even though the
-        #    # property owner has been redacted.
-        #    data['party_name'] = ''
-        #    #data['party_first'] = '' # These need to be referred
-        #    # to by their schema names, not the name that they
-        #    # are ultimately dumped to.
-        #    #data['party_middle'] = ''
-        #    data['plaintiff'] = '' # A key field can not have value
-        #    # None or upserts will work as blind inserts.
-        #else:
-        #    data['plaintiff'] = str(data['party_name'])
-        #del data['party_type']
-        #del data['party_name']
-    # The stuff below was originally written as a separate function
-    # called avoid_null_keys, but based on the above warning, it seems
-    # better to merge it with omit_owners.
         unconverted_boolean_fields = ['interstate', 'state_road', 'local_road_only',
                 'turnpike', 'wet_road', 'snow_slush_road', 'icy_road', 'sudden_deer',
                 'shldr_related', 'rear_end', 'ho_oppdir_sdswp', 'hit_fixed_object',
@@ -348,18 +328,6 @@ class CrashSchema(pl.BaseSchema):
 
     class Meta:
         ordered = True
-
-   # @pre_load
-   # def fix_nas_and_strip(self, data):
-   #     for k, v in data.items():
-   #         if k in ['breed', 'color']:
-   #             if v in ['.', '', 'NA', 'N/A']:
-   #                 data[k] = None
-   #             else:
-   #                 data[k] = data[k].strip()
-
-   #         if k in ['dogname']:
-   #             data[k] = data[k].strip()
 
 crashes_package_id = TEST_PACKAGE_ID # Production version of Dog Licenses
 
