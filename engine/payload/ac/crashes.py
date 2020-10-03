@@ -261,10 +261,71 @@ class CrashSchema(pl.BaseSchema):
                 'illumination_dark', 'minor_injury', 'moderate_injury', 'major_injury',
                 'nhtsa_agg_driving', 'psp_reported', 'running_stop_sign', 'train',
                 'trolley', 'deer_related'] # This new format first appeared in the 2018 data.
-        yes_no_to_0_1 = {'Yes': 1, 'No': 0}
+        yes_no_to_0_1 = {'Yes': 1, 'No': 0,
+                '1.0': 1, '0.0': 0}
         for field in unconverted_boolean_fields:
             if data[field] not in ['0', '1', '', None]:
                 data[field] = yes_no_to_0_1[data[field]]
+
+        fields_foolishly_cast_by_excel = ['crash_year', 'district', 'day_of_week',
+                'illumination', 'weather', 'road_condition', 'collision_type',
+                'total_units', 'relation_to_road', 'tcd_type', 'urban_rural',
+                'person_count', 'vehicle_count', 'automobile_count',
+                'motorcycle_count', 'bus_count', 'small_truck_count',
+                'heavy_truck_count', 'suv_count', 'van_count',
+                'bicycle_count', 'fatal_count', 'injury_count',
+                'maj_inj_count', 'mod_inj_count', 'min_inj_count',
+                'unk_inj_deg_count', 'unk_inj_per_count',
+                'unbelted_occ_count', 'unb_death_count',
+                'unb_maj_inj_count', 'belted_death_count',
+                'belted_maj_inj_count', 'mcycle_death_count',
+                'mcycle_maj_inj_count', 'bicycle_death_count',
+                'bicycle_maj_inj_count', 'ped_count',
+                'ped_death_count', 'ped_maj_inj_count',
+                'comm_veh_count', 'max_severity_level',
+                'driver_count_16yr', 'driver_count_17yr',
+                'driver_count_18yr', 'driver_count_19yr',
+                'driver_count_20yr', 'driver_count_50_64yr',
+                'driver_count_65_74yr', 'driver_count_75plus',
+                'est_hrs_closed', 'lane_closed', 'ln_close_dir',
+                'rdwy_surf_type_cd', 'spec_juris_cd', 'tcd_func_cd',
+                'work_zone_type', 'work_zone_loc', 'cons_zone_spd_lim',
+                'interstate', 'state_road', 'local_road',
+                'local_road_only', 'turnpike', 'wet_road',
+                'snow_slush_road', 'snow_slush_road', 'icy_road',
+                'sudden_deer', 'shldr_related', 'rear_end',
+                'ho_oppdir_sdswp', 'hit_fixed_object',
+                'sv_run_off_rd', 'work_zone', 'property_damage_only',
+                'fatal_or_maj_inj', 'injury', 'fatal', 'non_intersection',
+                'intersection', 'signalized_int', 'stop_controlled_int',
+                'unsignalized_int', 'school_bus', 'school_zone',
+                'hit_deer', 'hit_tree_shrub', 'hit_embankment',
+                'hit_pole', 'hit_gdrail', 'hit_gdrail_end',
+                'hit_barrier', 'hit_bridge', 'overturned',
+                'motorcycle', 'bicycle', 'hvy_truck_related',
+                'vehicle_failure', 'train_trolley', 'phantom_vehicle',
+                'alcohol_related', 'drinking_driver', 'underage_drnk_drv',
+                'unlicensed', 'cell_phone', 'no_clearance',
+                'running_red_lt', 'tailgating', 'cross_median',
+                'curve_dvr_error', 'limit_65mph', 'speeding',
+                'speeding_related', 'aggressive_driving',
+                'fatigue_asleep', 'driver_16yr', 'driver_17yr',
+                'driver_18yr', 'driver_65_74yr', 'driver_75plus',
+                'unbelted', 'pedestrian', 'distracted', 'curved_road',
+                'driver_19yr', 'driver_20yr', 'driver_50_64yr',
+                'vehicle_towed', 'fire_in_vehicle', 'hit_parked_vehicle',
+                'mc_drinking_driver', 'drugged_driver', 'injury_or_fatal',
+                'comm_vehicle', 'impaired_driver', 'deer_related',
+                'drug_related', 'hazardous_truck', 'illegal_drug_related',
+                'illumination_dark', 'minor_injury', 'moderate_injury',
+                'major_injury', 'nhtsa_agg_driving', 'psp_reported',
+                'running_stop_sign', 'train', 'trolley', 'rdwy_seq_num',
+                'adj_rdwy_seq', 'access_ctrl', 'lane_count', 'road_owner',
+                'speed_limit', 'segment', 'offset', 'tot_inj_count']
+
+        for field in fields_foolishly_cast_by_excel:
+            if data[field] not in [None, '']:
+                data[field] = str(int(float(data[field])))
 
         # 2018 data includes leading zeros in times (e.g., 013000 for
         # 1:30am) and other fields. In the cumulative resource, all of the
