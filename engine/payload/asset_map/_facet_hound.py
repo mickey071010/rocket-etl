@@ -470,6 +470,11 @@ class FishFriesSchema(GeocodedAssetSchema):
                 data[boolean] = False
 
     @pre_load
+    def fix_bogus_email_addresses(self, data):
+        if 'email' in data and data['email'] in ['', 'N/A']:
+            data['email'] = None
+
+    @pre_load
     def fix_bogus_phone_numbers(self, data):
         # Since the fish fry events are being squeezed into the "community/non-profit organizations"
         # category, the hours of operation will be put into the notes field like so:
