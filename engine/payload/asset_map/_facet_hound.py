@@ -2938,6 +2938,38 @@ class PreventionPointSchema(AssetSchema):
         data[f] = ', '.join(parts)
         assert data[f] is not None
 
+class PublicArtSchema(AssetSchema):
+    job_code = 'public_art'
+    asset_type = fields.String(dump_only=True, default='public_art') # Create this new AssetType!!!!!!!!!
+    ntee_code = fields.String(dump_only=True, default='a51') # A51 is "Art Museums" but it's the
+    # closets approximation in the NTEE Code (which just represents organizations, not infrastructure).
+    name = fields.String(load_from='title')
+    asset_name = fields.String(load_from='title')
+    parent_location = fields.String(load_from='park', allow_none=True)
+    localizability = fields.String(dump_only=True, default='fixed')
+    city = fields.String(default='Pittsburgh', allow_none=True)
+    state = fields.String(default='PA', allow_none=True)
+    latitude = fields.Float(load_from='latitude', allow_none=True)
+    longitude = fields.Float(load_from='longitude', allow_none=True)
+    data_source_name = fields.String(default="WPRDC Dataset: City of Pittsburgh Public Art")
+    data_source_url = fields.String(default='https://data.wprdc.org/dataset/city-of-pittsburgh-public-art')
+    tags = fields.String(load_from='art_type', allow_none=True)
+    primary_key_from_rocket = fields.String(load_from='id', allow_none=False) # The 'name' field could also work.
+
+    @pre_load
+    def fix_names(self, data):
+        f0 = 'title'
+        f = 'artist_name'
+        fixed_title = f"{data[f0]}"
+        if data[f] not in [None, '', 'n/a', 'Unknown', 'Not Applicable']:
+            fixed_title += f" ({data[f]})"
+        fixed_title = re.sub("  ", " ", fixed_title)
+        data['name'] = fixed_title
+        data['asset_name'] = fixed_title
+
+    @post_load
+    def fix_synthesized_key(self, data):
+        data['synthesized_key'] = synthesize_key(data, ['primary_key_from_rocket'])
 #when,neighborhood,time_range,where_description,street_address_or_intersection
 # dfg
 
@@ -3729,6 +3761,18 @@ job_dicts = [
         #'primary_key_fields': None,
         'destinations': ['file'],
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'PreventionPoint.csv',
+    },
+    {
+        'update': 2,
+        'job_code': PublicArtSchema().job_code, #'public_art'
+        'source_type': 'local',
+        'source_file': ASSET_MAP_SOURCE_DIR + 'from-wprdc-datasets/public-art-pgh.csv',
+        'encoding': 'utf-8-sig',
+        'schema': PublicArtSchema,
+        'always_wipe_data': True,
+        'primary_key_fields': ['id'],
+        'destinations': ['file'],
+        'destination_file': ASSET_MAP_PROCESSED_DIR + 'public-art-pgh.csv',
     },
 ]
 
