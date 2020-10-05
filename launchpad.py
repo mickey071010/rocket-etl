@@ -90,9 +90,11 @@ def main(**kwargs):
     # server to be searched for unharvested tables.
     for job in selected_jobs:
         kwparameters = dict(kwargs)
-        if migrate_schema and 'ckan' in job.destinations:
+        if 'ckan' in job.destinations:
             package_id = get_package_id(job, test_mode) # This stuff needs to be tested.
             resource_id = find_resource_id(package_id, job.resource_name)
+
+        if migrate_schema and 'ckan' in job.destinations:
             # Delete the Data Table view to avoid new fields not getting added to an existing view.
             delete_datatable_views(resource_id)
             # Is this really necessary though? In etl_util.py, migrate_schema being True is already going to force clear_first to be True
