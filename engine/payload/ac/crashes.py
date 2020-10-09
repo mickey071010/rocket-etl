@@ -49,8 +49,10 @@ class CrashSchema(pl.BaseSchema):
     bicycle_count = fields.Integer(dump_to="BICYCLE_COUNT", allow_none=True)
     fatal_count = fields.Integer(dump_to="FATAL_COUNT", allow_none=True)
     injury_count = fields.Integer(dump_to="INJURY_COUNT", allow_none=True)
-    maj_inj_count = fields.Integer(dump_to="MAJ_INJ_COUNT", allow_none=True)
-    mod_inj_count = fields.Integer(dump_to="MOD_INJ_COUNT", allow_none=True)
+    maj_inj_count = fields.Integer(dump_to="MAJ_INJ_COUNT", allow_none=True) # PennDOT is not supplying this field in
+    # 2019, but they are offering SUSPECTED_SERIOUS, so the County is giving us those values as MAJ_INJ_COUNT.
+    mod_inj_count = fields.Integer(dump_to="MOD_INJ_COUNT", allow_none=True) # The 2019 data provided by the County has
+    # this field (for backward compatibility), but as PennDOT is not supplying these values, this column is entirely blank.
     min_inj_count = fields.Integer(dump_to="MIN_INJ_COUNT", allow_none=True)
     unk_inj_deg_count = fields.Integer(dump_to="UNK_INJ_DEG_COUNT", allow_none=True)
     unk_inj_per_count = fields.Integer(dump_to="UNK_INJ_PER_COUNT", allow_none=True)
@@ -203,8 +205,8 @@ class CrashSchema(pl.BaseSchema):
     segment = fields.String(dump_to="SEGMENT", allow_none=True)
     offset = fields.Integer(dump_to="OFFSET", allow_none=True)
     street_name = fields.String(dump_to="STREET_NAME", allow_none=True)
-    tot_inj_count = fields.Integer(dump_to="TOT_INJ_COUNT", allow_none=True) # This field is missing from 2019 data provided by County but added for backward compatibility.
-    school_bus_unit = fields.String(dump_to="SCHOOL_BUS_UNIT", allow_none=True) # This field is missing from 2019 data provided by County but added for backward compatibility.
+    tot_inj_count = fields.Integer(dump_to="TOT_INJ_COUNT", allow_none=True)
+    school_bus_unit = fields.String(dump_to="SCHOOL_BUS_UNIT", allow_none=True)
 
     @pre_load
     def fix_lane_count(self, data):
