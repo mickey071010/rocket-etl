@@ -203,6 +203,8 @@ class CrashSchema(pl.BaseSchema):
     segment = fields.String(dump_to="SEGMENT", allow_none=True)
     offset = fields.Integer(dump_to="OFFSET", allow_none=True)
     street_name = fields.String(dump_to="STREET_NAME", allow_none=True)
+    tot_inj_count = fields.Integer(dump_to="TOT_INJ_COUNT", allow_none=True) # This field is missing from 2019 data provided by County but added for backward compatibility.
+    school_bus_unit = fields.String(dump_to="SCHOOL_BUS_UNIT", allow_none=True) # This field is missing from 2019 data provided by County but added for backward compatibility.
 
     @pre_load
     def fix_lane_count(self, data):
@@ -246,6 +248,22 @@ class CrashSchema(pl.BaseSchema):
         for field in unconverted_boolean_fields:
             if data[field] not in ['0', '1', '', None]:
                 data[field] = yes_no_to_0_1[data[field]]
+
+        # Backward compatibility code to handle some fields in 2019 data
+        boolean_fields_to_convert_back_to_y_n = ['ntfy_hiwy_maint', 'tfc_detour_ind']
+            # For backward compatibility with previous years and the cumulative table.
+        zero_one_to_y_n = {'Yes': 'Y', 'No': 'N',
+                '1.0': 'Y', '0.0': 'N',
+                '1': 'Y', '0': 'N',
+                'Y': 'Y', 'N': 'N',
+                '': None, None: None,
+                'U': 'U'} # Preserve the 'U' value since it is not clear
+                # from the PennDOT data dictionary what it means and whether
+                # it can just be translated to None (though it probably means
+                # that it is Unknown whether traffic was detoured, when
+                # this value appears in the tfc_detour_ind field).
+        for field in boolean_fields_to_convert_back_to_y_n:
+            data[field] = zero_one_to_y_n[data[field]]
 
         fields_foolishly_cast_by_excel = ['crash_year', 'district', 'day_of_week',
                 'illumination', 'weather', 'road_condition', 'collision_type',
@@ -329,7 +347,7 @@ class CrashSchema(pl.BaseSchema):
     class Meta:
         ordered = True
 
-crashes_package_id = TEST_PACKAGE_ID # Production version of Dog Licenses
+crashes_package_id = "3130f583-9499-472b-bb5a-f63a6ff6059a" # Production version of Crash data
 
 current_year = datetime.now().year
 last_year = current_year - 1
