@@ -367,10 +367,10 @@ job_dicts = [
         #'primary_key_fields': [],
         'always_wipe_data': False,
         'upload_method': 'upsert',
-        'primary_key_fields': ['crash_crn'],
+        'primary_key_fields': ['CRASH_CRN'],
         'destinations': ['file'], # These lines are just for testing
         'destination_file': f'{last_year}_crashes.csv', # purposes.
         'package': crashes_package_id,
-        'resource_name': f'{last_year} Crashes'
+        'resource_name': f'{last_year} Crash Data'
     },
 ]
