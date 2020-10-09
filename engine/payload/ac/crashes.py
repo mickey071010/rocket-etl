@@ -373,4 +373,21 @@ job_dicts = [
         'package': crashes_package_id,
         'resource_name': f'{last_year} Crash Data'
     },
+    {
+        'job_code': 'cumulative_crashes',
+        'source_type': 'sftp',
+        'source_dir': '',
+        'source_file': f'{last_year}_crashes.csv',
+        'connector_config_string': 'sftp.county_sftp',
+        'encoding': 'utf-8-sig',
+        'schema': CrashSchema,
+        #'primary_key_fields': [],
+        'always_wipe_data': False,
+        'upload_method': 'upsert',
+        'primary_key_fields': ['CRASH_CRN'],
+        #'destinations': ['file'], # These lines are just for testing
+        #'destination_file': f'{last_year}_crashes.csv', # purposes.
+        'package': crashes_package_id,
+        'resource_name': f'Cumulative Crash Data (2004-2018)',
+    },
 ]
