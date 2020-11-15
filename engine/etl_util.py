@@ -192,10 +192,10 @@ def get_resource_parameter(site,resource_id,parameter=None,API_key=None):
 def get_package_id(job, test_mode):
     return job.package if not test_mode else TEST_PACKAGE_ID
 
-def find_resource_id(package_id,resource_name):
+def find_resource_id(package_id, resource_name):
     # Get the resource ID given the package ID and resource name.
     from engine.credentials import site, API_key
-    resources = get_package_parameter(site,package_id,'resources',API_key)
+    resources = get_package_parameter(site, package_id, 'resources', API_key)
     for r in resources:
         if 'name' in r and r['name'] == resource_name:
             return r['id']
@@ -481,6 +481,7 @@ class Job:
         self.encoding = job_dict['encoding'] if 'encoding' in job_dict else 'utf-8' # wprdc-etl/pipeline/connectors.py also uses UTF-8 as the default encoding.
         self.connector_config_string = job_dict['connector_config_string'] if 'connector_config_string' in job_dict else ''
         self.custom_processing = job_dict['custom_processing'] if 'custom_processing' in job_dict else (lambda *args, **kwargs: None)
+        self.custom_post_processing = job_dict['custom_post_processing'] if 'custom_post_processing' in job_dict else (lambda *args, **kwargs: None)
         self.schema = job_dict['schema'] if 'schema' in job_dict else None
         self.primary_key_fields = job_dict['primary_key_fields'] if 'primary_key_fields' in job_dict else None
         self.upload_method = job_dict['upload_method'] if 'upload_method' in job_dict else None
@@ -734,6 +735,7 @@ class Job:
         self.default_setup(use_local_files)
         self.custom_processing(self, **kwparameters) # In principle, filtering could be done here, but this might be kind of a hack.
         locators_by_destination = self.run_pipeline(test_mode, clear_first, wipe_data, migrate_schema, file_format='csv', retry_without_last_line=False, ignore_empty_rows=ignore_empty_rows)
+        self.custom_post_processing(self, **kwparameters)
         return locators_by_destination # Return a dict allowing look up of final destinations of data (filepaths for local files and resource IDs for data sent to a CKAN instance).
 
 def push_to_datastore(job, file_connector, target, config_string, encoding, loader_config_string, primary_key_fields, test_mode, clear_first, upload_method='upsert'):
