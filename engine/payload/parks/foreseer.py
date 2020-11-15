@@ -84,7 +84,7 @@ def pull_measuremets_from_foreseer(jobject, **kwparameters):
         headers = ['datetime', 'measurement_name', 'value', 'units']
         write_to_csv(jobject.local_cache_filepath, dicts, headers)
 
-foreseer_package_id = TEST_PACKAGE_ID # Production version of            data package
+foreseer_package_id = "8af8733e-84f0-4cad-a7ac-5c5e071dd698" # Production version of Parks Conservancy data package
 
 job_dicts = [
     {
