@@ -20,19 +20,27 @@ class smartTrashCansSchema(pl.BaseSchema):
     last_updated_date = fields.DateTime(allow_none=False)
     group_name = fields.String(allow_none=False)
     address = fields.String(allow_none=False)
-    city = fields.String(allow_none=False)
-    state = fields.String(allow_none=False)
-    zip = fields.String(allow_none=False)
-    neighborhood = fields.String(allow_none=False)
-    dpw_division = fields.String(allow_none=False)
-    council_district = fields.String(allow_none=False)
-    ward = fields.String(allow_none=False)
-    fire_zone = fields.String(allow_none=False)
+    city = fields.String(allow_none=True)
+    state = fields.String(allow_none=True)
+    zip = fields.String(allow_none=True)
+    neighborhood = fields.String(allow_none=True)
+    dpw_division = fields.String(allow_none=True)
+    council_district = fields.String(allow_none=True)
+    ward = fields.String(allow_none=True)
+    fire_zone = fields.String(allow_none=True)
     x = fields.Float(allow_none=False)
     y = fields.Float(allow_none=False)
 
     class Meta:
         ordered = True
+
+    @pre_load
+    def fix_nas_and_dates(self, data):
+        fields_to_fix = ['neighborhood', 'dpw_division',
+                'council_district', 'ward', 'fire_zone']
+        for field in fields_to_fix:
+            if data[field] == 'NA':
+                data[field] = None
 
     @pre_load
     def fix_datetimes(self, data):
@@ -52,6 +60,7 @@ def conditionally_get_city_files(job, **kwparameters):
 
 job_dicts = [
     {
+        'job_code': 'smart_trash',
         'source_type': 'local',
         'source_dir': '',
         'source_file': 'smart_trash_containers.csv',
@@ -65,6 +74,7 @@ job_dicts = [
         'resource_name': 'Smart Trash Containers',
     },
     {
+        'job_code': 'smart_trash_geojson',
         'source_type': 'local',
         'source_dir': '',
         'source_file': 'smart_trash_containers.geojson',
