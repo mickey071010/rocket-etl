@@ -41,8 +41,8 @@ job_dicts = [
         'custom_processing': conditionally_get_city_files,
         'schema': RecCenterAttendanceSchema,
         'always_wipe_data': True,
-        'destinations': ['file'], # These lines are just for testing
-        'destination_file': f'cc_attendance.csv', # purposes.
+        #'destinations': ['file'], # These lines are just for testing
+        #'destination_file': f'cc_attendance.csv', # purposes.
         'primary_key_fields': ['date', 'center_name'],
         'upload_method': 'upsert',
         'package': cc_attendance_package_id,
