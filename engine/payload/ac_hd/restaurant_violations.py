@@ -1,12 +1,16 @@
-import csv, json, requests, sys, traceback
+import os, csv, json, requests, sys, traceback
+import ckanapi
 import time
 import re
 from datetime import datetime
 from dateutil import parser
 
-from marshmallow import fields, pre_load
+from marshmallow import fields, pre_load, post_load
 from engine.wprdc_etl import pipeline as pl
+from engine.etl_util import find_resource_id
 from engine.notify import send_to_slack
+from engine.credentials import site, API_key
+from engine.parameters.remote_parameters import TEST_PACKAGE_ID
 
 try:
     from icecream import ic
@@ -93,19 +97,60 @@ class ViolationsSchema(pl.BaseSchema):
 
         # Because of some issues with Excel files, two string values in the first row are getting parsed as floats instead of strings: ('encounter', 201401020037.0), ('id', 201202030011.0)
 
+def express_load_then_delete_file(job, **kwparameters):
+    """The basic idea is that the job processes with a 'file' destination,
+    so the ETL job loads the file into destination_file_path. Then as a
+    custom post-processing step, that file is Express-Loaded. This is
+    faster (particularly for large files) and avoids 504 errors and unneeded
+    API requests."""
+    # Eventually this function should be moved either to etl_util.py or
+    # more likely the pipeline framework. In either case, this approach
+    # can be formalized, either as a destination or upload method and
+    # possibly implemented as a loader (CKANExpressLoader).
+    if kwparameters['test_mode']:
+        job.package = TEST_PACKAGE_ID
+    ckan = ckanapi.RemoteCKAN(site, apikey=API_key)
+    csv_file_path = job.destination_file_path
+    resource_id = find_resource_id(job.package, job.resource_name)
+    if resource_id is None:
+        # If the resource does not already exist, create it.
+        print(f"Unable to find a resource with name '{job.resource_name}' in package with ID {job.package}.")
+        print(f"Creating new resource, and uploading CSV file {csv_file_path} to resource with name '{job.resource_name}' in package with ID {job.package}.")
+        resource_as_dict = ckan.action.resource_create(package_id=job.package,
+            name = job.resource_name,
+            upload=open(csv_file_path, 'r'))
+    else:
+        print(f"Uploading CSV file {csv_file_path} to resource with name '{job.resource_name}' in package with ID {job.package}.")
+        resource_as_dict = ckan.action.resource_patch(id = resource_id,
+            upload=open(csv_file_path, 'r'))
+        # Running resource_update once sets the file to the correct file and triggers some datastore action and
+        # the Express Loader, but for some reason, it seems to be processing the old file.
+
+        # So instead, let's run resource_patch (which just sets the file) and then run resource_update.
+        #resource_as_dict = ckan.action.resource_update(id = resource_id)
+        resource_as_dict = ckan.action.resource_update(id = resource_id,
+            upload=open(csv_file_path, 'r'))
+
+    print(f"Removing temp file at {csv_file_path}")
+    os.remove(csv_file_path)
+
 package_id = "8744b4f6-5525-49be-9054-401a2c4c2fac" # Production package for Allegheny County Restaurant/Food Facility Inspections
 
 job_dicts = [
     {
+        'job_code': 'restaurant_violations',
         'source_type': 'sftp',
         'source_dir': 'Health Department',
         'source_file': 'alco-restaurant-violations.csv',
         'encoding': 'latin-1',
         'connector_config_string': 'sftp.county_sftp',
         'schema': ViolationsSchema,
-        'upload_method': 'insert',
         'always_wipe_data': True,
+        'upload_method': 'insert',
+        'destinations': ['file'], # These lines are just for testing
+        'destination_file': f'alco-restuarant-violations.csv', # purposes.
         'package': package_id,
         'resource_name': "Food Facility/Restaurant Inspection Violations",
+        'custom_post_processing': express_load_then_delete_file
     },
 ]
