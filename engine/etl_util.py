@@ -117,6 +117,17 @@ def reorder_views(resource, views):
     r = requests.post(BASE_URL + 'resource_view_reorder', json={'id': resource_id, 'order': new_view_list},
                       headers={"Authorization": API_KEY})
 
+def delete_datatable_views(resource, views):
+    from engine.credentials import site, API_key
+    ckan = ckanapi.RemoteCKAN(site, apikey=API_key)
+    ckan.action.resource_view_clear(id=resource['id'], view_types=['datatables_view'])
+
+def deactivate_datastore(resource):
+    from engine.credentials import site, API_key
+    ckan = ckanapi.RemoteCKAN(site, apikey=API_key)
+    set_resource_parameters_to_values(site, resource['id'], ['datastore_active'], [False], API_key)
+    # How does this differ from deleting the datastore?
+
 def query_resource(site,query,API_key=None):
     """Use the datastore_search_sql API endpoint to query a CKAN resource."""
     ckan = ckanapi.RemoteCKAN(site, apikey=API_key)
