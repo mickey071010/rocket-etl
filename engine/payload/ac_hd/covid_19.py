@@ -120,10 +120,11 @@ job_dicts = [
         #'primary_key_fields': [],
         'always_wipe_data': True,
         'upload_method': 'insert',
-        #'destinations': ['file'], # These lines are just for testing
-        #'destination_file': f'covid_19_death_demographics.csv', # purposes.
+        'destinations': ['file'], # These lines are just for testing
+        'destination_file': f'covid_19_death_demographics.csv', # purposes.
         'package': covid_19_package_id,
-        'resource_name': f'Allegheny County COVID-19 Deaths by Demographic Groups'
+        'resource_name': f'Allegheny County COVID-19 Deaths by Demographic Groups',
+        'custom_post_processing': express_load_then_delete_file
     },
     {
         'job_code': 'deaths_by_date',
@@ -136,10 +137,11 @@ job_dicts = [
         #'primary_key_fields': [],
         'always_wipe_data': True,
         'upload_method': 'insert',
-        #'destinations': ['file'], # These lines are just for testing
-        #'destination_file': f'covid_19_deaths_by_date.csv', # purposes.
+        'destinations': ['file'], # These lines are just for testing
+        'destination_file': f'covid_19_deaths_by_date.csv', # purposes.
         'package': covid_19_package_id,
-        'resource_name': f'Allegheny County COVID-19 Deaths by Date'
+        'resource_name': f'Allegheny County COVID-19 Deaths by Date',
+        'custom_post_processing': express_load_then_delete_file
     },
     {
         'job_code': 'cases_by_place',
@@ -152,10 +154,11 @@ job_dicts = [
         #'primary_key_fields': [],
         'always_wipe_data': True,
         'upload_method': 'insert',
-        #'destinations': ['file'], # These lines are just for testing
-        #'destination_file': f'covid_19_cases_by_place.csv', # purposes.
+        'destinations': ['file'], # These lines are just for testing
+        'destination_file': f'covid_19_cases_by_place.csv', # purposes.
         'package': covid_19_package_id,
-        'resource_name': f'Allegheny County COVID-19 Counts by Municipality and Pittsburgh Neighborhood'
+        'resource_name': f'Allegheny County COVID-19 Counts by Municipality and Pittsburgh Neighborhood',
+        'custom_post_processing': express_load_then_delete_file
     },
     {
         'job_code': 'tests',
