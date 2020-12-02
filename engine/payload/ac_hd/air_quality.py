@@ -78,6 +78,41 @@ class AirQualityHourlySchema(pl.BaseSchema):
                 if v in ['None', 'NA']:
                     data[k] = None
 
+class MeasurementSites(pl.BaseSchema):
+    site_name = fields.String(load_from='SiteName'.lower())
+    description = fields.String(load_from='Description'.lower(), allow_none=True)
+    air_now_mnemonic = fields.String(load_from='AirNowMnemonic'.lower(), allow_none=True)
+    street_address1 = fields.String(load_from='StreetAddress1'.lower(), allow_none=True)
+    street_address2 = fields.String(load_from='StreetAddress2'.lower(), allow_none=True)
+    city = fields.String(load_from='City'.lower(), allow_none=True)
+    county = fields.String(load_from='County'.lower(), allow_none=True)
+    state_region = fields.String(load_from='StateRegion'.lower(), allow_none=True)
+    zip_code = fields.Date(load_from='ZipCode'.lower(), allow_none=True)
+    latitude = fields.Float(load_from='Latitude'.lower(), allow_none=True)
+    longitude = fields.Float(load_from='Longitude'.lower(), allow_none=True)
+    enabled = fields.String(load_from='Enabled'.lower())
+
+    class Meta:
+        ordered = True
+
+    @pre_load
+    def fix_nones(self, data):
+        for k, v in data.items():
+            if k in ['description', 'AirNowMnemonic'.lower(), 'StreetAddress1'.lower(),
+                    'StreetAddress2'.lower(), 'city', 'county', 'StateRegion'.lower(),
+                    'zipcode', 'latitude', 'longitude']:
+                if v in ['None', 'NA']:
+                    data[k] = None
+
+    @pre_load
+    def fix_booleans(self, data):
+        for k, v in data.items():
+            if k in ['enabled']:
+                if v in ['None', 'NA']:
+                    data[k] = None
+                else:
+                    data[k] == (data[k].lower() == 'true')
+
 def express_load_then_delete_file(job, **kwparameters):
     """The basic idea is that the job processes with a 'file' destination,
     so the ETL job loads the file into destination_file_path. Then as a
@@ -166,7 +201,25 @@ job_dicts = [
         'destinations': ['file'], # These lines are just for testing
         'destination_file': f'air_max_today.csv', # purposes.
         'package': air_quality_package_id,
-        'resource_name': f"Current Maximum Air Quality Readings for Today (new format)"
+        'resource_name': f"Current Maximum Air Quality Readings for Today (new format)",
+#        'custom_post_processing': express_load_then_delete_file
+    },
+    {
+        'job_code': 'measurement_sites',
+        'source_type': 'sftp',
+        'source_dir': 'Health Department',
+        'source_file': f'sourcesites.csv',
+        'connector_config_string': 'sftp.county_sftp',
+        'encoding': 'utf-8-sig',
+        'schema': MeasurementSites,
+        'primary_key_fields': ['sitename'],
+        'always_wipe_data': True,
+        'upload_method': 'upsert',
+        'destinations': ['file'], # These lines are just for testing
+        'destination_file': f'sourcesites.csv', # purposes.
+        'package': air_quality_package_id,
+        'resource_name': f"Sensor Locations (new format)",
+#        'custom_post_processing': express_load_then_delete_file
     },
 #    {
 #        'job_code': 'tests',
