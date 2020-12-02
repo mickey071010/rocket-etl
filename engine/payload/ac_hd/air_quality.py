@@ -196,8 +196,8 @@ job_dicts = [
         'encoding': 'utf-8-sig',
         'schema': AirQualityHourlySchema,
         'primary_key_fields': ['datetime', 'site', 'program', 'parameter'],
-        'always_wipe_data': False,
-        'upload_method': 'upsert',
+        'always_wipe_data': True,
+        'upload_method': 'insert',
         'destinations': ['file'], # These lines are just for testing
         'destination_file': f'air_max_today.csv', # purposes.
         'package': air_quality_package_id,
