@@ -18,16 +18,6 @@ try:
 except ImportError:  # Graceful fallback if IceCream isn't installed.
     ic = lambda *a: None if not a else (a[0] if len(a) == 1 else a)  # noqa
 
-def rev_geocode(pin):
-    if pin:
-        r = requests.get(
-            'http://tools.wprdc.org/geo/reverse_geocode/', params={'pin': pin})
-        if r.status_code == 200:
-            j = r.json()
-            return j['results']
-        else:
-            return None
-
 class SalesSchema(pl.BaseSchema):
     parid = fields.String(dump_to="PARID", allow_none=True)
     propertyhousenum = fields.Integer(
@@ -60,16 +50,6 @@ class SalesSchema(pl.BaseSchema):
     instrtyp = fields.String(dump_to="INSTRTYP", allow_none=True)
     instrtypdesc = fields.String(dump_to="INSTRTYPDESC", allow_none=True)
 
-    #municipality = fields.String(dump_to="MUNICIPALITY", allow_none=True)
-    #neighborhood = fields.String(dump_to="NEIGHBORHOOD", allow_none=True)
-    #pgh_council_district = fields.String(dump_to="PGH_COUNCIL_DISTRICT", allow_none=True)
-    #pgh_ward = fields.String(dump_to="PGH_WARD", allow_none=True)
-    #pgh_public_works_division = fields.String(dump_to="PGH_PUBLIC_WORKS_DIVISION", allow_none=True)
-    #pgh_police_zone = fields.String(dump_to="PGH_POLICE_ZONE", allow_none=True)
-    #pgh_fire_zone = fields.String(dump_to="PGH_FIRE_ZONE", allow_none=True)
-    #tract = fields.String(dump_to="TRACT", allow_none=True)
-    #block_group = fields.String(dump_to="BLOCK_GROUP", allow_none=True)
-
     class Meta:
         ordered = True
 
@@ -82,38 +62,6 @@ class SalesSchema(pl.BaseSchema):
         if data['recorddate']:
             data['recorddate'] = datetime.strptime(
                 data['recorddate'], date_format).date().isoformat()
-
-    @pre_load
-    def reverse_geocode(self, data):
-        pass
-        geo_data = rev_geocode(data['parid'])
-        if geo_data:
-            if 'pittsburgh_neighborhood' in geo_data:
-                data['neighborhood'] = geo_data['pittsburgh_neighborhood']['name']
-
-            if 'pittsburgh_city_council' in geo_data:
-                data['pgh_council_district'] = geo_data['pittsburgh_city_council']['name']
-
-            if 'pittsburgh_ward' in geo_data:
-                data['pgh_ward'] = geo_data['pittsburgh_ward']['name']
-
-            if 'us_census_tract' in geo_data:
-                data['tract'] = geo_data['us_census_tract']['name']
-
-            if 'pittsburgh_dpw_division' in geo_data:
-                data['pgh_public_works_division'] = geo_data['pittsburgh_dpw_division']['name']
-
-            if 'pittsburgh_police_zone' in geo_data:
-                data['pgh_police_zone'] = geo_data['pittsburgh_police_zone']['name']
-
-            if 'pittsburgh_fire_zone' in geo_data:
-                data['pgh_fire_zone'] = geo_data['pittsburgh_fire_zone']['name']
-
-            if 'allegheny_county_municipality' in geo_data:
-                data['municipality'] = geo_data['allegheny_county_municipality']['name']
-
-            if 'us_block_group' in geo_data:
-                data['block_group'] = geo_data['us_block_group']['name']
 
 sales_package_id = '9e0ce87d-07b8-420c-a8aa-9de6104f61d6'
 
@@ -129,9 +77,11 @@ job_dicts = [
         'primary_key_fields': ["PARID", "RECORDDATE", "SALEDATE", "DEEDBOOK",
                       "DEEDPAGE", "INSTRTYP", "PRICE", "SALECODE"],
         'always_wipe_data': True,
-        'upload_method': 'upsert',
-        'destinations': ['file'], # These lines are just for testing
-        'destination_file': f'sales.csv', # purposes.
+        'upload_method': 'upsert', # This job must be done by upsert
+        # because the source file contains a small percentage of duplicate rows.
+
+        #'destinations': ['file'], # These lines are just for testing
+        #'destination_file': f'sales.csv', # purposes.
         'package': sales_package_id,
         'resource_name': 'Property Sales Transactions',
     }
