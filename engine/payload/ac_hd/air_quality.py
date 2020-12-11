@@ -55,7 +55,8 @@ class AirQualityDailySchema(pl.BaseSchema):
                     data[k] = None
 
 class AirQualityHourlySchema(pl.BaseSchema):
-    datetime = fields.DateTime(load_from='AqiDateTime'.lower())
+    datetime = fields.DateTime(load_from='AqiDateTimeEST'.lower())
+    datetime_utc = fields.DateTime(load_from='AqiDateTimeUTC'.lower())
     site = fields.String(load_from='SiteName'.lower())
     program = fields.String(load_from='ResponsibleAQIProgramName'.lower())
     parameter = fields.String(load_from='ResponsibleParameterName'.lower())
@@ -166,8 +167,8 @@ job_dicts = [
         'primary_key_fields': ['date', 'site', 'program', 'parameter'],
         'always_wipe_data': False,
         'upload_method': 'upsert',
-        'destinations': ['file'], # These lines are just for testing
-        'destination_file': f'air_daily.csv', # purposes.
+        #'destinations': ['file'], # These lines are just for testing
+        #'destination_file': f'air_daily.csv', # purposes.
         'package': air_quality_package_id,
         'resource_name': f'Daily Air Quality Data (new format)'
     },
@@ -179,11 +180,11 @@ job_dicts = [
         'connector_config_string': 'sftp.county_sftp',
         'encoding': 'utf-8-sig',
         'schema': AirQualityHourlySchema,
-        'primary_key_fields': ['datetime', 'site', 'program', 'parameter'],
+        'primary_key_fields': ['datetime_utc', 'site', 'program', 'parameter'],
         'always_wipe_data': False,
         'upload_method': 'upsert',
-        'destinations': ['file'], # These lines are just for testing
-        'destination_file': f'air_hourly.csv', # purposes.
+        #'destinations': ['file'], # These lines are just for testing
+        #'destination_file': f'air_hourly.csv', # purposes.
         'package': air_quality_package_id,
         'resource_name': f'Hourly Air Quality Data (new format)'
     },
@@ -195,47 +196,29 @@ job_dicts = [
         'connector_config_string': 'sftp.county_sftp',
         'encoding': 'utf-8-sig',
         'schema': AirQualityHourlySchema,
-        'primary_key_fields': ['datetime', 'site', 'program', 'parameter'],
+        'primary_key_fields': ['datetime_utc', 'site', 'program', 'parameter'],
         'always_wipe_data': True,
-        'upload_method': 'insert',
-        'destinations': ['file'], # These lines are just for testing
-        'destination_file': f'air_max_today.csv', # purposes.
+        'upload_method': 'upsert',
+        #'destinations': ['file'], # These lines are just for testing
+        #'destination_file': f'air_max_today.csv', # purposes.
         'package': air_quality_package_id,
         'resource_name': f"Current Maximum Air Quality Readings for Today (new format)",
 #        'custom_post_processing': express_load_then_delete_file
     },
-    {
-        'job_code': 'measurement_sites',
-        'source_type': 'sftp',
-        'source_dir': 'Health Department',
-        'source_file': f'sourcesites.csv',
-        'connector_config_string': 'sftp.county_sftp',
-        'encoding': 'utf-8-sig',
-        'schema': MeasurementSites,
-        'primary_key_fields': ['sitename'],
-        'always_wipe_data': True,
-        'upload_method': 'upsert',
-        'destinations': ['file'], # These lines are just for testing
-        'destination_file': f'sourcesites.csv', # purposes.
-        'package': air_quality_package_id,
-        'resource_name': f"Sensor Locations (new format)",
-#        'custom_post_processing': express_load_then_delete_file
-    },
-#    {
-#        'job_code': 'tests',
+#    { # Commented out until the schema has been adjusted to include the full address.
+#        'job_code': 'measurement_sites',
 #        'source_type': 'sftp',
 #        'source_dir': 'Health Department',
-#        'source_file': f'CovidTestingCases.csv',
+#        'source_file': f'sourcesites.csv',
 #        'connector_config_string': 'sftp.county_sftp',
 #        'encoding': 'utf-8-sig',
-#        'schema': TestsSchema,
-#        #'primary_key_fields': [],
+#        'schema': MeasurementSites,
+#        'primary_key_fields': ['sitename'],
 #        'always_wipe_data': True,
-#        'upload_method': 'insert',
+#        'upload_method': 'upsert',
 #        'destinations': ['file'], # These lines are just for testing
-#        'destination_file': f'covid_19_tests.csv', # purposes.
-#        'package': covid_19_package_id,
-#        'resource_name': f'Allegheny County COVID-19 Tests and Cases',
-#        'custom_post_processing': express_load_then_delete_file
+#        'destination_file': f'sourcesites.csv', # purposes.
+#        'package': air_quality_package_id,
+#        'resource_name': f"Sensor Locations (new format)",
 #    },
 ]
