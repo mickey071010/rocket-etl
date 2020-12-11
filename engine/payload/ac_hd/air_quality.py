@@ -83,15 +83,11 @@ class MeasurementSites(pl.BaseSchema):
     site_name = fields.String(load_from='SiteName'.lower())
     description = fields.String(load_from='Description'.lower(), allow_none=True)
     air_now_mnemonic = fields.String(load_from='AirNowMnemonic'.lower(), allow_none=True)
-    street_address1 = fields.String(load_from='StreetAddress1'.lower(), allow_none=True)
-    street_address2 = fields.String(load_from='StreetAddress2'.lower(), allow_none=True)
-    city = fields.String(load_from='City'.lower(), allow_none=True)
-    county = fields.String(load_from='County'.lower(), allow_none=True)
-    state_region = fields.String(load_from='StateRegion'.lower(), allow_none=True)
-    zip_code = fields.Date(load_from='ZipCode'.lower(), allow_none=True)
+    address = fields.String(load_from='address'.lower(), allow_none=True)
+    #county = fields.String(load_from='County'.lower(), allow_none=True)
     latitude = fields.Float(load_from='Latitude'.lower(), allow_none=True)
     longitude = fields.Float(load_from='Longitude'.lower(), allow_none=True)
-    enabled = fields.String(load_from='Enabled'.lower())
+    enabled = fields.Boolean(load_from='Enabled'.lower())
 
     class Meta:
         ordered = True
@@ -99,9 +95,8 @@ class MeasurementSites(pl.BaseSchema):
     @pre_load
     def fix_nones(self, data):
         for k, v in data.items():
-            if k in ['description', 'AirNowMnemonic'.lower(), 'StreetAddress1'.lower(),
-                    'StreetAddress2'.lower(), 'city', 'county', 'StateRegion'.lower(),
-                    'zipcode', 'latitude', 'longitude']:
+            if k in ['description', 'AirNowMnemonic'.lower(), 'address'.lower(),
+                    'latitude', 'longitude']:
                 if v in ['None', 'NA']:
                     data[k] = None
 
@@ -206,20 +201,20 @@ job_dicts = [
         'resource_name': f"Current Maximum Air Quality Readings for Today (new format)",
 #        'custom_post_processing': express_load_then_delete_file
     },
-#    { # Commented out until the schema has been adjusted to include the full address.
-#        'job_code': 'measurement_sites',
-#        'source_type': 'sftp',
-#        'source_dir': 'Health Department',
-#        'source_file': f'sourcesites.csv',
-#        'connector_config_string': 'sftp.county_sftp',
-#        'encoding': 'utf-8-sig',
-#        'schema': MeasurementSites,
-#        'primary_key_fields': ['sitename'],
-#        'always_wipe_data': True,
-#        'upload_method': 'upsert',
-#        'destinations': ['file'], # These lines are just for testing
-#        'destination_file': f'sourcesites.csv', # purposes.
-#        'package': air_quality_package_id,
-#        'resource_name': f"Sensor Locations (new format)",
-#    },
+    {
+        'job_code': 'measurement_sites',
+        'source_type': 'sftp',
+        'source_dir': 'Health Department',
+        'source_file': f'sourcesites.csv',
+        'connector_config_string': 'sftp.county_sftp',
+        'encoding': 'utf-8-sig',
+        'schema': MeasurementSites,
+        'primary_key_fields': ['site_name'],
+        'always_wipe_data': True,
+        'upload_method': 'upsert',
+        #'destinations': ['file'],
+        #'destination_file': f'sourcesites.csv',
+        'package': air_quality_package_id,
+        'resource_name': f"Sensor Locations (new format)",
+    },
 ]
