@@ -104,6 +104,7 @@ city_business_licenses_package_id = "2b5324d4-c57f-42f7-bac8-2aec26e199cf"
 
 job_dicts = [
     {
+        'job_code': 'business_licenses',
         'source_type': 'local',
         'source_dir': '',
         'source_file': 'businessLicenses.csv',
@@ -117,6 +118,7 @@ job_dicts = [
         'resource_name': 'Business Licenses',
     },
     {
+        'job_code': 'contractor_licenses',
         'source_type': 'local',
         'source_dir': '',
         'source_file': 'contractorLicenses.csv',
@@ -130,6 +132,7 @@ job_dicts = [
         'resource_name': 'Licensed Contractors',
     },
     {
+        'job_code': 'trade_licenses',
         'source_type': 'local',
         'source_dir': '',
         'source_file': 'tradeLicenses.csv',
