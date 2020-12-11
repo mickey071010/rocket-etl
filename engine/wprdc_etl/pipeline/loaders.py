@@ -147,132 +147,6 @@ class CKANLoader(Loader):
 
         return response_json['result']['id']
 
-    def create_datastore(self, resource_id, fields):
-        """Create new datastore for specified resource
-
-        Params:
-            resource_id: resource ID for which the new datastore is being made
-            fields: header fields for the CSV file
-
-        Returns:
-            resource_id for the new datastore if successful
-
-        Raises:
-            CKANException if resource creation is unsuccessful
-        """
-
-        # Make API call
-        create_datastore = requests.post(
-            self.ckan_url + 'action/datastore_create',
-            headers={
-                'content-type': 'application/json',
-                'authorization': self.key
-            },
-            data=json.dumps({
-                'resource_id': resource_id,
-                'force': True,
-                'fields': fields,
-                'primary_key': self.key_fields if hasattr(self, 'key_fields') else None,
-                'indexes': self.indexes if hasattr(self, 'indexes') else None
-            })
-        )
-        # Note that
-        #   https://github.com/ckan/ckan/blob/7fd6ca6439e3a7db60787283148652f895b02920/ckanext/datastore/tests/test_create.py
-        # shows this as an example value for the indexes field:
-        #  'indexes': [['boo%k', 'author'], 'author'],
-        # This appears to demonstrate how to make 'author' and and also
-        # the combination of 'author' and 'boo%k' things that are indexed.
-
-        # https://github.com/ckan/ckan/blob/b6298333453650cd9dbb3f5d3566da719804ecca/ckanext/datastore/backend/postgres.py
-        # contains these checks:
-            # if indexes is not None:...
-            # if primary_key is not None:...
-        # This suggests that passing these values as None should be fine.
-        create_datastore = create_datastore.json()
-
-        if not create_datastore.get('success', False):
-            if 'name' in create_datastore['error'] and type(create_datastore['error']['name']) == list:
-                error_message = create_datastore['error']['name'][0]
-            else:
-                error_message = create_datastore['error']
-            raise CKANException('An error occured: {}'.format(error_message))
-
-        return create_datastore['result']['resource_id']
-
-
-    def generate_datastore(self, fields, clear, first, wipe_data):
-        if wipe_data and first:
-            # Delete all the records in the datastore, preserving the schema.
-            ckan = ckanapi.RemoteCKAN(site, apikey=self.key)
-            response = ckan.action.datastore_delete(id=self.resource_id, filters={}, force=True)
-            # Deleting the records in the datastore also has the side effect of deactivating the
-            # datastore, so we need to reactivate it.
-            response2 = ckan.action.resource_patch(id=self.resource_id, datastore_active=True)
-        elif clear and first:
-            delete_status = self.delete_datastore(self.resource_id)
-            if str(delete_status)[0] in ['4', '5']:
-                if str(delete_status) == '404':
-                    print("The datastore currently doesn't exist, so let's create it!")
-                else:
-                    raise RuntimeError('Delete failed with status code {}.'.format(str(delete_status)))
-            self.create_datastore(self.resource_id, fields)
-
-        elif self.resource_id is None:
-            self.resource_id = self.create_resource(self.package_id, self.resource_name)
-            self.create_datastore(self.resource_id, fields)
-
-        return self.resource_id
-
-
-    def delete_datastore(self, resource_id):
-        """Deletes datastore table for resource
-
-        Params:
-            resource: resource_id to remove table from
-
-        Returns:
-            Status code from the request
-        """
-        delete = requests.post(
-            self.ckan_url + 'action/datastore_delete',
-            headers={
-                'content-type': 'application/json',
-                'authorization': self.key
-            },
-            data=json.dumps({
-                'resource_id': resource_id,
-                'force': True
-            })
-        )
-        return delete.status_code
-
-    def upsert(self, resource_id, data, method='upsert'):
-        """Upsert data into datastore
-
-        Params:
-            resource_id: resource_id to which data will be inserted
-            data: data to be upserted
-
-        Returns:
-            request status
-        """
-        upsert = requests.post(
-            self.ckan_url + 'action/datastore_upsert',
-            headers={
-                'content-type': 'application/json',
-                'authorization': self.key
-            },
-            data=json.dumps({
-                'resource_id': resource_id,
-                'method': method,
-                'force': True,
-                'records': data
-            })
-        )
-        if upsert.status_code != 200:
-            print(f"Attempted upsert returned with status code {upsert.status_code}, reason '{upsert.reason}', and also this explanation:\n{upsert.text}\n")
-        return upsert.status_code
-
     def update_metadata(self, resource_id, just_last_modified=False):
         """Update a resource's metadata
 
@@ -359,6 +233,130 @@ class CKANDatastoreLoader(CKANLoader):
             raise RuntimeError('Resource must already exist in order to wipe its records.')
         if self.wipe_data and self.clear_first:
             raise RuntimeError('wipe_data and clear_first can not both be True at once.')
+
+    def create_datastore(self, resource_id, fields):
+        """Create new datastore for specified resource
+
+        Params:
+            resource_id: resource ID for which the new datastore is being made
+            fields: header fields for the CSV file
+
+        Returns:
+            resource_id for the new datastore if successful
+
+        Raises:
+            CKANException if resource creation is unsuccessful
+        """
+
+        # Make API call
+        create_datastore = requests.post(
+            self.ckan_url + 'action/datastore_create',
+            headers={
+                'content-type': 'application/json',
+                'authorization': self.key
+            },
+            data=json.dumps({
+                'resource_id': resource_id,
+                'force': True,
+                'fields': fields,
+                'primary_key': self.key_fields if hasattr(self, 'key_fields') else None,
+                'indexes': self.indexes if hasattr(self, 'indexes') else None
+            })
+        )
+        # Note that
+        #   https://github.com/ckan/ckan/blob/7fd6ca6439e3a7db60787283148652f895b02920/ckanext/datastore/tests/test_create.py
+        # shows this as an example value for the indexes field:
+        #  'indexes': [['boo%k', 'author'], 'author'],
+        # This appears to demonstrate how to make 'author' and and also
+        # the combination of 'author' and 'boo%k' things that are indexed.
+
+        # https://github.com/ckan/ckan/blob/b6298333453650cd9dbb3f5d3566da719804ecca/ckanext/datastore/backend/postgres.py
+        # contains these checks:
+            # if indexes is not None:...
+            # if primary_key is not None:...
+        # This suggests that passing these values as None should be fine.
+        create_datastore = create_datastore.json()
+
+        if not create_datastore.get('success', False):
+            if 'name' in create_datastore['error'] and type(create_datastore['error']['name']) == list:
+                error_message = create_datastore['error']['name'][0]
+            else:
+                error_message = create_datastore['error']
+            raise CKANException('An error occured: {}'.format(error_message))
+
+        return create_datastore['result']['resource_id']
+
+    def generate_datastore(self, fields, clear, first, wipe_data):
+        if wipe_data and first:
+            # Delete all the records in the datastore, preserving the schema.
+            ckan = ckanapi.RemoteCKAN(site, apikey=self.key)
+            response = ckan.action.datastore_delete(id=self.resource_id, filters={}, force=True)
+            # Deleting the records in the datastore also has the side effect of deactivating the
+            # datastore, so we need to reactivate it.
+            response2 = ckan.action.resource_patch(id=self.resource_id, datastore_active=True)
+        elif clear and first:
+            delete_status = self.delete_datastore(self.resource_id)
+            if str(delete_status)[0] in ['4', '5']:
+                if str(delete_status) == '404':
+                    print("The datastore currently doesn't exist, so let's create it!")
+                else:
+                    raise RuntimeError('Delete failed with status code {}.'.format(str(delete_status)))
+            self.create_datastore(self.resource_id, fields)
+
+        elif self.resource_id is None:
+            self.resource_id = self.create_resource(self.package_id, self.resource_name)
+            self.create_datastore(self.resource_id, fields)
+
+        return self.resource_id
+
+    def delete_datastore(self, resource_id):
+        """Deletes datastore table for resource
+
+        Params:
+            resource: resource_id to remove table from
+
+        Returns:
+            Status code from the request
+        """
+        delete = requests.post(
+            self.ckan_url + 'action/datastore_delete',
+            headers={
+                'content-type': 'application/json',
+                'authorization': self.key
+            },
+            data=json.dumps({
+                'resource_id': resource_id,
+                'force': True
+            })
+        )
+        return delete.status_code
+
+    def upsert(self, resource_id, data, method='upsert'):
+        """Upsert data into datastore
+
+        Params:
+            resource_id: resource_id to which data will be inserted
+            data: data to be upserted
+
+        Returns:
+            request status
+        """
+        upsert = requests.post(
+            self.ckan_url + 'action/datastore_upsert',
+            headers={
+                'content-type': 'application/json',
+                'authorization': self.key
+            },
+            data=json.dumps({
+                'resource_id': resource_id,
+                'method': method,
+                'force': True,
+                'records': data
+            })
+        )
+        if upsert.status_code != 200:
+            print(f"Attempted upsert returned with status code {upsert.status_code}, reason '{upsert.reason}', and also this explanation:\n{upsert.text}\n")
+        return upsert.status_code
 
     def load(self, data):
         '''Load data to CKAN using an upsert strategy

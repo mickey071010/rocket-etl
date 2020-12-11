@@ -5,7 +5,7 @@ import json
 from unittest.mock import Mock, patch, PropertyMock
 
 import wprdc_etl.pipeline as pl
-from wprdc_etl.pipeline.loaders import CKANLoader
+from wprdc_etl.pipeline.loaders import CKANDatastoreLoader
 from wprdc_etl.pipeline.exceptions import CKANException
 
 HERE = os.path.abspath(os.path.dirname(__file__))
@@ -31,7 +31,7 @@ class TestCKANDatastore(TestCKANDatastoreBase):
             {'id': {'someNumber': []}},
         ]
         super(TestCKANDatastore, self).setUp()
-        self.ckan_loader = CKANLoader(**self.ckan_config)
+        self.ckan_loader = CKANDatastoreLoader(**self.ckan_config)
         patcher.stop()
 
     def test_datapusher_init(self):
