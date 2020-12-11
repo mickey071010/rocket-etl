@@ -66,7 +66,7 @@ def set_data_dictionary(resource_id, old_fields):
     # Iterate through the fields in the data dictionary and try to apply them to the newly created data table.
     for field in present_fields:
         if field['id'] != '_id':
-            definition = next((f['info'] for f in old_fields if f['id'] == field['id']), None)
+            definition = next((f.get('info', None) for f in old_fields if f['id'] == field['id']), None)
             if definition is not None:
                 nf = dict(field)
                 nf['info'] = definition
