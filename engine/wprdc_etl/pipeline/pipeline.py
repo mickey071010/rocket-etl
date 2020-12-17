@@ -326,29 +326,29 @@ class Pipeline(object):
                 try:
                     # Get `chunk_size` number of records
                     if chunk_count >= self.start_from_chunk:
-                        print("Working on chunk {} (lines {}-{})".format(chunk_count,1+self.chunk_size*chunk_count,self.chunk_size*(chunk_count+1)))
+                        print("Working on chunk {} (lines {}-{})".format(chunk_count, 1 + self.chunk_size*chunk_count, self.chunk_size*(chunk_count + 1)))
                     for i in range(self.chunk_size):
                         try:
                             line = next(raw)
                             if chunk_count >= self.start_from_chunk:
-                                data = _extractor.handle_line(line)
-                                self.load_line(data)
+                                data = _extractor.handle_line(line) # line can be a record or a file.
+                                self.load_line(data) # Queue whatever is in data for eventual loading.
                         except IsHeaderException:
                             continue
                         except:
                             raise
                     if chunk_count >= self.start_from_chunk:
-                        _loader.load(self.data)
+                        _loader.load(self.data) # Load all the queued data.
                         self.data = []
 
 
                 except StopIteration:
                     try:
-                        _loader.load(self.data)
+                        _loader.load(self.data) # Load all the queued data.
                     except RuntimeError: # Specifically, we are interested in catching 409 errors here to deal with
                         if self.retry_without_last_line: # poorly formed source files (where the last line is partially missing).
                             print(" ** Trying to load this chunk of data again, but without the last line, which looks like this: {} **".format(self.data[-1]))
-                            _loader.load(self.data[:-1])
+                            _loader.load(self.data[:-1]) # Load all the queued data except the last item.
                         else:
                             raise
                     _connector.close()

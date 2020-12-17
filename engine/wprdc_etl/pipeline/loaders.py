@@ -404,7 +404,8 @@ class CKANDatastoreLoader(CKANLoader):
             return upsert_status, update_status
 
 class FileLoader(Loader):
-    """Write data to a local file (mostly for testing purposes)."""
+    """Write data to a local file, testing or as an intermediate step
+    in a chain of atomic pipeline actions."""
 
     def __init__(self, *args, **kwargs):
         super(FileLoader, self).__init__(*args, **kwargs)
