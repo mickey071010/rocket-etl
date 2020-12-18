@@ -27,6 +27,18 @@ def write_or_append_to_csv(filename, list_of_dicts, keys):
 def simplify_string(s):
     return  ''.join(filter(str.isalnum, s))
 
+def download_file_to_path(url, path = SOURCE_DIR):
+    """Stream the file to disk without using excessive memory."""
+    # From https://stackoverflow.com/a/39217788
+    import shutil
+
+    local_filepath = f"{base_dir}/{url.split('/')[-1]}"
+    with requests.get(url, stream=True) as r:
+        with open(local_filepath, 'wb') as f:
+            shutil.copyfileobj(r.raw, f)
+
+    return local_filepath
+
 def save_to_waiting_room(list_of_dicts, resource_id, resource_name):
     # data_dictionary is a list of dicts:
         #  [{'id': '_id', 'type': 'int'},
@@ -584,28 +596,56 @@ class Job:
         # The retry_without_last_line option is a way of dealing with CSV files
         # that abruptly end mid-line.
         locators_by_destination = {}
+        file_format = source_file_format = self.source_file.split('.')[-1].lower()
+        # While wprdc_etl uses 'CSV' as a
+        # format that it sends to CKAN, I'm inclined to switch to 'csv',
+        # and uniformly lowercasing all file formats.
+
+        # Though given a format of 'geojson', the CKAN API resource_create
+        # response lists format as 'GeoJSON', so CKAN is doing some kind
+        # of correction.
+
         for destination in self.destinations:
             package_id = get_package_id(self, test_mode)
 
             # [ ] Maybe the use_local_files and test_mode and any other parameters should be applied in a discrete stage between initialization and running.
+            # This would allow the source and destination parameters to be prepared, leaving the pipeline running to just run the pipeline.
+            # However, writing the CKANFilestoreLoader is a prerequisite for this.
+            #if self.source_type == 'sftp' and destination == 'ckan_filestore':
 
-            if destination == 'ckan_filestore':
-                # Maybe a pipeline is not necessary to just upload a file to a CKAN resource.
+            if destination == 'ckan_filestore': # and self.source_type not in ['sftp', 'local']:
+
+                # [ ] Test local file uploads to the CKAN Filestore before deleting all this logic.
+
+                # Maybe a pipeline is not necessary to just upload a file to a CKAN resource, if the file is local!
                 ua = 'rocket-etl/1.0 (+https://tools.wprdc.org/)'
                 ckan = ckanapi.RemoteCKAN(site, apikey=API_KEY, user_agent=ua)
 
-                source_file_format = self.source_file.split('.')[-1].lower()
-                # While wprdc_etl uses 'CSV' as a
-                # format that it sends to CKAN, I'm inclined to switch to 'csv',
-                # and uniformly lowercasing all file formats.
-
-                # Though given a format of 'geojson', the CKAN API resource_create
-                # response lists format as 'GeoJSON', so CKAN is doing some kind
-                # of correction.
                 upload_kwargs = {'package_id': package_id,
-                        'format': source_file_format,
+                        'format': file_format,
                         'url': 'dummy-value',  # ignored but required by CKAN<2.6
-                        'upload': open(self.target, 'r')} # target is the source file path
+                        }
+                if self.source_type in ['local']:
+                    upload_kwargs['upload'] = open(self.target, 'r') # target is the source file path
+                    # Specifying the target like this only works if the file is already local.
+                    # This can look like this:
+                    # <_io.TextIOWrapper name='/Users/drw/WPRDC/etl/rocket-etl/source_files/ac_hd/sourcesites.geojson' mode='r' encoding='UTF-8'>
+                elif not use_local_files and self.source_type in ['http']: # [ ] Test this untested block.
+                    # This could also happen in default_setup, but really everything under "if destination == 'ckan_filestore'"
+                    # should be moved/eliminated once a CKANFileStoreLoader is written.
+                    source_url = f"{self.source_url_path}/{self.source_file}"
+                    self.target = cached_source_file_path = download_file_to_path(source_url)
+                    upload_kwargs['upload'] = open(self.target, 'r') # target is the source file path
+                elif not use_local_files and self.source_type in ['sftp']:
+                    #ftp_connector = pl.SFTPConnector(host =
+                    #ftp_file = ftp_connector.connect(self.source_connector, self.target, config_string=self.connector_config_string, encoding=self.encoding, local_cache_filepath=self.local_cache_filepath)
+                    # Test the file-based pipeline by using FileExtractor, with the regular SFTP connector (as configured in the air_quality.py script
+                    # for the sourcesites.geojson file, and the new CKANFilestoreLoader (which still needs to be written). CKANFilestoreLoader
+                    # will only work if paired with another file-based Extractor. Also, the schema has got to be addressed somewhere maybe.
+
+                    loader = pl.CKANFilestoreLoader
+                    raise FileNotFoundError("To get a file via FTP and upload to the CKAN filestore, it would be best to implement a proper CKANFileStoreLoader. This necessitates modifying how pipelines work a bit.")
+
                 if not resource_exists(package_id, self.resource_name):
                     upload_kwargs['name'] = self.resource_name
                     result = ckan.action.resource_create(**upload_kwargs)
