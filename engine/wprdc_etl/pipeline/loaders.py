@@ -180,9 +180,149 @@ class CKANLoader(Loader):
         )
         return update.status_code
 
+class CKANFilestoreLoader(CKANLoader):
+    '''Store files in CKAN's filestore.
+    '''
+    has_tabular_output = False
+
+    def __init__(self, *args, **kwargs):
+        '''Constructor for new CKANFilestoreLoader
+
+        Arguments:
+            config: location of a configuration file
+
+        Keyword Arguments:
+            Maybe none.
+
+        '''
+        super(CKANFilestoreLoader, self).__init__(*args, **kwargs)
+        self.filepath = kwargs.get('filepath') # The path where the
+        # file should be stored (to set the name of the file when
+        # it's unset by, for instance, the SFTP connector.
+
+    def upload(self, data):
+        """Upload file to filestore
+
+        Params:
+            data: file to be uploaded
+
+        Returns:
+            request status
+        """
+        upload_kwargs = {
+            'package_id': self.package_id,
+            'format': self.file_format,
+            'url': 'dummy-value',  # ignored but required by CKAN<2.6
+            }
+
+        if self.resource_id is None:
+            upload_kwargs['name'] = self.resource_name
+        else:
+            upload_kwargs['id'] = self.resource_id
+
+        # If we pass an in-memory file-stream version of a file (like one obtained via the
+        # SFTPConnector and loaded into memory, it has no filename. It is of type
+        # <class '_io.TextIOWrapper'> but has no name, and the name attribute of TextIOWrapper
+        # cannot be changed/set. The solution to this is to note that the CKAN API
+        # accepts 'upload' values specified with multipart/form-data, which allows the
+        # mimetype, filename, and headers of the file to be given.
+
+        # "You can set a file name explicitly by passing a tuple, e.g.
+        # upload=('myfilename.csv', urlopen(url))
+        # This is borrowed from requests
+        # https://2.python-requests.org/en/latest/user/quickstart/#post-a-multipart-encoded-file"
+        if hasattr(data, 'name'):
+            upload_kwargs['upload'] = data # data is the named source file (which has already been opened).
+        else:
+            filename = self.filepath.split('/')[-1]
+            upload_kwargs['upload'] = (filename, data) # data is the source file (which has already been opened).
+
+        ckan = ckanapi.RemoteCKAN(site, apikey=API_key)
+        created_new_resource = False
+        if not self.resource_exists(self.package_id, self.resource_name):
+            upload_kwargs['name'] = self.resource_name
+            result = ckan.action.resource_create(**upload_kwargs)
+            print('Creating new resource and uploading file to filestore...')
+            created_new_resource = True
+        else:
+            upload_kwargs['id'] = self.get_resource_id(self.package_id, self.resource_name)
+            result = ckan.action.resource_update(**upload_kwargs)
+            print('Uploading file to filestore...')
+            # Uploading a 'local' file vs one held in memory and obtained by SFTP,
+            # the two differences are:
+                # 1) the resource's "mimetype" field is set to 'application/json' rather than None
+                # 2) the file's name is correct (rather than 'upload')
+
+        #if result.status_code != 200:
+        #    print(f"Attempted file upload returned with status code {result.status_code}, reason '{result.reason}', and also this explanation:\n{result.text}\n")
+        return 200, created_new_resource # It will be necessary to revise error handling to accommodate the exceptions and error codes supported by the CKAN API.
+        # Exceptions will prevent this 200 from being returned.
+
+
+    def load(self, data):
+        '''Load the file into the CKAN filestore
+
+        Arguments:
+            data: a list of files to be added to the CKAN filestore
+
+        Raises:
+            RuntimeError if the upload or update metadata
+                calls are unsuccessful
+
+        Returns:
+            A two-tuple of the status codes for the upsert
+            and metadata update calls
+        '''
+        upload_status, created_new_resource = self.upload(data[0]) # There is a bit of an impedance mismatch
+        # with using the hack of making each line of data a file:
+        # It's not clear how to handle multiple files. Eventually, it would be
+        # nice to specify a list of resource names that each of the files could
+        # map to, in order to handle a directory of files, as, I believe,
+        # arcgis_grappler might have been demanding.
+
+        # Maybe either have resource_name or resource_names_list and
+        # vectorize other things too, as needed, verifying that lengths
+        # match.
+        if created_new_resource:
+            return upload_status, None
+            # This is behind an if because the metadata can not be updated
+            # immediately after the creation of a filestore file because
+            # of some new kind of lag.
+        update_status = self.update_metadata(self.resource_id, just_last_modified=True)
+        # It's necessary to set just_last_modified to True because otherwise
+        # update_metadata tries to set the URL type and the URL to
+        # values that only work for datastores.
+
+        if upload_status == 409:
+            print(f"dir(self) = {dir(self)}")
+            pprint(self.fields)
+            print(f"key_fields = {self.key_fields}")
+            if hasattr(self, 'indexes') and self.indexes is not None:
+                print(f"indexes = {self.indexes}")
+            raise RuntimeError('Upload failed with status code {}. This may be because of a conflict between datastore fields/keys and specified primary keys. Or maybe you are trying to insert a row into a resource with an existing row with the same primary key or keys. But check the more informative explanation above.'.format(str(upload_status)))
+
+        if str(upload_status)[0] in ['4', '5']:
+            time.sleep(10)
+            upload_status = self.upload(self.resource_id, data, self.method) # Try data update again.
+            if str(upload_status)[0] in ['4', '5']:
+                raise RuntimeError(f'Upload failed with status code {upload_status}.')
+
+        elif str(update_status)[0] in ['4', '5']:
+            time.sleep(5)
+            update_status = self.update_metadata(self.resource_id) # Try metadata update again.
+            if str(update_status)[0] in ['4', '5']:
+                time.sleep(10)
+                update_status = self.update_metadata(self.resource_id) # Try one more time.
+                if str(update_status)[0] in ['4', '5']:
+                    raise RuntimeError('Metadata update failed (three times) with final status code {}'.format(str(update_status)))
+        else:
+            return upload_status, update_status # It's unclear why these statuses are being returned here.
+                # I can't find a place where they are being used.
+
 class CKANDatastoreLoader(CKANLoader):
     '''Store data in CKAN using an upsert strategy
     '''
+    has_tabular_output = True
 
     def __init__(self, *args, **kwargs):
         '''Constructor for new CKANDatastoreLoader
@@ -406,6 +546,8 @@ class CKANDatastoreLoader(CKANLoader):
 class FileLoader(Loader):
     """Write data to a local file, testing or as an intermediate step
     in a chain of atomic pipeline actions."""
+    has_tabular_output = True # For now, though eventually there might
+    # be TabularFileLoader (with CSV as a type) and NontabularFileLoader.
 
     def __init__(self, *args, **kwargs):
         super(FileLoader, self).__init__(*args, **kwargs)
