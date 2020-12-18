@@ -585,7 +585,7 @@ class Job:
         elif extension in ['xls', 'xlsx']:
             self.extractor = pl.ExcelExtractor
         else:
-            raise ValueError("No known extractor for file extension .{}".format(extension))
+            self.extractor = pl.FileExtractor
 
     def run_pipeline(self, test_mode, clear_first, wipe_data, migrate_schema, file_format='csv', retry_without_last_line=False, ignore_empty_rows=False):
         # This is a generalization of push_to_datastore() to optionally use

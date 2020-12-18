@@ -27,6 +27,28 @@ class Extractor(object):
         '''
         raise NotImplementedError
 
+class FileExtractor(Extractor):
+    '''Extractor subclass for extracting entire files
+    '''
+
+    def __init__(self, connection, *args, **kwargs):
+        super(FileExtractor, self).__init__(connection)
+
+    def handle_line(self, line):
+        '''Sets up the element from the iterable to be handled by the loader's load_line function.
+        '''
+        return line # Just return the file.
+
+    def process_connection(self):
+        '''This function gets the file returned from the Connector.connect()
+        function and puts it in an iterator.
+        '''
+        reader = iter([self.connection])
+        # Eventually update the Connector to support a list of files.
+        # resource_names_list might have to be specified in the job_dict
+        # and an AllOrSelectedFilesInADirectoryHTTPExtractor would be
+        # needed to complete this kind of vectorized pipeline.
+        return reader
 
 class TableExtractor(Extractor):
     '''Abstract Extractor subclass for extracting data in a tabular format
