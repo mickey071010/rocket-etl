@@ -26,7 +26,7 @@ class RangersOutreachSchema(pl.BaseSchema):
     date = fields.Date(load_from='date', allow_none=True)
     time = fields.String(load_from='time', allow_none=True)
     contact_type = fields.String(load_from='contact.type')
-    number = fields.Integer(load_from='number')
+    number = fields.Integer(load_from='number', allow_none=True)
     volunteer_hours = fields.String(load_from='volunteer.hours', allow_none=True)
     ranger_trail_work_hours = fields.Float(load_from='ranger.trail.work.hours', allow_none=True)
     notes = fields.String(load_from='notes', allow_none=True)
