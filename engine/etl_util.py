@@ -714,7 +714,7 @@ class Job:
                     self.upload_method = 'insert' # Note that this will always append records to an existing file
                     # unless 'always_clear_first' (or 'always_wipe_data') is set to True.
                 else:
-                    raise ValueError("run_pipeline does not know how to handle destination = {}".format(destination))
+                    raise ValueError(f"run_pipeline does not know how to handle destination = {destination}")
 
                 clear_first = clear_first or self.always_clear_first or migrate_schema # If migrate_schema == True, 1) backup the data dictionary,
                 # 2) delete the Data Table view, 3) clear the datastore, 4) run the job, and 5) try to restore the data dictionary.

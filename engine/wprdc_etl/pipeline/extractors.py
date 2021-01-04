@@ -131,7 +131,7 @@ class CSVExtractor(TableExtractor):
 
 
 class ExcelExtractor(TableExtractor):
-    '''TableExtractor subclass for Microsft Excel spreadsheet files (XLS, XLSX)
+    '''TableExtractor subclass for Microsoft Excel spreadsheet files (XLS, XLSX)
     '''
 
     def __init__(self, connection, *args, **kwargs):
