@@ -69,6 +69,7 @@ class CKANLoader(Loader):
         self.resource_name = kwargs.get('resource_name')
         self.resource_id = kwargs.get('resource_id',
                                       self.get_resource_id(self.package_id, self.resource_name))
+        self.file_format = kwargs.get('file_format').lower()
 
     def get_resource_id(self, package_id, resource_name):
         """Search for resource within a CKAN dataset and returns its ID
@@ -136,7 +137,7 @@ class CKANLoader(Loader):
                 'url': '#',
                 'name': resource_name,
                 'url_type': 'datapusher',
-                'format': 'CSV'
+                'format': self.file_format, # This has previously always been hard-coded as 'CSV'!
             })
         )
 

@@ -587,7 +587,7 @@ class Job:
         else:
             self.extractor = pl.FileExtractor
 
-    def run_pipeline(self, test_mode, clear_first, wipe_data, migrate_schema, use_local_files, file_format='csv', retry_without_last_line=False, ignore_empty_rows=False):
+    def run_pipeline(self, test_mode, clear_first, wipe_data, migrate_schema, use_local_files, retry_without_last_line=False, ignore_empty_rows=False):
         # This is a generalization of push_to_datastore() to optionally use
         # the new FileLoader (exporting data to a file rather than just CKAN).
 
@@ -596,8 +596,14 @@ class Job:
         # The retry_without_last_line option is a way of dealing with CSV files
         # that abruptly end mid-line.
         locators_by_destination = {}
-        file_format = source_file_format = self.source_file.split('.')[-1].lower()
-        # While wprdc_etl uses 'CSV' as a
+        source_file_format = destination_file_format = self.source_file.split('.')[-1].lower()
+        # 1) The downside to extracting the file format from the source file name
+        # is that it couples the source and destination a bit too tightly.
+        # One can imagine a scenario where tabular data is obtained from an API
+        # and it's supposed to be uploaded as a CSV file somewhere. In this case
+        # a separate "destination_file_format" would need to be specified.
+        #
+        # 2) While wprdc_etl uses 'CSV' as a
         # format that it sends to CKAN, I'm inclined to switch to 'csv',
         # and uniformly lowercasing all file formats.
 
@@ -622,7 +628,7 @@ class Job:
                 ckan = ckanapi.RemoteCKAN(site, apikey=API_KEY, user_agent=ua)
 
                 upload_kwargs = {'package_id': package_id,
-                        'format': file_format,
+                        'format': destination_file_format,
                         'url': 'dummy-value',  # ignored but required by CKAN<2.6
                         }
                 if self.source_type in ['local']:
@@ -749,7 +755,7 @@ class Job:
                         .schema(self.schema) \
                         .load(loader, self.loader_config_string,
                               filepath = self.destination_file_path,
-                              file_format = file_format,
+                              file_format = destination_file_format,
                               fields = self.schema().serialize_to_ckan_fields(),
                               key_fields = self.primary_key_fields,
                               package_id = package_id,
@@ -780,7 +786,7 @@ class Job:
         ignore_empty_rows = kwparameters['ignore_empty_rows']
         self.default_setup(use_local_files)
         self.custom_processing(self, **kwparameters) # In principle, filtering could be done here, but this might be kind of a hack.
-        locators_by_destination = self.run_pipeline(test_mode, clear_first, wipe_data, migrate_schema, use_local_files, file_format='csv', retry_without_last_line=False, ignore_empty_rows=ignore_empty_rows)
+        locators_by_destination = self.run_pipeline(test_mode, clear_first, wipe_data, migrate_schema, use_local_files, retry_without_last_line=False, ignore_empty_rows=ignore_empty_rows)
         self.custom_post_processing(self, **kwparameters)
         return locators_by_destination # Return a dict allowing look up of final destinations of data (filepaths for local files and resource IDs for data sent to a CKAN instance).
 
