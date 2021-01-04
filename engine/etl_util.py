@@ -587,7 +587,7 @@ class Job:
         else:
             self.extractor = pl.FileExtractor
 
-    def run_pipeline(self, test_mode, clear_first, wipe_data, migrate_schema, file_format='csv', retry_without_last_line=False, ignore_empty_rows=False):
+    def run_pipeline(self, test_mode, clear_first, wipe_data, migrate_schema, use_local_files, file_format='csv', retry_without_last_line=False, ignore_empty_rows=False):
         # This is a generalization of push_to_datastore() to optionally use
         # the new FileLoader (exporting data to a file rather than just CKAN).
 
@@ -780,7 +780,7 @@ class Job:
         ignore_empty_rows = kwparameters['ignore_empty_rows']
         self.default_setup(use_local_files)
         self.custom_processing(self, **kwparameters) # In principle, filtering could be done here, but this might be kind of a hack.
-        locators_by_destination = self.run_pipeline(test_mode, clear_first, wipe_data, migrate_schema, file_format='csv', retry_without_last_line=False, ignore_empty_rows=ignore_empty_rows)
+        locators_by_destination = self.run_pipeline(test_mode, clear_first, wipe_data, migrate_schema, use_local_files, file_format='csv', retry_without_last_line=False, ignore_empty_rows=ignore_empty_rows)
         self.custom_post_processing(self, **kwparameters)
         return locators_by_destination # Return a dict allowing look up of final destinations of data (filepaths for local files and resource IDs for data sent to a CKAN instance).
 
