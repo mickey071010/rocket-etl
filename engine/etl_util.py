@@ -3,6 +3,7 @@ from datetime import datetime
 # It's also possible to do this in interactive mode:
 # > sudo su -c "sftp -i /home/sds25/keys/pitt_ed25519 pitt@ftp.pittsburghpa.gov" sds25
 from engine.wprdc_etl import pipeline as pl
+from engine.wprdc_etl.pipeline.schema import NullSchema
 from engine.parameters.remote_parameters import TEST_PACKAGE_ID
 from engine.parameters.local_parameters import SETTINGS_FILE
 
@@ -500,7 +501,7 @@ class Job:
         self.connector_config_string = job_dict['connector_config_string'] if 'connector_config_string' in job_dict else ''
         self.custom_processing = job_dict['custom_processing'] if 'custom_processing' in job_dict else (lambda *args, **kwargs: None)
         self.custom_post_processing = job_dict['custom_post_processing'] if 'custom_post_processing' in job_dict else (lambda *args, **kwargs: None)
-        self.schema = job_dict['schema'] if 'schema' in job_dict else None
+        self.schema = job_dict['schema'] if 'schema' in job_dict and job_dict['schema'] is not None else NullSchema
         self.primary_key_fields = job_dict['primary_key_fields'] if 'primary_key_fields' in job_dict else None
         self.upload_method = job_dict['upload_method'] if 'upload_method' in job_dict else None
         self.always_clear_first = job_dict['always_clear_first'] if 'always_clear_first' in job_dict else False
@@ -752,7 +753,10 @@ class Job:
                     curr_pipeline = pl.Pipeline(self.job_code + ' pipeline', self.job_code + ' Pipeline', log_status=False, chunk_size=1000, settings_file=SETTINGS_FILE, retry_without_last_line = retry_without_last_line, ignore_empty_rows = ignore_empty_rows) \
                         .connect(self.source_connector, self.target, config_string=self.connector_config_string, encoding=self.encoding, local_cache_filepath=self.local_cache_filepath) \
                         .extract(self.extractor, firstline_headers=True) \
-                        .schema(self.schema) \
+                        .schema(self.schema) \ # This line is the main reason a
+                            # NullSchema was invented to handle loaders for non-tabular data,
+                            # which allows the framework to function with a smaller number of
+                            # changes.
                         .load(loader, self.loader_config_string,
                               filepath = self.destination_file_path,
                               file_format = destination_file_format,

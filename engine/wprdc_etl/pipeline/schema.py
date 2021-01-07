@@ -8,6 +8,17 @@ FIELD_TO_CKAN_TYPE_MAPPING = {
     fields.Time: 'time', #fields.JSON: 'json' # This is not supported by Marshmallow 2.15.1.
 }
 
+class NullSchema(Schema):
+    '''A null schema which nominally is a marshmallow schema, but which
+    doesn't actually do anything. It's designed to support file-based
+    (rather than tabular-data-based) pipelines.
+
+    Possibly this is not needed because the has_tabular_output field
+    routes around using schemas entirely.'''
+
+    def serialize_to_ckan_fields(self, capitalize=False):
+        return []
+
 class BaseSchema(Schema):
     '''Base schema for the pipeline. Extends :py:class:`marshmallow.Schema`
     '''
