@@ -179,26 +179,31 @@ class Pipeline(object):
         return self
 
     def load_line(self, data):
-        '''Load a line into the pipeline's data or throw an error
+        '''For tabular data, load a line into the pipeline's data or throw an error.
+        For non-tabular data, the contents of "data" are a file, which is added
+        to the list of files (in self.data) to be processed.
 
         Arguments:
             data: A parsed line from an extractor's handle_line
                 method
         '''
-        loaded = self.__schema.load(data)
-        if loaded.errors:
-            error_message = 'There were errors in the input data: {} (passed data: {})'.format(
-                loaded.errors.__str__(), data
-            )
-            if self.strict_load:
-                if self.ignore_empty_rows and all([v==None for v in data.values()]):
-                    print("Ignoring empty row.")
-                else:
-                    raise RuntimeError(error_message)
-            else:
-                print(error_message)
+        if not self._loader.has_tabular_output:
+            self.data.append(data)
         else:
-            self.data.append(self.__schema.dump(loaded.data).data)
+            loaded = self.__schema.load(data)
+            if loaded.errors:
+                error_message = 'There were errors in the input data: {} (passed data: {})'.format(
+                    loaded.errors.__str__(), data
+                )
+                if self.strict_load:
+                    if self.ignore_empty_rows and all([v==None for v in data.values()]):
+                        print("Ignoring empty row.")
+                    else:
+                        raise RuntimeError(error_message)
+                else:
+                    print(error_message)
+            else:
+                self.data.append(self.__schema.dump(loaded.data).data)
 
     def enforce_full_pipeline(self):
         '''Ensure that a pipeline has an extractor, schema, and loader
