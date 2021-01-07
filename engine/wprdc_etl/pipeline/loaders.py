@@ -214,6 +214,7 @@ class CKANFilestoreLoader(CKANLoader):
             'package_id': self.package_id,
             'format': self.file_format,
             'url': 'dummy-value',  # ignored but required by CKAN<2.6
+            'url_type': 'upload'
             }
 
         if self.resource_id is None:
