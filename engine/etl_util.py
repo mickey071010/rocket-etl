@@ -751,7 +751,7 @@ class Job:
                     curr_pipeline = pl.Pipeline(self.job_code + ' pipeline', self.job_code + ' Pipeline', log_status=False, chunk_size=1000, settings_file=SETTINGS_FILE, retry_without_last_line = retry_without_last_line, ignore_empty_rows = ignore_empty_rows) \
                         .connect(self.source_connector, self.target, config_string=self.connector_config_string, encoding=self.encoding, local_cache_filepath=self.local_cache_filepath) \
                         .extract(self.extractor, firstline_headers=True) \
-                        .schema(self.schema) \ # This line is the main reason a NullSchema was invented.
+                        .schema(self.schema) \
                         .load(loader, self.loader_config_string,
                               filepath = self.destination_file_path,
                               file_format = destination_file_format,
