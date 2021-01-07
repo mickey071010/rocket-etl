@@ -1,4 +1,4 @@
-import requests, os, csv
+import requests, os, csv, ckanapi
 import json
 import datetime
 import time
