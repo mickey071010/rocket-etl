@@ -579,8 +579,7 @@ class FileLoader(Loader):
             ``None`` otherwise
         '''
 
-        assert file_format == 'csv'
-        if filepath[-3:].lower() != 'csv':
+        if filepath.split('.')[-1].lower() != 'csv': # Eventually change this to file_format.lower():
             raise ValueError("Why does the end of the filename not have the same extension as the file_format?")
 
         # How should the situation when the file already exists be handled?
