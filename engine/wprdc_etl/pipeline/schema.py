@@ -13,8 +13,9 @@ class NullSchema(Schema):
     doesn't actually do anything. It's designed to support file-based
     (rather than tabular-data-based) pipelines.
 
-    Possibly this is not needed because the has_tabular_output field
-    routes around using schemas entirely.'''
+    This allows the framework to function with a smaller number of
+    changes than just relying on the has_tabular_output field of
+    the loader and workarounds.'''
 
     def serialize_to_ckan_fields(self, capitalize=False):
         return []

@@ -741,22 +741,17 @@ class Job:
                 elif wipe_data:
                     if destination in ['ckan']:
                         if datastore_exists(package_id, self.resource_name):
-
                             print("Wiping records from the datastore for {}".format(self.resource_name))
                         else:
                             print("Since it makes no sense to try to wipe the records from a datastore that does not exist, wipe_data is being toggled to False.")
                             wipe_data = False
 
-                # Upload data to datastore
-                print('Uploading tabular data...')
+                print(f'Uploading {"tabular data" if loader.has_tabular_output else "file"}...')
                 try:
                     curr_pipeline = pl.Pipeline(self.job_code + ' pipeline', self.job_code + ' Pipeline', log_status=False, chunk_size=1000, settings_file=SETTINGS_FILE, retry_without_last_line = retry_without_last_line, ignore_empty_rows = ignore_empty_rows) \
                         .connect(self.source_connector, self.target, config_string=self.connector_config_string, encoding=self.encoding, local_cache_filepath=self.local_cache_filepath) \
                         .extract(self.extractor, firstline_headers=True) \
-                        .schema(self.schema) \ # This line is the main reason a
-                            # NullSchema was invented to handle loaders for non-tabular data,
-                            # which allows the framework to function with a smaller number of
-                            # changes.
+                        .schema(self.schema) \ # This line is the main reason a NullSchema was invented.
                         .load(loader, self.loader_config_string,
                               filepath = self.destination_file_path,
                               file_format = destination_file_format,
