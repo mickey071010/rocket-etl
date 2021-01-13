@@ -3779,11 +3779,14 @@ job_dicts = [
 assert len(job_dicts) == len({d['job_code'] for d in job_dicts}) # Verify that all job codes are unique.
 
 #to_geocode_or_not_to_geocode = site_is_up('geo.wprdc.org')
-to_geocode_or_not_to_geocode = False
+to_geocode_or_not_to_geocode = False # The reason not to geocode using Pelias is that (as of 2021),
+# it sometimes returns nominally confident results that are terribly wrong.
+# The GitHub issues for the Pelias geocoder include complaints that Pelias returns results that are listed with 100% confidence which are clearly wrong. (https://github.com/pelias/pelias/issues/880) The maintainer says that they've resolved some previous problems with the confidence calculation, but that it's a hard problem and there could easily be more problems. The maintainer also suggests that underlying issues in the data Pelias uses for a region can cause geocoding errors.
+# It would be better to use Geomancer.
 #to_geocode_or_not_to_geocode = True
 
-if to_geocode_or_not_to_geocode:
-    print("geo.wprdc.org is accessible, so geocoding attempts will be made.")
+#if to_geocode_or_not_to_geocode:
+#    print("geo.wprdc.org is accessible, so geocoding attempts will be made.")
 
 if one_file:
     for jd in job_dicts:
