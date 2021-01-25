@@ -75,7 +75,7 @@ job_dicts = [
         'encoding': 'utf-8-sig',
         'schema': AssetSchema,
         #'primary_key_fields': ['synthesized_key'],
-        #'always_wipe_data': True,
+        'always_wipe_data': True,
         'upload_method': 'insert',
         #'destinations': ['file'],
         #'destination_file': f'asset_dump.csv',
