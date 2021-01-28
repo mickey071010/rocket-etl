@@ -218,6 +218,14 @@ if __name__ == '__main__':
                 elif arg in ['wipe_data']:
                     wipe_data = True
                     args.remove(arg)
+                elif arg in ['dont_wipe_data', "don't_wipe_data",
+                            'don_t_wipe_data', 'override_wipe_data']:
+                    # Use one of these arguments to run clear_first
+                    # on a job that has always_wipe_data = True.
+                    wipe_data = False
+                    for job_dict in job_dicts:
+                        job_dict.pop('always_wipe_data', None)
+                    args.remove(arg)
                 elif arg in ['migrate_schema']:
                     migrate_schema = True
                     args.remove(arg)

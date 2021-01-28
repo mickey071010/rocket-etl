@@ -731,7 +731,7 @@ class Job:
 
                 wipe_data = wipe_data or self.always_wipe_data
                 if clear_first and wipe_data:
-                    raise ValueError("clear_first and wipe_data should not both be True simultaenously.")
+                    raise ValueError("clear_first and wipe_data should not both be True simultaneously. To clear a datastore for a job that has always_wipe_data = True, add the command-line argument 'override_wipe_data'.")
                 elif clear_first:
                     if destination in ['ckan']:
                         if datastore_exists(package_id, self.resource_name):
