@@ -438,7 +438,9 @@ def local_file_and_dir(jobject, base_dir, file_key='source_file'):
     if target_file in [None, '']:
         local_directory = base_dir + "{}/".format(jobject.job_directory) # Is there really a situation
         # where we need to generate the local directory even though the referenced file is None?
-        local_file_path = None
+        # YES. Currently it's when a file is obtained from (for instance) a web site
+        # and is being uploaded to the filestore.
+        local_file_path = jobject.source_file
     elif target_file[0] == '/': # Actually the file is specifying an absolute path, so override
         # the usual assumption that the file is located in the job_directory.
         local_file_path = target_file
@@ -554,6 +556,12 @@ class Job:
         else:
             raise ValueError("The source_type is not specified.")
             # [ ] What should we do if no source_type (or no source) is specified?
+
+        # It seems like self.destination_file_path and self.destination_directory should be
+        # only defined if the destination is a local one. (So destination == 'file'.)
+        # HOWEVER, self.destination_file_path is currently being used to specify the
+        # filepath parameter in the load() part of the pipeline, below. This is
+        # a workaround to avoid specifying yet another parameter.
 
         self.destination_file_path, self.destination_directory = local_file_and_dir(self, base_dir = DESTINATION_DIR, file_key = 'destination_file')
         if use_local_files or self.source_type == 'local':
