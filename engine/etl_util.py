@@ -28,12 +28,12 @@ def write_or_append_to_csv(filename, list_of_dicts, keys):
 def simplify_string(s):
     return  ''.join(filter(str.isalnum, s))
 
-def download_file_to_path(url, path = SOURCE_DIR):
+def download_file_to_path(url, local_dir, path = SOURCE_DIR):
     """Stream the file to disk without using excessive memory."""
     # From https://stackoverflow.com/a/39217788
     import shutil
 
-    local_filepath = f"{base_dir}/{url.split('/')[-1]}"
+    local_filepath = f"{local_dir}/{url.split('/')[-1]}"
     with requests.get(url, stream=True) as r:
         with open(local_filepath, 'wb') as f:
             shutil.copyfileobj(r.raw, f)
@@ -641,7 +641,7 @@ class Job:
                     # This could also happen in default_setup, but really everything under "if destination == 'ckan_filestore'"
                     # should be moved/eliminated once a CKANFileStoreLoader is written.
                     source_url = f"{self.source_url_path}/{self.source_file}"
-                    self.target = cached_source_file_path = download_file_to_path(source_url)
+                    self.target = cached_source_file_path = download_file_to_path(source_url, local_dir=WAITING_ROOM_DIR)
                     upload_kwargs['upload'] = open(self.target, 'r') # target is the source file path
                 elif not use_local_files and self.source_type in ['sftp']:
                     #ftp_connector = pl.SFTPConnector(host =
