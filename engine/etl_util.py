@@ -620,15 +620,17 @@ class Job:
         # response lists format as 'GeoJSON', so CKAN is doing some kind
         # of correction.
 
+
         for destination in self.destinations:
-            package_id = get_package_id(self, test_mode)
+            package_id = get_package_id(self, test_mode) # This is the effective package ID,
+            # taking into account whether test mode is active.
 
             # [ ] Maybe the use_local_files and test_mode and any other parameters should be applied in a discrete stage between initialization and running.
             # This would allow the source and destination parameters to be prepared, leaving the pipeline running to just run the pipeline.
             # However, writing the CKANFilestoreLoader is a prerequisite for this.
             #if self.source_type == 'sftp' and destination == 'ckan_filestore':
 
-            if destination == 'ckan_filestore': # and self.source_type not in ['sftp', 'local']:
+            if destination == 'ckan_filestore' and self.source_type not in ['sftp', 'local', 'http']:
 
                 # [ ] Test local file uploads to the CKAN Filestore before deleting all this logic.
 
@@ -730,6 +732,8 @@ class Job:
                     loader = pl.FileLoader
                     self.upload_method = 'insert' # Note that this will always append records to an existing file
                     # unless 'always_clear_first' (or 'always_wipe_data') is set to True.
+                elif destination == 'ckan_filestore':
+                    loader = pl.CKANFilestoreLoader
                 else:
                     raise ValueError(f"run_pipeline does not know how to handle destination = {destination}")
 
