@@ -122,8 +122,10 @@ def main(**kwargs):
 
         locators_by_destination = job.process_job(**kwparameters)
         for destination, table_locator in locators_by_destination.items():
-            if destination == 'ckan':
+            if destination in ['ckan', 'ckan_filestore']:
                 post_process(locators_by_destination[destination])
+            if destination == 'ckan': # The data dictionary seemingly doesn't need
+                # to be reset if it's a ckan_filestore Express Loader operation.
                 if clear_first or migrate_schema: # [ ] Should the data dictionary definitely be restored if clear_first = True?
                     results = set_data_dictionary(resource_id, data_dictionary)
                     # Attempt to restore data dictionary, taking into account the deletion and addition of fields, and ignoring any changes in type.
