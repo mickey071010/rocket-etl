@@ -199,7 +199,11 @@ class CKANFilestoreLoader(CKANLoader):
         super(CKANFilestoreLoader, self).__init__(*args, **kwargs)
         self.filepath = kwargs.get('filepath') # The path where the
         # file should be stored (to set the name of the file when
-        # it's unset by, for instance, the SFTP connector.
+        # it's unset by, for instance, the SFTP connector).
+        # self.filepath was invented to hold the complete path
+        # for saving files in FileLoader. Here it is being used
+        # by CKANFilestoreLoader, just to pass the filename
+        # (where any other parts of the path will be ignored).
 
     def upload(self, data):
         """Upload file to filestore

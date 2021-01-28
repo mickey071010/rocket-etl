@@ -714,6 +714,8 @@ class Job:
                 # Have the parameters that are being passed to curr_pipeline below correct for uplading the zipped archive? ########
             else:
                 self.select_extractor()
+
+                # BEGIN Destination-specific configuration
                 if destination == 'ckan':
                     loader = pl.CKANDatastoreLoader
                 elif destination == 'file':
@@ -747,6 +749,8 @@ class Job:
                             wipe_data = False
 
                 print(f'Uploading {"tabular data" if loader.has_tabular_output else "file"}...')
+                # END Destination-specific configuration
+
                 try:
                     curr_pipeline = pl.Pipeline(self.job_code + ' pipeline', self.job_code + ' Pipeline', log_status=False, chunk_size=1000, settings_file=SETTINGS_FILE, retry_without_last_line = retry_without_last_line, ignore_empty_rows = ignore_empty_rows) \
                         .connect(self.source_connector, self.target, config_string=self.connector_config_string, encoding=self.encoding, local_cache_filepath=self.local_cache_filepath) \
