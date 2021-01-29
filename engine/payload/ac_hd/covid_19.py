@@ -6,7 +6,7 @@ from pprint import pprint
 
 from marshmallow import fields, pre_load, post_load
 from engine.wprdc_etl import pipeline as pl
-from engine.etl_util import find_resource_id
+from engine.etl_util import find_resource_id, post_process
 from engine.credentials import site, API_key
 
 from engine.notify import send_to_slack
@@ -105,6 +105,11 @@ def express_load_then_delete_file(job, **kwparameters):
 
     print(f"Removing temp file at {csv_file_path}")
     os.remove(csv_file_path)
+
+    # Since launchpad.py doesn't update the last_etl_update metadata value in this case
+    # because this is a workaround, do it manually here:
+    post_process(resource_id)
+    # [ ] But really, an ExpressLoader is probably called for, or at least a standardized express_load_then_delete_file function.
 
 covid_19_package_id = '80e0ca5d-c88a-4b1a-bf5d-51d0aaeeac86' # Production version of COVID-19 testing data package
 
