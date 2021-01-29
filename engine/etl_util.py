@@ -671,57 +671,6 @@ class Job:
                     upload_kwargs['id'] = find_resource_id(package_id, self.resource_name)
                     result = ckan.action.resource_update(**upload_kwargs)
                     print('Uploading file to filestore...')
-            elif destination == 'local_monthly_archive_zipped':
-                # [ ] Break all of this LMAZ code off into one or more separate functions.
-                loader = pl.FileLoader
-                self.upload_method = 'insert'
-                # Try using destination_directory and destination_file_path for the archives.
-                # Append the year-month to the filename (before the extension).
-                pathparts = self.destination_file_path.split('/')
-                filenameparts = pathparts[-1].split('.')
-                now = datetime.now()
-                last_month_num = (now.month - 1) % 12
-                year = now.year
-                if last_month_num == 0:
-                    last_month_num = 12
-                if last_month_num == 12: # If going back to December,
-                    year -= 1            # set year to last year
-                last_month_str = str(last_month_num)
-                if len(last_month_str) == 1:
-                    last_month_str = '0' + last_month_str
-                regex_parts = list(filenameparts)
-                filenameparts[-2] += "_{}-{}".format(year, last_month_str)
-                timestamped_filename = '.'.join(filenameparts)
-
-                regex_parts[-2] += "_{}".format(year)
-                regex_pattern = '.'.join(regex_parts[:-1]) # This is for matching filenames that should be rolled up into the same year of data.
-                zip_file_name = regex_pattern + '.zip'
-
-                pathparts[-1] = timestamped_filename
-                destination_file_path = '/'.join(pathparts) # This is the new timestamped filepath.
-                ic(self.destination_file_path)
-                # Store the file locally
-
-                # Zip the files with matching year in filename.
-                destination_directory = '/'.join(self.destination_file_path.split('/')[:-1])
-                all_files = os.listdir(destination_directory)
-                list_of_files_to_compress = sorted([f for f in all_files if re.match(regex_pattern, f)])
-
-                #cp synthesized-liens.csv zipped/liens-with-current-status-beta.csv
-                zip_file_path = destination_directory + '/' + zip_file_name
-                #zip zipped/liens-with-current-status-beta.zip zipped/liens-with-current-status-beta.csv
-                import zipfile
-                process_zip = zipfile.ZipFile(zip_file_path, 'w')
-                for original_file_name in list_of_files_to_compress:
-                    file_to_zip = destination_directory + '/' + original_file_name
-                    process_zip.write(file_to_zip, original_file_name, compress_type=zipfile.ZIP_DEFLATED)
-                process_zip.close()
-                # Upload the file at zip_file_path to the appropriate resource.
-                #####resource_id =  # [ ] This lmaz option needs to be finished.
-
-                # Delete the file at zip_file_path.
-                os.remove(zip_file_path)
-                # Have the parameters that are being passed to curr_pipeline below correct for uplading the zipped archive? ########
             else:
                 self.select_extractor()
 
