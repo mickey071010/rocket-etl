@@ -24,39 +24,37 @@ or
 
 A number of options can be set using command-line parameters:
 
-Force the use of local files (rather than fetching them via FTP) housed in the appropriate `source_files` subdirectory:
+* Force the use of local files (rather than fetching them via FTP) housed in the appropriate `source_files` subdirectory:
 ```bash
 > python launchpad.py pgh/smart_trash.py local
 ```
 
-Run the script in test mode, which means that rather than writing the results to the production version of the CKAN package described in the `jobs` list in the script, the data will be written to a default private CKAN package:
+* Run the script in test mode, which means that rather than writing the results to the production version of the CKAN package described in the `jobs` list in the script, the data will be written to a default private CKAN package:
 ```bash
 > python launchpad.py pgh/smart_trash.py test
 ```
 
-The `PRODUCTION` boolean in `engine/parameters/local_parameters.py` decides whether output defaults to the production package or the test package.
-Thus running with the `test` command-line argument is only necessary when the `PRODUCTION` variable is True. When `PRODUCTION` is False, sending data to the production package requires using the `production` command-line parameter, like this:
+* The `PRODUCTION` boolean in `engine/parameters/local_parameters.py` decides whether output defaults to the production package or the test package. Thus running with the `test` command-line argument is only necessary when the `PRODUCTION` variable is True. When `PRODUCTION` is False, sending data to the production package requires using the `production` command-line parameter, like this:
 ```bash
 > python launchpad.py pgh/smart_trash.py production
 ```
 
-Run the script without sending any Slack alerts:
+* Run the script without sending any Slack alerts:
 ```bash
 > python launchpad.py pgh/smart_trash.py mute
 ```
 
-Log output to a default log location (also namespaced by payload directory names):
+* Log output to a default log location (also namespaced by payload directory names), for use in production:
 ```bash
 > python launchpad.py pgh/smart_trash.py log
 ```
-This one is intended for production use.
 
-Clear the CKAN resource before upserting data (necessary for instance when he fields or primary keys have changed):
+* Clear the CKAN resource before upserting data (necessary for instance when he fields or primary keys have changed):
 ```bash
 > python launchpad.py pgh/smart_trash.py clear_first
 ```
 
-Reverse the notification-sending behavior to only send a notification if the source file is found:
+* Reverse the notification-sending behavior to only send a notification if the source file is found:
 ```bash
 > python launchpad.py pgh/smart_trash.py wake_me_when_found
 ```
