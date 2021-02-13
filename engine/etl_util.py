@@ -416,9 +416,15 @@ def post_process(resource_id):
         except ckanapi.errors.NotFound:
             print("Unable to perform package-level post-processing, as this package does not exist.")
         else:
-            add_tag(package, '_etl')
-            update_etl_timestamp(package, resource)
+            return package, resource
+    return None, None
 
+def post_process(resource_id, job):
+    package, resource = create_data_table_view_if_needed(resource_id)
+    if resource is not None and package is not None:
+        add_tag(package, '_etl')
+        update_etl_timestamp(package, resource)
+    #    set_time_field_if_needed(package, resource, job)
 
 def lookup_parcel(parcel_id):
     """Accept parcel ID for Allegheny County parcel and return geocoordinates."""
