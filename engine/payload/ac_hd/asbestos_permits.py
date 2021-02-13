@@ -18,7 +18,7 @@ except ImportError:  # Graceful fallback if IceCream isn't installed.
 DATE_FORMAT = "%Y-%m-%d"# %H:%M:%S"
 
 class AsbestosPermitSchema(pl.BaseSchema):
-    permit_number = fields.String()
+    permit_number = fields.String(allow_none=True)
     s_name = fields.String(allow_none=True)
     s_address = fields.String(allow_none=True)
     city = fields.String(allow_none=True)
