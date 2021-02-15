@@ -215,6 +215,22 @@ job_dicts = [
         #'destinations': ['file'],
         #'destination_file': f'sourcesites.csv',
         'package': air_quality_package_id,
-        'resource_name': f"Sensor Locations (new format)",
+        'resource_name': f"Sensor Locations",
+    },
+    {
+        'job_code': 'measurement_sites_geojson',
+        'source_type': 'sftp',
+        'source_dir': 'Health Department',
+        'source_file': 'sourcesites.geojson',
+        'connector_config_string': 'sftp.county_sftp',
+        'encoding': 'utf-8-sig',
+        'schema': None,
+        #'destinations': ['file'],
+        #'destination_file': f'sourcesites.geojson',
+        'destinations': ['ckan_filestore'],
+        'destination_file': 'sourcesites.geojson', # This sets the
+        # filename that CKANFilestoreLoader will use to name the file.
+        'package': air_quality_package_id,
+        'resource_name': 'Sensor Locations (GeoJSON)'
     },
 ]
