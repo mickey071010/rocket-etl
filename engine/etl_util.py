@@ -14,6 +14,12 @@ from engine.parameters.local_parameters import SOURCE_DIR, WAITING_ROOM_DIR, DES
 
 BASE_URL = 'https://data.wprdc.org/api/3/action/'
 
+def write_to_csv(filename, list_of_dicts, keys):
+    with open(filename, 'w') as output_file:
+        dict_writer = csv.DictWriter(output_file, keys, extrasaction='ignore', lineterminator='\n')
+        dict_writer.writeheader()
+        dict_writer.writerows(list_of_dicts)
+
 def write_or_append_to_csv(filename, list_of_dicts, keys):
     if not os.path.isfile(filename):
         with open(filename, 'w') as output_file:
@@ -383,6 +389,42 @@ def set_extra_metadata_field(package,key,value):
     from engine.credentials import site, API_key
     set_package_parameters_to_values(site,package['id'],['extras'],[extras_list],API_key)
 
+def add_time_field(package, resource, job):
+    if job.time_field is None:
+        # Note that if the job does not specify a time_field or gives a time_field of None,
+        # add_time_field is currently not checking this against what's in the CKAN package
+        # metadata. This is for the best since it will be necessary to track down all
+        # resources with time_fields and add them to the ETL jobs (which in some cases
+        # will necessitate migrating the job to rocket-etl, which may not be trivial).
+        return
+    if 'extras' in package:
+        extras_list = package['extras']
+        # Keep definitions and uses of extras metadata updated here:
+        # https://github.com/WPRDC/data-guide/blob/master/docs/metadata_extras.md
+
+        # The format as obtained from the CKAN API is like this:
+        #       u'extras': [{u'key': u'dcat_issued', u'value': u'2014-01-07T15:27:45.000Z'}, ...
+        # not a dict, but a list of dicts.
+        extras = {d['key']: d['value'] for d in extras_list}
+    else:
+        extras = {}
+
+    if 'time_field' in extras:
+        time_field_by_resource_id = extras['time_field']
+        # The time_field metadata is a dict where resource IDs are the keys, and
+        # the values are the names of the fields representing a good time field
+        # for the corresponding resource.
+        # Example: {"76fda9d0-69be-4dd5-8108-0de7907fc5a4": "CREATED_ON"}
+        if resource['id'] in time_field_by_resource_id:
+            assert job.time_field == time_field_by_resource_id[resource['id']]
+        else:
+            time_field_by_resource_id[resource['id']] = job.time_field
+    else:
+        time_field_by_resource_id = {resource['id']: job.time_field}
+
+    print(f"Setting time_field to {time_field_by_resource_id}.")
+    set_extra_metadata_field(package, 'time_field', json.dumps(time_field_by_resource_id))
+
 def update_etl_timestamp(package,resource):
     from engine.credentials import site, API_key
     ckan = ckanapi.RemoteCKAN(site, apikey=API_key)
@@ -402,7 +444,7 @@ def get_package_by_id(package_id):
     ckan = ckanapi.RemoteCKAN(site, apikey=API_key)
     return ckan.action.package_show(id=package_id)
 
-def post_process(resource_id):
+def create_data_table_view_if_needed(resource_id):
     # Create a DataTable view if the resource has a datastore.
     try:
         resource = get_resource_by_id(resource_id)
@@ -424,7 +466,7 @@ def post_process(resource_id, job):
     if resource is not None and package is not None:
         add_tag(package, '_etl')
         update_etl_timestamp(package, resource)
-    #    set_time_field_if_needed(package, resource, job)
+        add_time_field(package, resource, job)
 
 def lookup_parcel(parcel_id):
     """Accept parcel ID for Allegheny County parcel and return geocoordinates."""
@@ -511,6 +553,7 @@ class Job:
         self.custom_post_processing = job_dict['custom_post_processing'] if 'custom_post_processing' in job_dict else (lambda *args, **kwargs: None)
         self.schema = job_dict['schema'] if 'schema' in job_dict and job_dict['schema'] is not None else NullSchema
         self.primary_key_fields = job_dict['primary_key_fields'] if 'primary_key_fields' in job_dict else None
+        self.time_field = job_dict['time_field'] if 'time_field' in job_dict else None # Specify the field that provides a good temporal key.
         self.upload_method = job_dict['upload_method'] if 'upload_method' in job_dict else None
         self.always_clear_first = job_dict['always_clear_first'] if 'always_clear_first' in job_dict else False
         self.always_wipe_data = job_dict['always_wipe_data'] if 'always_wipe_data' in job_dict else False
