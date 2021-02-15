@@ -1,0 +1,1195 @@
+code,service_term,count
+BD-1800.1000,Brown Bag Food Programs,1
+BD-1800.1500,Commodity Supplemental Food Program,1
+BD-1800.2000,Food Pantries,6
+BD-1800.2250,Food Vouchers,1
+BD-1800.6400,Packed Lunches/Dinners,2
+BD-1800.8200-250,Formula/Baby Food,1
+BD-1800.8200-255,Fresh Food,1
+BD-1800.8200-500,Meals Ready to Eat,2
+BD-1850,Emergency Food Clearinghouses,1
+BD-1875.2000,Food Banks/Food Distribution Warehouses,1
+BD-2400.2250,Farmers Markets,1
+BD-2400.2590,Grocery Ordering/Delivery,2
+BD-2600.1500,Community Gardening,1
+BD-2600.3000,Home Gardening Assistance/Supplies,1
+BD-5000.0200,After School Meal Programs,1
+BD-5000.1450,Child and Adult Care Food Programs,1
+BD-5000.1470,Community Meals,1
+BD-5000.1500,Congregate Meals/Nutrition Sites,1
+BD-5000.3500,Home Delivered Meals,2
+BD-5000.8300,Soup Kitchens,4
+BD-5000.8500,Summer Food Service Programs,1
+BH-0500.3140,Homelessness Prevention Programs,9
+BH-0500.3200,Housing Related Coordinated Entry,2
+BH-0500.7000,Rapid Re-Housing Programs,1
+BH-1800.1500-050,Crisis Nurseries/Child Care,1
+BH-1800.1500-100,Domestic Violence Shelters,3
+BH-1800.1500-308,Human Trafficking Shelters,1
+BH-1800.1500-700,Runaway/Youth Shelters,2
+BH-1800.3500,Homeless Drop In Centers,5
+BH-1800.8500,Homeless Shelter,1
+BH-1800.8500-150,Community Shelters,16
+BH-1800.8500-185,Extreme Weather Shelters,2
+BH-1800.8500-300,Homeless Motel Vouchers,2
+BH-3000.1000,Accessible Home Construction,1
+BH-3000.1800-950,Weatherization Programs,2
+BH-3000.3500,Home Barrier Evaluation/Removal Services,1
+BH-3000.3500-700,Ramp Construction Services,2
+BH-3000.3500-900,Undesignated Home Barrier Removal Services,1
+BH-3000.3550-390,Home Rehabilitation Services,5
+BH-3500.3400-300,Foreclosure Prevention Loan Modification/Refinancing Programs,2
+BH-3700.3000,Homebuyer/Home Purchase Counseling,2
+BH-3800.5000,Mortgage Payment Assistance,3
+BH-3800.5150,Moving Expense Assistance,1
+BH-3800.7000,Rent Payment Assistance,7
+BH-3800.7250,Rental Deposit Assistance,3
+BH-3800.8000,Supportive Housing Expense Assistance,1
+BH-3900.3050-180,Elderly/Disabled Home Rental Listings,1
+BH-3900.3050-440,Low Cost Home Rental Listings,1
+BH-3900.3100,Housing Search Assistance,2
+BH-7000.4600-450,Low Income/Subsidized Private Rental Housing,1
+BH-7000.4600-650,Rooming/Boarding Houses,1
+BH-7000.4600-700,Section 8 Housing Choice Vouchers,1
+BH-7000.4600-800,Single Room Occupancy Housing,1
+BH-7000.5100-330,Independent Living Communities/Complexes,1
+BH-7000.5100-450,Market Rate Rental Housing,1
+BH-7000.8100-800,Sweat Equity Programs,1
+BH-8300.3000,Housing Authorities,1
+BH-8400.2000,Family Permanent Supportive Housing,1
+BH-8400.3000,Homeless Permanent Supportive Housing,1
+BH-8400.6000,Older Adult/Disability Related Supportive Housing,4
+BH-8500.7000,Residential Placement Services for People With Disabilities,2
+BH-8500.8000,Senior Housing Information and Referral,1
+BH-8600,Transitional Housing/Shelter,5
+BM-0500,Automobiles,1
+BM-3000.0500-030,Air Conditioners,1
+BM-3000.0500-250,General Appliance Provision,3
+BM-3000.0500-970,Water Heaters,1
+BM-3000.1000,Bedding/Linen,1
+BM-3000.1500,Cleaning Products,1
+BM-3000.2000-100,Baby Furniture,1
+BM-3000.2000-130,Beds,1
+BM-3000.2000-250,General Furniture Provision,3
+BM-3000.4000,Kitchenware,1
+BM-6000.1500,Computer Distribution Programs,1
+BM-6000.6000,Office Furniture,1
+BM-6500.1500-100,Baby Clothing,1
+BM-6500.1500-120,Children's Clothing,1
+BM-6500.1500-130,Clothing Vouchers,1
+BM-6500.1500-150,Diapers,2
+BM-6500.1500-250,General Clothing Provision,5
+BM-6500.1500-500,Maternity Clothing,1
+BM-6500.1500-600,Nursing Clothing,1
+BM-6500.1500-800,School Clothing,1
+BM-6500.1500-920,Winter Clothing,1
+BM-6500.1500-950,Work Clothing,1
+BM-6500.6500-300,Hair and Nail Care,1
+BM-6500.6500-650,Personal/Grooming Supplies,3
+BM-6500.6500-850,Temporary Mailing Address,1
+BM-7000.0500,Automotive Repair and Maintenance,1
+BM-7000.1000,Bicycle Repair,1
+BM-8500,Thrift Shops,1
+BT-4500.4500-020,Airport Shuttle Services,1
+BT-4500.4500-150,Car Sharing Programs,1
+BT-4500.4500-153,Carpooling Programs,2
+BT-4500.4500-560,Neighborhood Shuttle Services,2
+BT-4500.4500-850,Taxi Services,1
+BT-4500.4700,Local Bus Services,1
+BT-4500.6500-120,Child Transportation Programs,1
+BT-4500.6500-170,Disability Related Transportation,2
+BT-4500.6500-255,Employment Related Transportation,1
+BT-4500.6500-280,General Paratransit/Community Ride Programs,1
+BT-4500.6500-350,Indigent Transportation,1
+BT-4500.6500-500,Non-Emergency Medical Transportation,7
+BT-4500.6500-800,Senior Ride Programs,1
+BT-4800,Long Distance Transportation,1
+BT-8300.0870,Automobile Loans,1
+BT-8300.1000-400,Local Bus Fare,1
+BT-8300.2500,Gas Money,1
+BT-8300.3000,Mileage Reimbursements,1
+BT-8400,Transportation Organizations,1
+BT-8750,Travelers Assistance,1
+BV-8900.1700-150,Discounted Cable Service,1
+BV-8900.1700-250,Discounted Gas Service,1
+BV-8900.1700-330,Discounted Internet Service,1
+BV-8900.1700-900,Discounted Water Service,1
+BV-8900.9120,Utility Bill Payment Plan Negotiation Assistance,1
+BV-8900.9150,Utility Deposit Assistance,1
+BV-8900.9300-180,Electric Service Payment Assistance,4
+BV-8900.9300-250,Gas Service Payment Assistance,4
+BV-8900.9300-300,Heating Fuel Payment Assistance,1
+BV-8900.9300-330,Internet Service Payment Assistance,1
+BV-8900.9300-800,Sewer Service Payment Assistance,1
+BV-8900.9300-850,Telephone Service Payment Assistance,1
+BV-8900.9300-860,Trash/Recycling Service Payment Assistance,1
+BV-8900.9300-950,Water Service Payment Assistance,4
+BV-8950.1800-195,Electric Service Shutoff Suspension Programs,1
+BV-9000.1500,Electric Service Providers,1
+BV-9000.6000,Natural Gas Service Providers,1
+BV-9000.6500,Propane/Home Heating Oil Suppliers,1
+BV-9000.9500,Water Service Providers,1
+DD-1500,Consumer Complaints,1
+DD-1500.0080,Adult Residential Facility Complaints,1
+DD-1500.1780,Consumer Product Safety Complaints,1
+DD-1500.4150-450,Local Government Complaints/Ombudsman Offices,1
+DD-1500.4280,Health Facility Complaints,1
+DD-1500.4650,Housing Complaints,1
+DD-1500.5200,Law Enforcement Complaints,1
+DD-1500.5250,Lawyer Complaints,1
+DD-1500.5830,Mental Health Facility Complaints,1
+DD-1500.7230-800,Social Worker Complaints,1
+DD-1500.9650-850,Telephone Service Complaints,1
+DD-2100.1000,Better Business Bureaus,1
+DF-4500.6300,Occupational/Professional Licensing and Certification,2
+DF-7000.1450,Child Custody Orders,1
+DF-7000.1550,Court Records,1
+DF-7000.1700,Death Related Records/Permits,1
+DF-7000.3300,Identification Cards,2
+DF-7000.5000,Marriage Licenses,1
+DF-7000.5200,Military Records,1
+DF-7000.8330,Support Orders,1
+DF-7000.8350-450,Land Deeds/Titles,1
+DF-7020.3300,Identification Card Fee Payment Assistance,1
+DM-1500.1500,Credit Counseling,1
+DM-1800.1000,Bankruptcy Assistance,1
+DM-1800.5000,Mortgage Delinquency and Default Counseling,1
+DM-2000,Financial Literacy Training,1
+DM-6500,Personal Financial Counseling,3
+DM-7000,Representative Payee Services,1
+DT-8400,Tax Appeals/Audit Assistance,1
+DT-8500,Tax Collection Agencies,1
+DT-8700.2000,Federal Income Tax Information,1
+DT-8700.6500,Property Tax Information,1
+DT-8800,Tax Preparation Assistance,2
+FC-8200.8100-140,Community Courts,2
+FC-8200.8100-200,Family Law Courts,1
+FC-8200.8100-920,Veterans Courts,1
+FF-0500.1250,Community Correctional Centers,1
+FF-0500.1300,Community Service Work Programs,1
+FF-0500.1800-050,Adult Diversion,1
+FF-0500.1800-300,Jail Diversion Programs for Mentally Ill Offenders,1
+FF-0500.6500,Parole,1
+FF-0500.6550,Probation,2
+FF-1500,Correctional Facilities,1
+FF-1900,Ex-Offender Reentry Programs,1
+FF-3300,Inmate Support Services,1
+FJ-2600,Guardians ad Litem,1
+FJ-6700.6500,Public Defender,1
+FL,Law Enforcement Agencies,1
+FN-1500.0700,Bicycle Theft Prevention,1
+FN-1500.1550,Community Crime Prevention Programs,1
+FN-1500.1850,Dating Violence Prevention,1
+FN-1500.1900-150,Child Abuse Prevention,1
+FN-1500.1900-800,Spouse/Intimate Partner Abuse Prevention,1
+FN-1500.2150,General Crime Prevention Programs,1
+FN-1500.2560,Human Trafficking Prevention,1
+FN-1500.8150,Sexual Assault Prevention,1
+FN-1700.6600,Probation/Parole Violations Reporting,1
+FN-1900,Crime Victim Support,1
+FP-0500,Advocacy,1
+FP-0500.2500,Group Advocacy,1
+FP-0500.3300,Individual Advocacy,3
+FP-0500.3500,Issue Advocacy,8
+FP-0500.7800,Self Advocacy Support,1
+FP-0500.8000,System Advocacy,3
+FP-4000,Legal Counseling,1
+FP-4500,Legal Representation,8
+FT-1000.2500,General Benefits Assistance,2
+FT-1000.6600,Protection and Advocacy for Individuals With Disabilities,3
+FT-1000.8900,Unemployment Insurance Benefits Assistance,1
+FT-1000.9000,Veteran Benefits Assistance,3
+FT-1000.9500,Welfare Rights Assistance,1
+FT-1020,Certificates/Forms Assistance,1
+FT-1070,Consumer Law,2
+FT-1800.1800,Education Discrimination Assistance,1
+FT-1800.1850,Employment Discrimination Assistance,2
+FT-1800.2900,Health Care Discrimination Assistance,1
+FT-1800.3000,Housing Discrimination Assistance,2
+FT-2450,Elder Law,1
+FT-2700.0500,Advance Medical Directives,1
+FT-2700.9500,Will Preparation Assistance,1
+FT-2800.1500,Criminal Record Expungement Assistance,1
+FT-3000.0500,Alimony Assistance,1
+FT-3000.1450,Child Advocacy Centers,1
+FT-3000.1500,Child Custody/Visitation Assistance,3
+FT-3000.1600,Child Support Assistance/Enforcement,3
+FT-3000.1640,Comprehensive Family Law Services,3
+FT-3000.1700,Divorce Assistance,1
+FT-3000.1750,Domestic/Family Violence Legal Services,2
+FT-3000.1800,Emancipation of Minors,1
+FT-3000.2500,Grandparent Rights,1
+FT-3000.6500,Paternity Suits,1
+FT-3200,General Legal Aid,9
+FT-3250,Health Law,2
+FT-3425.8500,Transgender Name/Gender Identity Modification Assistance,1
+FT-3500.1500,Citizenship and Immigration Services Offices,1
+FT-3600,Immigration/Naturalization Legal Services,1
+FT-3900.3300,Insurance Claims Assistance,2
+FT-4150,Labor and Employment Law,2
+FT-4500.1800,Eviction Prevention Legal Assistance,5
+FT-4500.4600,Landlord/Tenant Dispute Resolution,1
+FT-4500.8550,Tenant Rights Information/Counseling,1
+FT-4800,Lawyer Referral Services,1
+FT-4950,Long Term Care Ombudsman Programs,1
+FT-5100,Malpractice Assistance,1
+FT-6900.2500,Guardianship Assistance,1
+FT-6940.1530,Crime Victim/Witness Related No Contact Orders,1
+FT-8000,School System Advocacy,1
+FT-9400,Wage/Benefits Garnishment Assistance,1
+HD-0500,Alternative Education,2
+HD-1800.1800,Early Head Start,1
+HD-1800.3000,Head Start,2
+HD-1800.6500,Preschools,2
+HD-1800.8000,School Readiness Programs,2
+HD-6000.1300,Colleges/Universities,1
+HD-6000.8000,Schools of the Arts,1
+HD-6000.9000,Technical/Trade Schools,4
+HD-8000.8100,Secondary/High Schools,1
+HH-0500.0500,Adult Basic Education,2
+HH-0500.1560,College/University Extension Programs,1
+HH-0500.1600,Continuing Education,2
+HH-0500.2500-250,GED/High School Equivalency Test Instruction,2
+HH-0500.8000-150,English as a Second Language,3
+HH-1600,Dropout Programs,1
+HH-2500,Gifted Education,1
+HH-3000,Homeless School Transition Programs,2
+HH-3300.1800-220,Internet Courses,1
+HH-4500,Literacy Programs,1
+HH-7000,Remedial Education,1
+HH-7920,School Based Teen Parent/Pregnant Teen Programs,2
+HH-7950,Service Learning Programs,1
+HH-8000.8000,Special Education Classes/Centers,1
+HH-8300,Summer School Programs,1
+HH-9000,Vocational Education,1
+HL-2500.0500,Academic Counseling,1
+HL-2500.1500,College/University Entrance Support,1
+HL-3010,Instructional Support Services,1
+HL-8000,Student Financial Aid,1
+HL-8000.1750,Education Related Fee Payment Assistance,1
+HL-8000.1800-900,Veteran Education Benefits,1
+HL-8000.8000,Scholarships,5
+HL-8000.8500,Tuition Assistance,5
+HL-8120.1300,College/University Admissions,1
+HL-8120.1800,Elementary/Secondary School Registration Offices,2
+HL-8120.7780,School Social Work Services,1
+HL-8120.7800,School Supplies,2
+HL-8120.7950,Student Counseling Services,1
+HL-8120.7980,Student Disability Services,1
+HL-8120.8100,Student Organizations,1
+HL-8500,Test Preparation,1
+HL-8700,Tutoring Services,1
+JD-1500,Conservation,1
+JD-6500.0500,Air Pollution Control,1
+JD-6500.1800,Hazardous Materials Control,1
+JP-1500.1700-150,Covid-19 Control,1
+JP-6500.1500,Environmental Hazards Cleanup,1
+JP-6500.1800-450,Lead Testing,1
+JP-6500.1800-850,Tap Water Testing,1
+JP-6500.1900,Environmental Hazards Information,1
+JP-6500.6500,Pest Control Services,1
+JP-6600,Public Health Nursing,1
+JR-6000,911 Services,1
+JR-8200.1500,Child Care Instruction,2
+JR-8200.2500,General Safety Education,1
+JR-8200.3000-250,Home Safety Evaluations,1
+JR-8200.8500-100,Bicycle Safety Education,1
+JR-8200.8500-150,Child Passenger Safety Education,1
+JR-8200.8500-160,Child Passenger Safety Seat Inspections,1
+JR-8200.8500-180,Driving Safety Education,1
+JR-8400.1400,Carbon Monoxide Detectors,2
+JR-8400.1500,Child Passenger Safety Seats,1
+JR-8400.3600,Home Safety Devices,1
+JR-8400.8000,Smoke Alarms,2
+LD-1500,Emergency Medical Transportation,1
+LD-1700,Emergency Room Care,1
+LD-3300,Intensive Care,1
+LD-8500,Trauma Centers,1
+LE,General Medical Care,4
+LF-0100,Activities of Daily Living Assessment,1
+LF-4900,Disease/Disability Specific Screening/Diagnosis,1
+LF-4900.1000,Blood Pressure Screening,1
+LF-4900.1500-200,Colposcopy,1
+LF-4900.1500-500,Mammograms,1
+LF-4900.1500-650,Pap Tests,1
+LF-4900.1565,Covid-19 Diagnostic Tests,2
+LF-4900.1670,Dental Screening,1
+LF-4900.1700,Diabetes Screening,2
+LF-4900.1980,Eye Examinations,1
+LF-4900.2000,Eye Screening,1
+LF-4900.2050,Geriatric Assessment,1
+LF-4900.2145,Hearing Aid Evaluations,1
+LF-4900.2200,Hepatitis Testing,1
+LF-4900.2400,HIV Testing,1
+LF-4900.4000,Kidney Screening,1
+LF-4900.4500,Lead Poisoning Screening,1
+LF-4900.6200,Nutrition Assessment Services,1
+LF-4900.6500,Osteoporosis Detection,1
+LF-4900.8000,Sexually Transmitted Disease Screening,1
+LF-4900.8100,Sickle Cell Screening,1
+LF-4900.8600,Tuberculosis Screening,1
+LF-5280,General Laboratory Tests,1
+LF-5350,Genetic Testing and Screening,1
+LF-7000.1700,Developmental Assessment,1
+LF-7000.1730,Developmental Screening,1
+LF-7000.9500,Well Baby Care,1
+LF-7100.2500,General Physical Examinations,1
+LF-7300,Prenatal Evaluation,1
+LH-0350,Aging and Disability Resource Centers,1
+LH-0500.0900,Blood Supply Services,1
+LH-0600,Assistive Technology Equipment,1
+LH-0600.1700,Daily Living Aids,1
+LH-0600.3000-300,Hearing Aids,1
+LH-0600.5000,Mobility Aids,1
+LH-0600.5000-100,Blind Mobility Aids,1
+LH-0600.5000-970,Wheelchairs/Wheeled Mobility,1
+LH-0600.7000-040,Adapted Cycling Equipment,1
+LH-0600.8180,Specialized Telecommunications Equipment,1
+LH-0600.8200-050,Artificial Speech/Augmentative Communication Aids,2
+LH-0600.9000-250,Glasses/Contact Lenses,1
+LH-0600.9000-450,Low Vision Aids,2
+LH-0650.0250,Assistive Technology Equipment Loan,1
+LH-2600.1700,Dental Care Referrals,2
+LH-2600.6400,Pharmacy Referrals,1
+LH-2600.6500,Physician Referrals,2
+LH-2700.0150,AIDS/HIV Prevention Counseling,1
+LH-2700.0500,Assistive Technology Information,1
+LH-2700.0600,Assistive Technology Training,1
+LH-2700.1000,Breast Self Examination Instruction,1
+LH-2700.1540,Chronic Disease Self Management Programs,1
+LH-2700.1700,Disease/Disability Information,16
+LH-2700.2000,First Aid Instruction,1
+LH-2700.2500,General Health Education Programs,6
+LH-3000,Health Insurance/Dental Coverage,1
+LH-3500.0200-140,Certified Application Counselor Programs,1
+LH-3500.0200-330,In Person Assister Programs,1
+LH-3500.2500,General Health Insurance Information/Counseling,1
+LH-3500.4500,Long Term Care Insurance Information/Counseling,1
+LH-3500.4800,Managed Health Care Information,1
+LH-3500.4900,Medicaid Information/Counseling,2
+LH-3500.5000,Medicare Information/Counseling,2
+LH-3500.8000,State/Local Health Insurance Information/Counseling,1
+LH-4600,Long Term Care Options Counseling,1
+LH-5000.3300,Incontinence Supplies,1
+LH-5000.6200,Occasional Medical Equipment/Supplies,1
+LH-5100.3000,Health Insurance Premium Assistance,2
+LH-5100.5000,Medical Care Expense Assistance,2
+LH-5100.5050,Medical Equipment Expense Assistance,1
+LH-5100.6500,Prescription Expense Assistance,3
+LH-6300.3650-400,Lead Safe Homes,1
+LH-6300.3650-600,Patient/Family Housing,1
+LH-6300.5500,Medical Social Work,1
+LH-6300.6400,Pastoral Care,1
+LH-6300.6500,Patient/Family Morale Boosting Programs,1
+LH-6300.6550,Personal Health Care Advocate Services,3
+LH-6300.9500,Wish Foundations,1
+LH-6700.6250,Prescription Drug Discount Cards,1
+LH-6700.6300,Prescription Drug Patient Assistance Programs,1
+LH-6700.6400-330,Insulin,1
+LH-6700.6500,Prescription Medication Monitoring Systems,1
+LJ-2000.0100,Abortion Services,1
+LJ-2000.1000,Birth Control,1
+LJ-2000.6400,Pre-Abortion Counseling,1
+LJ-2000.6500,Pregnancy Counseling,1
+LJ-2000.6750,Pregnancy Testing,1
+LJ-2000.8500,Teen Family Planning Programs,1
+LJ-5000.1000,Breastfeeding Support Programs,1
+LJ-5000.1500,Childbirth Education,2
+LJ-5000.1900,Doula Services,1
+LJ-5000.5000,Maternity Homes,1
+LJ-5000.5250,Midwifery,1
+LJ-5000.6550,Post Pregnancy Shelter/Transitional Housing,1
+LJ-5000.6600,Prenatal Care,2
+LJ-5000.6615,Prenatal/Postnatal Home Visitation Programs,1
+LJ-5000.8000,Safe Havens for Abandoned Newborns,1
+LJ-8000,Sexuality/Reproductive Health Education,1
+LL-3000,Hospitals,1
+LL-6000,Nursing Facilities,2
+LN-1500,Community Clinics,5
+LN-3000,Hospital Based Outpatient Services,3
+LN-5000,Mobile Health Care,1
+LN-6700,Public Clinics,1
+LN-8500,Urgent Care Centers,1
+LN-9000,Veteran Outpatient Clinics,1
+LN-9500,Women's Health Centers,1
+LR-0450,Autism Therapy,1
+LR-1550,Centers for Independent Living,1
+LR-1570,Condition Specific Rehabilitation Services,2
+LR-1610,Day Rehabilitation,1
+LR-1700,Early Intervention for Children With Disabilities/Delays,2
+LR-3050,Hippotherapy,1
+LR-3100,Home/Community Based Developmental Disabilities Programs,1
+LR-3200,Independent Living Skills Instruction,5
+LR-4000,Inpatient Rehabilitation,1
+LR-6200,Occupational Therapy,1
+LR-6400,Orientation and Mobility Training,2
+LR-6600,Physical Therapy,3
+LR-7950,Service Animals,2
+LR-8000,Speech and Hearing,3
+LR-8000.0500-800.05,American Sign Language Instruction,1
+LR-8400,Therapeutic Exercise,1
+LT-0500,Alternative Medicine,1
+LT-1530,Clinical Trials,1
+LT-1750.0500,AIDS/HIV Clinics,1
+LT-1750.0600,Arthritis Treatment Centers,1
+LT-1750.1500,Cancer Clinics,2
+LT-1750.1700,Dementia Management,1
+LT-1750.1750,Diabetes Management Clinics,1
+LT-1750.6200,Parkinson's Disease/Movement Disorders Clinics,1
+LT-1750.7935,Sexual Assault Treatment,1
+LT-1750.8000,Sexually Transmitted Disease Treatment,1
+LT-1750.8050,Sickle Cell Anemia Clinics,1
+LT-1750.9000,Tuberculosis Clinics,1
+LT-1900,Enterostomal Therapy,1
+LT-2600,Hemodialysis,1
+LT-2800.3000,Home Health Aide Services,3
+LT-2800.3100,Home Nursing,2
+LT-3000,Hospice Care,1
+LT-3400,Immunizations,1
+LT-3400.1500,Childhood Immunization,1
+LT-3400.2000,Flu Vaccines,1
+LT-3500,Intravenous Medication,1
+LT-6400,Outpatient Surgery,1
+LT-6600,Pain Management,2
+LT-6650,Palliative Care,1
+LT-9500,Weight Management,1
+LV-1600.1700,Dental Hygiene,2
+LV-1600.1750,Dental Prosthodontics,1
+LV-1600.1900,Emergency Dental Care,1
+LV-1600.1980,Endodontics,1
+LV-1600.2400,General Dentistry,2
+LV-1600.5000,Mobile Dental Care,1
+LV-1600.6300,Oral/Maxillofacial Surgery,1
+LV-1600.6350,Orthodontics,1
+LV-1600.6400,Pediatric Dentistry,1
+LV-1600.6500,Periodontics,1
+LV-1600.8000,Special Care Dentistry,1
+LV-2400.5000,Mobile Eye Care,1
+LV-2400.6300,Ophthalmology,1
+LV-2400.6350,Optometry,1
+LV-2600,Family and Community Medicine,1
+LV-3300,Internal Medicine,1
+LV-6000,Obstetrics/Gynecology,1
+LV-6800,Pediatrics,2
+LV-7200,Podiatry/Foot Care,1
+LV-8300,Surgery,1
+LV-8500,Telemedicine,1
+ND-1500,Comprehensive Job Assistance Centers,3
+ND-2000.1500,Career Development,1
+ND-2000.3480,Job Retraining,4
+ND-2000.3500,Job Training Formats,6
+ND-2000.3500-330,Internship Programs,1
+ND-2000.6400,Occupation Specific Job Training,1
+ND-2000.6500,Prejob Guidance,1
+ND-2000.6500-340,Job Interview Training,3
+ND-2000.6500-360,Job Readiness,5
+ND-2000.6500-380,Job Search Techniques,4
+ND-2000.6500-700,Resume Preparation Assistance,5
+ND-2000.6600,Prevocational Training,5
+ND-2000.9000,Vocational Assessment,2
+ND-3400,Job Development,1
+ND-3400.8000,Special Needs Job Development,1
+ND-3400.9500,Youth Job Development,3
+ND-3500,Job Finding Assistance,1
+ND-3500.3500,Job Information,1
+ND-3500.3600,Job Search/Placement,7
+ND-3500.3700,Job Search Resource Centers,1
+ND-3600.8200,Summer Employment,1
+ND-6500.1500,Comprehensive Disability Related Employment Programs,2
+ND-6500.1800,Disability Related Center Based Employment,2
+ND-6500.1850,Displaced Homemaker Employment Programs,1
+ND-6500.1950,Ex-Offender Employment Programs,1
+ND-6500.3050,Homeless Employment Programs,1
+ND-6500.3300,Immigrant/Refugee Employment Programs,1
+ND-6500.3500,Job Corps,1
+ND-6500.8000,Senior Community Service Employment Programs,1
+ND-6500.8120,Supported Employment,5
+ND-6500.9200,Veteran Employment Programs,1
+ND-6500.9500,Welfare to Work Programs,1
+ND-6500.9600,WIOA Programs,3
+ND-6500.9800,Youth Employment Programs,1
+ND-6500.9800-050,At Risk Youth Employment Programs,1
+ND-6500.9800-250,General Youth Employment Programs,1
+ND-6500.9800-800,Student Employment Programs,1
+ND-6500.9800-850,Summer Youth Employment Programs,2
+ND-9000,Vocational Rehabilitation,2
+ND-9200.0300,AmeriCorps,1
+ND-9200.8000-200,Foster Grandparent Program,1
+ND-9200.8000-700,RSVP Program,1
+ND-9200.8000-800,Senior Companion Program,2
+NL-1000.8100,SSI,1
+NL-1000.8500,TANF,1
+NL-3000.1500,Child Care Expense Assistance,2
+NL-3000.1900,Family Caregiver Subsidies,3
+NL-3000.3300,In Home Supportive Services Subsidies,1
+NL-3000.3500,Kinship Care Subsidy Programs,1
+NL-5000.1500,CHIP Programs,2
+NL-5000.2600,Government Subsidized Prescription Drug Benefits,1
+NL-5000.2700,Home/Community Care Financing Programs,3
+NL-5000.5000-520,Medicaid Applications,1
+NL-5000.5000-700,Medicare Savings Programs,1
+NL-5000.5000-770,State Medicaid Managed Care Enrollment Programs,1
+NL-5000.5000-800,State Medicaid Waiver Programs,1
+NL-5000.5000-800.30,Home/Community Based Care Waiver Programs,2
+NL-5000.5000-800.50,Managed Care/Freedom of Choice Waiver Programs,1
+NL-5000.6500,Nursing Home Transition Financing Programs,1
+NL-5000.6800,PACE Programs,1
+NL-5000.8000,State/Local Health Insurance Programs,1
+NL-5000.8000-050,Adult State/Local Health Insurance Programs,1
+NL-5000.8000-150,Children's State/Local Health Insurance Programs,1
+NL-6000.2000,Food Stamps/SNAP,1
+NL-6000.2000-220,Food Stamps/SNAP Applications,1
+NL-6000.9500,WIC,1
+NS-1000,Burial Benefits,1
+NS-1000.9000,Veteran Burial Benefits,1
+NS-1800,Disability Benefits,1
+NS-1800.8000,Social Security Disability Insurance,1
+NS-1800.9000-900,Veteran Aid and Attendance Benefits,1
+NS-1800.9000-920,Veteran Disability Compensation Benefits,1
+NS-1800.9000-940,Veteran Housebound Benefits,1
+NS-1800.9000-960,Veteran Pension Program,1
+NS-7000,Retirement Benefits,1
+NS-8000.5000,Medicare,1
+NS-8000.5000-520,Medicare Appeals/Complaints,1
+NS-8200,Survivors Insurance,1
+NS-9000,Unemployment Insurance,1
+NT-2500,Gift Card Distribution Programs,1
+NT-6400.3300,Interest Free Loans,2
+NT-6400.4500,Low Interest Loans,1
+NT-8900,Undesignated Temporary Financial Assistance,6
+PB-0900,Burial/Cremation Expense Assistance,2
+PB-1950,Funeral Preplanning Services,1
+PB-5000,Mortuary Services,1
+PD-0700.0400,Animal Control,1
+PD-0700.0600,Animal Licenses,1
+PD-6250,Pet Care Services,1
+PD-6250.6400,Pet Care Supplies,1
+PD-6250.6600,Pet Food,1
+PD-7600.0100,Animal Adoption,1
+PD-7600.0300,Animal Lost and Found,1
+PD-7600.0500,Animal Rescue,1
+PD-7600.0600,Animal Shelters,1
+PD-7600.0700,Animal Surrender Services,1
+PD-7600.2100,Foster Care/Temporary Shelter for Animals,1
+PD-9000.6000,Neuter/Spay Services,1
+PD-9000.6600,Pet Therapy,1
+PD-9000.9000,Veterinary Care Expense Assistance,1
+PH,Individual and Family Support Services,1
+PH-0300,Adoption Services,1
+PH-0300.0300,Adoption Counseling and Support,1
+PH-0300.0350,Adoption Evaluation/Placement,1
+PH-0300.0400,Adoption Information/Referrals,1
+PH-0300.6500,Preadoptive Foster Care,1
+PH-0300.7000,Relinquishment for Adoption Assistance and Support,1
+PH-0300.8100-200,Designated Adoption,1
+PH-0300.8100-600,Open Adoption,1
+PH-0300.8100-800,Special Needs Adoption,1
+PH-0320,Adult Day Programs,4
+PH-0320.0200,Adult Day Program Centers,1
+PH-0360,Aging in Place Membership Organizations/Networks,1
+PH-0500,Attendant Services for People With Disabilities,1
+PH-0700,Benefits Screening,1
+PH-0780,Caregiver Consultation and Support,1
+PH-0800,Caregiver Training,2
+PH-1000,Case/Care Management,10
+PH-1000.4500,Long Term Case/Care Management,1
+PH-1000.8500,Transitional Case/Care Management,5
+PH-1250.1400,Child Care Centers,2
+PH-1250.1800,Extended Child Care,1
+PH-1400,Companionship,3
+PH-1400.1000,Buddy Programs,1
+PH-1400.1900-220,Friendly Telephoning,1
+PH-1400.1900-230,Friendly Visiting,1
+PH-1400.5000,Mentoring Programs,1
+PH-1400.5000-100,Adult/Child Mentoring Programs,1
+PH-1400.6500,Peer to Peer Networking,1
+PH-1450.3200,Immigrant Accompaniment Programs,1
+PH-1450.3300,Immigrant Mutual Assistance Associations,1
+PH-1450.3400,Immigrant Resettlement Services,1
+PH-1450.7000,Refugee Resettlement Services,1
+PH-1800,Emergency Alert,1
+PH-1800.3300,Identification Devices,1
+PH-1800.6260,Personal Alarm Systems,1
+PH-2200,Escort Programs,1
+PH-2360,Family Based Services,1
+PH-2360.1500,Child Care Mental Health Consultation Programs,1
+PH-2360.2000,Economic Self Sufficiency Programs,4
+PH-2360.2300,Family Group Conferencing,1
+PH-2360.2350,Family Preservation Programs,3
+PH-2360.2400,Family Support Centers/Outreach,5
+PH-2360.3300,Intensive Family Reunification Services,1
+PH-2360.8000,School Based Integrated Services,1
+PH-2360.9500,Wraparound Facilitation/Community Support,5
+PH-2400.0200,Adoptive Family Recruitment,1
+PH-2400.1300,Case/Care Management Referrals,1
+PH-2400.1400,Child Care Provider Recruitment,1
+PH-2400.1500,Child Care Provider Referrals,1
+PH-2400.1900,Foster Home Placement,1
+PH-2400.2000,Foster Parent/Family Recruitment,1
+PH-2400.3300,In Home Assistance Registries,1
+PH-2950.1000,Birthday Programs,1
+PH-2950.1500-120,Christmas Baskets,1
+PH-2950.1500-200,Christmas Meals,1
+PH-2950.1500-220,Christmas Parties,1
+PH-2950.1750-300,Easter Meals,1
+PH-2950.3050,Holiday Donations,1
+PH-2950.3200,Holiday Gifts/Toys,1
+PH-2950.8500-850,Thanksgiving Baskets,2
+PH-2950.8500-870,Thanksgiving Meals,1
+PH-3300.1800,Errand Running/Shopping Assistance,4
+PH-3300.2750,Home Maintenance and Minor Repair Services,1
+PH-3300.2750-220,Furnace Maintenance/Repair,1
+PH-3300.2750-250,General Minor Home Repair Programs,3
+PH-3300.2750-300,House Painting,1
+PH-3300.2750-900,Water Heater Maintenance/Repair,1
+PH-3300.3000,Homemaker Assistance,3
+PH-3300.3100,Housekeeping Assistance,2
+PH-3300.3220,In Home Meal Preparation,1
+PH-3300.6500,Personal Care,5
+PH-3300.6900,Residential Snow Shoveling,1
+PH-3300.8030,Supported Living Services for Adults With Disabilities,1
+PH-3300.9750-450,General Yard Work,1
+PH-3500.8000,Sign Language Interpretation,2
+PH-6000.6500,Parental Visitation Monitoring,1
+PH-6000.8500,Therapeutic Visitation,1
+PH-6100,Parenting Education,3
+PH-6100.1550,Co-Parenting Workshops,1
+PH-6100.1600,Court Ordered Parenting Programs,1
+PH-6100.1700,Disability Related Parenting Programs,2
+PH-6100.1800,Expectant/New Parent Assistance,2
+PH-6100.1800-250,General Expectant/New Parent Assistance,3
+PH-6100.1800-650,New Dad Parenting Programs,3
+PH-6100.1800-900,Teen Expectant/New Parent Assistance,1
+PH-6100.3300,Home Based Parenting Education,1
+PH-6100.6600,Parenting Helplines,2
+PH-6100.6700,Parenting Materials,1
+PH-6100.6800,Parenting Skills Classes,2
+PH-6200,Personal Enrichment,1
+PH-6200.1500,Communication Training,1
+PH-6200.1850,Disability Awareness Programs,2
+PH-6200.2000,Family Life Education,1
+PH-6200.4500,Leadership Development,1
+PH-6200.4550,Life Coaching,2
+PH-6200.4600,Life Skills Education,13
+PH-6200.7000,Relationship Workshops,1
+PH-6200.8300,Social Skills Training,2
+PH-6200.8400,Stress Management,1
+PH-6200.8600,Team Building Activities,2
+PH-6300,Placements for Children and Youth,1
+PH-6300.1500,Child/Youth Placement Evaluation Programs,1
+PH-6300.1900,Foster Homes for Children With Disabilities,1
+PH-6300.2000,Foster Homes for Dependent Children,1
+PH-6300.2400,Group Homes for Children and Youth With Disabilities,1
+PH-6300.2500,Group Homes for Dependent Children,1
+PH-6300.3500,Kinship Care,1
+PH-6300.8000,Supervised Living for Older Youth,2
+PH-6500.0500,Adult Protective Services,2
+PH-6500.1500,Children's Protective Services,1
+PH-7000,Respite Care,2
+PH-7000.3300,In Home Respite Care,1
+PH-7000.3300-040,Adult In Home Respite Care,2
+PH-7000.3300-140,Children's In Home Respite Care,1
+PH-7000.6000,Out of Home Respite Care,1
+PH-7000.6000-060,Adult Out of Home Respite Care,1
+PH-7000.6000-160,Children's Out of Home Respite Care,2
+PH-8000,Street Outreach Programs,3
+PL,Leisure Activities/Recreation,1
+PL-2000.1500,Catering Services,1
+PL-6400,Parks/Recreation Areas,1
+PL-6400.1500,Camps,1
+PL-6400.1500-180,Day Camps,5
+PL-6400.1500-700,Residential Camps,2
+PL-6400.1500-800,Special Interest Camps,6
+PL-6400.1500-820,Summer Camps,4
+PL-6400.1500-850,Therapeutic Camps,8
+PL-6400.6000,Nature Centers/Walks,1
+PL-6400.6500-150,City/County Parks,1
+PL-6400.6750-050,Athletic Clubs,1
+PL-6400.7000-150,Campgrounds,1
+PL-6400.7000-700,Recreation Centers,1
+PL-6400.7000-840,Swimming Facilities,1
+PL-6600,Physical Fitness,3
+PL-6900,Recreation Related Expense Assistance,1
+PL-7000,Recreational Activities/Sports,2
+PL-7000.1600-700,Rowing,1
+PL-7000.3150-050,Adapted Sports/Games,1
+PL-7000.4350-180,Chess,1
+PL-7000.4360,General Recreational Activities/Sports,1
+PL-7000.5150,Horseback Riding,1
+PL-7000.5800-850,T'ai Chi Ch'uan,1
+PL-7000.8900,Team Sports/Leagues,1
+PL-7000.8900-080,Baseball,1
+PL-7000.8900-830,Softball,1
+PL-7200.8500,Toy Libraries/Toy Loan Programs,1
+PL-7400.0300,Acting Instruction,1
+PL-7400.0500,Arts and Crafts Instruction,1
+PL-7400.0500-160,Children's Arts and Crafts,1
+PL-7400.1500,Computer and Related Technology Classes,5
+PL-7400.1700-080,Ballet Instruction,1
+PL-7400.1700-200,Folk/Ethnic Dancing Instruction,1
+PL-7400.1700-500,Modern Dance Instruction,1
+PL-7400.1700-850,Tap Dancing Instruction,1
+PL-7400.1750-180,Do It Yourself Bicycle Repair Instruction,1
+PL-7400.1900,Driver Training,1
+PL-7400.1900-500,Mature Driver Training,1
+PL-7400.5000,Memory Improvement Instruction,1
+PL-7400.5500-570,Musical Instrument Instruction,1
+PL-7400.5500-800,Vocal Music Instruction,1
+PL-7400.6300,Outdoor Environmental Education,1
+PL-7400.9000,Wilderness Training,1
+PL-7400.9500,Writing Instruction,1
+PL-7600.2600,Government Buildings/Installations,1
+PL-7700.1300,Community Celebrations/Festivals,1
+PL-7700.2000-200,Fashion Shows,1
+PL-8700.2000,Field Trips/Excursions,1
+PN-8000,Support Group Clearinghouses,4
+PN-8100,Support Groups,1
+PN-8100.0200-130,Crime Victim Support Groups,1
+PN-8100.0200-180,Domestic Violence Support Groups,1
+PN-8100.0200-800,Sexual Assault/Incest Support Groups,1
+PN-8100.0500-070,Alcohol Use Disorder Support Groups,1
+PN-8100.0500-135,Co-Occurring Disorders Support Groups,1
+PN-8100.0500-180,Drug Use Disorder Support Groups,1
+PN-8100.0500-195,DUI Related Support Groups,1
+PN-8100.0500-270,General Addictions/Substance Use Disorder Support Groups,1
+PN-8100.0500-300,Hoarding Support Groups,1
+PN-8100.0500-830,Smoking Addiction Support Groups,1
+PN-8100.0500-900,Weight Related Support Groups,2
+PN-8100.1000-030,Adult Parental Loss Support Groups,1
+PN-8100.1000-080,Bereaved Child Support Groups,1
+PN-8100.1000-100,Bereaved Parent Support Groups,3
+PN-8100.1000-250,General Bereavement Support Groups,3
+PN-8100.1000-300,Homicide Survivors Support Groups,1
+PN-8100.1000-650,Pet Loss Support Groups,1
+PN-8100.1000-800,Suicide Survivors Support Groups,1
+PN-8100.1000-850,Terminal Illness Support Groups,1
+PN-8100.1000-900,Widow/Widower Support Groups,2
+PN-8100.1400,Caregiver/Care Receiver Support Groups,6
+PN-8100.2000-180,Families of Inmates Support Groups,1
+PN-8100.2000-230,Families/Friends of Individuals With an Alcohol Use Disorder Support Groups,1
+PN-8100.2000-235,Families/Friends of Individuals With a Drug Use Disorder Support Groups,1
+PN-8100.3000,Health/Disability Related Support Groups,50
+PN-8100.4500-050,Aging/Older Adult Support Groups,6
+PN-8100.4500-220,Employment/Retirement Related Support Groups,1
+PN-8100.4500-400,LGBTQ Support Groups,1
+PN-8100.4500-550,Military Family Support Groups,3
+PN-8100.4500-600,Offender/Ex-Offender Support Groups,1
+PN-8100.4500-700,Religion/Spirituality Related Support Groups,1
+PN-8100.4500-850,Veteran Support Groups,2
+PN-8100.4500-900,Women's Support Groups,1
+PN-8100.4500-950,Youth/Student Support Groups,1
+PN-8100.5000,Mental Health Related Support Groups,4
+PN-8100.6500,Parenting/Family Support Groups,2
+PN-8100.6500-030,Adoption and Foster/Kinship Care Support Groups,3
+PN-8100.6500-650,Parent Support Groups,5
+PN-8100.6500-750,Separation/Divorce Support Groups,1
+PS-1500,Children's Play Groups,1
+PS-3300,Intergenerational Programs,1
+PS-6500,Parent/Child Activity Groups,1
+PS-8000,Social Clubs/Events,1
+PS-8000.3000,Health/Disability Related Social Clubs,2
+PS-8000.4000,LGBTQ Social Clubs,1
+PS-8000.6000,Older Adult Social Clubs,1
+PS-8200,Special Interest Clubs,1
+PS-8200.0550,Arts and Crafts Clubs,1
+PS-8200.1450,Computer User Groups,1
+PS-8200.6000-400,Knitting Clubs,1
+PS-8200.8100,Science and Mathematics Clubs/Societies,1
+PS-8200.8100-220,General Science Clubs,1
+PS-9800,Youth Development,1
+PS-9800.1000,Boys/Girls Clubs,1
+PS-9800.1500,Faith Based Youth Programs,2
+PS-9800.8500,Scouting Programs,1
+PS-9800.9650,Y Facilities,2
+PS-9800.9670,Youth Agricultural Programs,1
+PS-9800.9700,Youth Business Programs,1
+PS-9800.9800,Youth Community Service Programs,1
+PS-9800.9900,Youth Enrichment Programs,1
+PS-9800.9950,Youth Military Cadet Programs,1
+PV-3300.5000,Meditation,1
+PV-7000,Religious Activities,1
+PV-7000.6400,Religious Service Projects,2
+PV-7000.6500,Religious Study Groups,1
+PV-7000.9000,Worship Services,1
+PW-9000,Volunteer Recruitment/Placement,2
+PX,Volunteer Opportunities,1
+PX-0400.1400,Clerical Volunteer Opportunities,1
+PX-0400.1800-250,Donations Sorting/Packing Volunteer Opportunities,1
+PX-0400.9500,Volunteer Recruitment/Coordination Volunteer Opportunities,2
+PX-0500.0400,Animal Foster Care/Rescue Volunteer Opportunities,1
+PX-0500.0700,Animal Shelter Attendant Volunteer Opportunities,1
+PX-1500.2500,Government Boards/Commissions Volunteer Opportunities,1
+PX-1700.3400,Home/Public Building Accessibility Volunteer Opportunities,1
+PX-1700.8000,Snow Clearance Volunteer Opportunities,1
+PX-1850.2500,Guardians ad Litem Volunteer Opportunities,1
+PX-1850.4000-030,Advocacy/Ombudsman Volunteer Opportunities,1
+PX-1900.1475,Disaster Related Cleanup/Labor Volunteer Opportunities,1
+PX-1900.1540,Disaster Related Food Services Volunteer Opportunities,1
+PX-2000.1300,Career Development Volunteer Opportunities,1
+PX-2000.8500,Tutoring Volunteer Opportunities,1
+PX-2300.0200-200,Domestic Violence Volunteer Opportunities,1
+PX-2300.1700-120,Buddy Program Volunteer Opportunities,1
+PX-2300.1700-140,Conversation Partner Volunteer Opportunities,1
+PX-2300.1700-180,Friendly Telephoning Volunteer Opportunities,1
+PX-2300.1700-300,Home Visit Volunteer Opportunities,1
+PX-2300.1700-500,Mentoring Services Volunteer Opportunities,1
+PX-2300.1800,Errand Running/Shopping Volunteer Opportunities,1
+PX-2300.6600,Personal Finances/Tax Assistance Volunteer Opportunities,1
+PX-2400,Food Production/Preparation/Delivery Volunteer Opportunities,1
+PX-2400.5000,Meal Delivery Volunteer Opportunities,1
+PX-2400.5100,Meal Preparation/Serving Volunteer Opportunities,1
+PX-3000.3000,Hospice Care Volunteer Opportunities,1
+PX-3000.5000,Medical Care Volunteer Opportunities,1
+PX-8000.3000,Holiday Related Volunteer Opportunities,1
+PX-8500,Transportation Volunteer Opportunities,1
+RD-1000.1000,Behavior Modification,2
+RD-1500,Cognitive Behavioral Therapy,1
+RD-1900,Faith Based Counseling,3
+RD-5200,Multisystemic Therapy,1
+RD-6800.6500,Psychotherapy/Psychoanalysis,1
+RD-7000,Rational Emotive Therapy,1
+RF-1500,Conjoint Counseling,1
+RF-2000,Family Counseling,7
+RF-2500,Group Counseling,5
+RF-3300,Individual Counseling,7
+RF-6500,Peer Counseling,3
+RF-8380,Talklines/Warmlines,3
+RM-3300.6500,Psychiatric Hospitals,2
+RM-3300.6600-050,Adolescent Psychiatric Inpatient Units,2
+RM-3300.6600-080,Adult Psychiatric Inpatient Units,1
+RM-3300.6600-150,Children's Psychiatric Inpatient Units,2
+RM-6500,Outpatient Mental Health Facilities,8
+RM-7000.0500,Adult Residential Treatment Facilities,4
+RM-7000.1500,Children's/Adolescent Residential Treatment Facilities,2
+RP-1400,Counseling Services,1
+RP-1400.2500,General Counseling Services,3
+RP-1400.8000-020.03,Adult Child Abuse Survivor Counseling,1
+RP-1400.8000-020.05,Adult Child Sexual Abuse Survivor Counseling,1
+RP-1400.8000-020.15,Child Abuse Counseling,1
+RP-1400.8000-020.18,Child Sexual Abuse Counseling,1
+RP-1400.8000-020.21,Counseling for Children Affected by Domestic Violence,1
+RP-1400.8000-020.24,Elder Abuse Counseling,1
+RP-1400.8000-020.65,Parent Abuse Counseling,1
+RP-1400.8000-020.80,Spouse/Intimate Partner Abuse Counseling,1
+RP-1400.8000-050,Adolescent/Youth Counseling,4
+RP-1400.8000-070,Anger Management,1
+RP-1400.8000-100,Bereavement Counseling,3
+RP-1400.8000-145,Caregiver Counseling,1
+RP-1400.8000-155,Child Guidance,2
+RP-1400.8000-160,Crime Victim/Witness Counseling,1
+RP-1400.8000-175,Divorce Counseling,3
+RP-1400.8000-250,Gambling Addiction Counseling,2
+RP-1400.8000-260,Gender Identity Counseling,1
+RP-1400.8000-270,Geriatric Counseling,1
+RP-1400.8000-300,Health/Disability Related Counseling,5
+RP-1400.8000-330,Internet Addiction Counseling,1
+RP-1400.8000-500,Marriage Counseling,2
+RP-1400.8000-645,Parent Child Interactive Therapy,1
+RP-1400.8000-650,Parent Counseling,2
+RP-1400.8000-655,Perinatal/Postpartum Depression Counseling,1
+RP-1400.8000-670,Premarital Counseling,2
+RP-1400.8000-675,Psychiatric Disorder Counseling,1
+RP-1400.8000-750,Runaway/Homeless Youth Counseling,1
+RP-1400.8000-795,Sex Offender Counseling,1
+RP-1400.8000-800,Sexual Assault Counseling,2
+RP-1400.8000-805,Sexual Orientation Counseling,1
+RP-1400.8000-820,Spiritual/Religious Issues Counseling,1
+RP-1400.8000-825,Suicide Counseling,1
+RP-1400.8000-900,Veteran Reintegration Counseling,3
+RP-1500.0300,After Hours Crisis Drop In Programs,1
+RP-1500.1400,Crisis Intervention Hotlines/Helplines,1
+RP-1500.1400-150,Child Abuse Hotlines,1
+RP-1500.1400-200,Domestic Violence Hotlines,1
+RP-1500.1400-250,General Crisis Intervention Hotlines,5
+RP-1500.1400-300,Human Trafficking Hotlines,1
+RP-1500.1400-400,LGBTQ Helplines,1
+RP-1500.1400-500,Mental Health Crisis Lines,2
+RP-1500.1400-700,Runaway/Homeless Youth Helplines,1
+RP-1500.1400-750,Sexual Assault Hotlines,1
+RP-1500.1400-800,Suicide Prevention Hotlines,2
+RP-1500.1500,Crisis Residential Treatment,2
+RP-1500.3300,In Person Crisis Intervention,2
+RP-1500.3400-650,Psychiatric Mobile Response Teams,1
+RP-1500.3400-850,Third Party Involuntary Commitment Petition Services,1
+RP-5000,Mental Health Evaluation,1
+RP-5000.1400,Central Intake/Assessment for Mental Health Services,3
+RP-5000.1500,Clinical Psychiatric Evaluation,1
+RP-5000.5000,Mental Health Screening,1
+RP-5000.6400,Psychological Assessment,1
+RP-5000.6500,Psychological Testing,1
+RP-5000.6600,Psychosocial Evaluation,1
+RP-6400.0200,Adult Psychiatry,1
+RP-6400.1500,Child and Adolescent Psychiatry,2
+RP-6400.1900,Eating Disorders Treatment,1
+RP-6400.2500,General Psychiatry,1
+RP-6400.2700,Geriatric Psychiatry,1
+RP-6400.8000-300,Home Based Mental Health Services,5
+RP-6400.8000-580,Programs for Offenders With Mental Disabilities,1
+RP-6400.8000-600,Psychiatric Case Management,1
+RP-6400.8000-620,Psychiatric Day Treatment,5
+RP-6400.8000-650,Psychiatric Medication Services,1
+RP-6400.8000-650.64,Psychiatric Medication Monitoring,1
+RP-6400.8000-660,Psychiatric Rehabilitation,2
+RP-8000,Supportive Therapies,1
+RP-8000.0500,Art Therapy,1
+RP-8000.1925,Equestrian Therapy,1
+RP-8000.5000,Music Therapy,1
+RP-8000.7400,Recreational Therapy,3
+RR-1800,Early Intervention for Mental Illness,1
+RR-5050,Mental Health Expense Assistance,1
+RR-5150,Mental Health Information/Education,2
+RR-5150.2000,Family Psychoeducation,1
+RR-5150.2500,General Mental Health Information/Education,3
+RR-5150.5000-800,Suicide Prevention Programs,1
+RR-5180,Mental Health Intervention Programs,1
+RR-5240,Mental Health Self Management Programs,2
+RR-6510,Peer Support Services,2
+RR-8500,Therapy Referrals,1
+RR-8800.5100,Mental Health Halfway Houses,1
+RR-8800.6400,Psychiatric Aftercare Services,1
+RR-8800.6500,Psychiatric Resocialization,1
+RX-0400,Assessment for Substance Use Disorders,1
+RX-0400.1500,Central Intake/Assessment for Substance Use Disorders,2
+RX-0400.1600,Court Ordered DUI Evaluations,1
+RX-0400.1855,Drug/Alcohol Use Self Evaluation Tools,1
+RX-0400.2500,General Assessment for Substance Use Disorders,1
+RX-1700,Detoxification,1
+RX-1750,DUI Offender Programs,1
+RX-5100,Minor in Possession Offender Programs,1
+RX-8250,Substance Use Disorder Education/Prevention,1
+RX-8250.0500,Alcohol Use Disorder Education/Prevention,1
+RX-8250.0550,Alcohol/Drug Impaired Driving Prevention,1
+RX-8250.1700,Drug Use Disorder Education/Prevention,2
+RX-8250.8000,Tobacco Use Education/Prevention,1
+RX-8450.1150,Comprehensive Outpatient Substance Use Disorder Treatment,3
+RX-8450.3300,Inpatient Substance Use Disorder Treatment Facilities,1
+RX-8450.5000,Medication Assisted Maintenance Treatment for Substance Use Disorders,1
+RX-8450.6600,Perinatal Substance Use Disorder Treatment,1
+RX-8450.7000,Residential Substance Use Disorder Treatment Facilities,1
+RX-8450.7900,Smoking/Vaping Cessation,3
+RX-8450.8000,Substance Use Disorder Counseling,3
+RX-8450.8100,Substance Use Disorder Day Treatment,1
+RX-8470,Supportive Substance Use Disorder Services,1
+RX-8470.1900-610,Needle Exchange/Distribution Programs,1
+RX-8470.1900-630,Opioid Antidote Distribution Programs,1
+RX-8470.6900,Relapse Prevention Programs,1
+RX-8470.7000,Residences for People With Chronic Substance Use Disorders,1
+RX-8470.8100,Smoking/Vaping Cessation Support,1
+RX-8470.8200,Substance Use Disorder Crisis Intervention,1
+RX-8470.8250,Substance Use Disorder Drop In Programs,2
+RX-8470.8350,Substance Use Disorder Hotlines,2
+RX-8470.8400,Substance Use Disorder Intervention Programs,1
+RX-8470.8580,Substance Use Disorder Peer Recovery Coach Services,1
+RX-8470.8600,Substance Use Disorder Referrals,1
+RX-8470.8900,Substance Use Disorder Treatment Expense Assistance,1
+RX-8500,Transitional Residential Substance Use Disorder Services,1
+RX-8500.6500,Recovery Homes/Halfway Houses,4
+RX-8500.8000,Sober Living Homes,1
+TA,Arts and Culture,1
+TA-0480,Arts Centers,1
+TA-1550,Cultural Heritage Programs,1
+TA-2850,Historical Societies,1
+TA-3000.0750,Book Distribution Programs,1
+TA-5500.8000,Science and Technology Museums,1
+TA-6800.5000,Multipurpose Performing Arts Centers,1
+TB-0700.2100,Financial Services,1
+TB-0700.2100-145,Checking/Savings Accounts,1
+TB-0700.2100-180,Education Savings Accounts,1
+TB-0700.2100-330,Individual Development Accounts,1
+TB-0700.2200-190,Fundraising Campaigns,1
+TB-0700.2200-700,Research Funds,2
+TB-0900,Business Development,1
+TB-0900.0600,Business Assistance Centers,1
+TB-0900.0650-200,Entrepreneurial Training,1
+TB-0900.1000-800,Small Business Financing,2
+TB-0900.8000-500,Minority Business Development,1
+TB-0900.8000-600,Nonprofit Corporation Development,1
+TB-0900.8000-800,Small Business Development,1
+TB-1500,Community Development Corporations,2
+TB-3000.1400,Community Housing Development Organizations,1
+TB-7000,Redevelopment Programs,1
+TB-7000.6000,Neighborhood Revitalization,1
+TB-8200.7000,Regional Economic Development,1
+TC-1500,Conference/Convention Facilities,2
+TC-1700,Drop In Centers,2
+TC-5000,Meeting Space,1
+TC-5500.4000,LGBTQ Community Centers,1
+TC-5500.6000,Neighborhood Multipurpose Centers,2
+TC-5500.8000,Senior Centers,1
+TC-5500.9500,Women's Centers,1
+TC-5500.9800,Youth Centers,1
+TC-7000,Retreat Centers,1
+TD-0300.1300,County Government Departments/Offices,1
+TD-0300.6000,Nongovernmental Agency Departments,1
+TD-0300.8000,State Government Agencies/Departments,1
+TD-0350.1000,Budget and Finance Offices,1
+TD-1100.2000,FEMA Emergency Food/Shelter Administrative Agencies,1
+TD-1100.6500-050,Area Agencies on Aging,1
+TD-1200,Charities/Grantmaking Organizations,1
+TD-1200.1500,Community Funds,1
+TD-1200.1800,Federated Giving Programs,1
+TD-1200.6500,Private Foundations,1
+TD-1200.6600-600,Public Foundations,1
+TD-1200.6600-900,Voluntary Health Organizations,3
+TD-1400.0500,Auxiliaries,1
+TD-1400.9000,Veteran Membership Organizations,2
+TD-1600,Community Action/Social Advocacy Groups,1
+TD-1600.1770,Education Advocacy Groups,1
+TD-1600.2570,Health Related Advocacy Groups,3
+TD-1600.2600,Homelessness Advocacy Groups,1
+TD-1600.2800,Housing Advocacy Groups,2
+TD-1600.3100,Human Rights Groups,1
+TD-1600.3100-140,Children's Rights Groups,2
+TD-1600.3100-180,Disability Rights Groups,1
+TD-1600.3100-200,Ethnic Advocacy Groups,2
+TD-1600.3100-400,LGBTQ Advocacy Groups,1
+TD-1600.3100-550,Mental Health Associations,1
+TD-1600.3100-750,Right to Life Groups,1
+TD-1600.3100-850,Victim's Rights Groups,1
+TD-1600.6000,Neighborhood Improvement Groups,2
+TD-6500,Planning/Coordinating/Advisory Groups,2
+TD-6600.2200-950,United States Senate Offices,1
+TD-6600.4500,Local Officials Offices,2
+TD-6600.4500-160,County Clerk of the Courts Offices,1
+TD-6600.4500-200,County Controller Offices,1
+TD-6600.4500-260,County Executive Offices,1
+TD-6600.4500-300,County Recorder Offices,1
+TD-6600.4500-360,County Treasurer Offices,1
+TD-6600.4500-500,Mayors Offices,1
+TD-6600.8000-800,State Legislature Offices,1
+TE-1000.0700,Building Code Enforcement/Appeals,1
+TE-1000.1000,Building Inspection,1
+TE-1000.1500-100,Building Permits,1
+TE-4520,Land Use Planning and Regulation Bodies,1
+TE-4525.4600-980.85,Zoning Information,1
+TE-8000.8200-650,Pothole/Road Repair,1
+TE-8000.8200-800,Sidewalk Repair,1
+TE-8920.6600-150,Christmas Tree Recycling,1
+TE-8920.6600-190,Electronic Waste Recycling,1
+TE-8920.6600-450,Large Appliance Pickup/Recycling Programs,1
+TE-8920.6600-750,Recycling Centers,1
+TE-8920.7200-500,Medical Waste Disposal,1
+TE-8920.9000-820,Sewer Connection Services,1
+TE-8920.9000-830,Sewer System Maintenance,1
+TH-1500.1700,Disaster Relief/Recovery Organizations,1
+TH-1700.1910,Disaster Related Volunteer Preparedness/Mobilization Programs,1
+TH-1700.1950,Emergency Preparedness and Response Planning,1
+TH-1700.2050,Functional Needs Registries,1
+TH-2300.6370,Post Disaster Emergency Medical Equipment and Supplies,1
+TH-2600,Disaster Relief Services,3
+TH-2600.1550,Disaster Related Clothing/Emergency Supplies,1
+TH-2600.1580,Disaster Related Shelter Services,1
+TH-2600.1880,Extreme Cold Warming Centers,1
+TH-2600.6450,Post Disaster Food Services,1
+TH-2600.6500,Post Disaster Mental Health Services,1
+TH-2600.6500-600,Post Disaster Crisis Counseling,1
+TH-2900.1700,Disaster Donations Coordination,2
+TH-2900.1700-180,Disaster Donations Matching Services,1
+TH-2900.1780,Disaster Related Case Management,1
+TH-2900.1785,Disaster Related Cash Grants,2
+TH-2900.1790,Disaster Related Commodity Replacement/Rental,1
+TH-2900.1800-150,Community Disaster Service Centers/Hotlines,2
+TH-2900.1800-700,Red Cross Disaster Service Centers,2
+TH-2900.6500-150,Disaster Specific Home Repair,1
+TH-2900.6500-200,Disaster Specific Rent Assistance,1
+TI-1800.1000,Building Materials/Supplies Donation Programs,1
+TI-1800.1500-100,Baby Clothing Donation Programs,1
+TI-1800.1500-150,Children's Clothing Donation Programs,1
+TI-1800.1500-180,Diaper Donation Programs,1
+TI-1800.1500-200,Formal Wear Donation Programs,1
+TI-1800.1500-250,General Clothing Donation Programs,1
+TI-1800.1500-870,Winter Clothing Donation Programs,1
+TI-1800.2000,Food Donation Programs,2
+TI-1800.3000-080,Baby Furniture Donation Programs,1
+TI-1800.3000-180,Electronics/Small Appliance Donation Programs,1
+TI-1800.3000-200,Furniture/Home Furnishings Donation Programs,1
+TI-1800.4500-900,Toy/Game Donation Programs,1
+TI-1800.5000,Medical Equipment/Assistive Technology Donation Programs,2
+TI-1800.5150,Military Donations/Relief Programs,1
+TI-1800.6500-150,Computer Donation Programs,1
+TI-1800.6500-550,Office Equipment Donation Programs,1
+TI-1800.6700,Personal/Grooming Supplies Donation Programs,1
+TI-1800.8100,School Supplies Donation Programs,1
+TI-1800.9000-050,Automobile Donation Programs,2
+TI-1800.9000-080,Bicycle Donation Programs,1
+TI-2100,Donation Pickups,1
+TJ-0500,Accessibility Information,1
+TJ-1550,Charity Information,1
+TJ-1800.3300-100,Community Web Portals,1
+TJ-1800.3300-600.10,Blogging/Microblogging Web Services,1
+TJ-1800.3300-600.84,Social Networking Web Services,1
+TJ-1800.6500-330,Internet Service Providers,1
+TJ-1800.6650,Public Access Computers/Tools,1
+TJ-1800.6700,Public Internet Access Sites,1
+TJ-1800.6800,Public Wi-Fi Sites,1
+TJ-3000.1500,Comprehensive Information and Referral,5
+TJ-3000.8000,Specialized Information and Referral,11
+TJ-3000.8500,211 Systems,1
+TJ-3200.1750,Energy Information Services,1
+TJ-3200.2500-160,County Government Information Services,2
+TJ-3200.2500-850,311 Services,1
+TJ-3200.4500,Legal Information Services,1
+TJ-3200.5000,Medical Information Services,2
+TJ-3200.8000,Shelter Information Services,1
+TJ-4400,Libraries,1
+TJ-4400.0500,Academic Libraries,1
+TJ-4400.5000,Municipal Libraries,1
+TJ-4400.6500,Public Libraries,1
+TJ-4400.8100-100,Business Libraries,1
+TJ-4400.8100-180,Disability Related Libraries,1
+TJ-4400.8100-450,Law Libraries,1
+TJ-4400.8100-500,Medical Libraries,1
+TJ-4500,Library Services,1
+TJ-4500.1000,Book Loan,1
+TJ-4500.1200,Bookmobiles,1
+TJ-4500.7000,Reference/Information,1
+TJ-4500.8300-100,Braille Materials/Collections,1
+TJ-4500.8300-180,Ethnic Collections,1
+TJ-4500.8300-270,Grants Research Collections,1
+TJ-4500.8300-450,Large Print Materials/Collections,1
+TJ-6500,Public Awareness/Education,1
+TJ-6500.1700,Directory/Resource List Publication,1
+TJ-6500.6000,Newsletters,1
+TJ-6500.6300,Outreach Programs,5
+TJ-6500.6700,Printed Materials,1
+TJ-6500.8000,Speakers/Speakers Bureaus,1
+TJ-6500.8500,Subject Specific Public Awareness/Education,4
+TJ-6500.9500,Workshops/Symposiums,3
+TL-3800.1900-800,Student Exchange Programs,1
+TM,Military Service,1
+TM-0500,Armed Forces Emergency Services,3
+TM-5200,Military Transition Assistance Programs,2
+TM-8200,Social Services for Military Personnel,2
+TN-0300,Aging/Long Term Care Facility Associations,1
+TN-1000.1500,Chambers of Commerce,1
+TN-1400,Child Care Provider Associations,1
+TN-1450,Child Welfare/Family Services Associations,1
+TN-1700,Disability Associations,1
+TN-1870,Emergency Management Associations,1
+TN-2900,Home Care/Hospice Associations,1
+TN-4600,Legal Associations,1
+TN-4800,Library Associations,1
+TN-5000,Medical Associations,1
+TO-6600,Organizational Training Services,1
+TP-1000.2000-250,Board Preparation Training Assistance,1
+TP-1850.1500-150,Certification Program Application Assistance,1
+TP-2100.0250-150,Contract Management Assistance,1
+TP-3000.8000,Staff Development Services,1
+TP-3350.1800-330,Information and Referral Database Management Assistance,1
+TP-3350.3300,Information Technology Maintenance/Support,1
+TP-5900.6500-100,Community Engagement Program Development,1
+TP-6500.1800-150,Customer Satisfaction Surveys,1
+TP-6600.0900,Business Diversification Assistance,1
+TP-6650.1500,Consulting Skills Development,1
+TP-6650.2000,Facilitation Skills Development,1
+TP-6650.5200,Mentoring Skills Development,1
+TP-6650.8700,Training Skills Development,1
+TP-6700.5200,Media Relations Services,1
+TQ-1800.0500,Absentee Ballots,1
+TQ-1800.1600,Election Information,1
+TQ-1800.6500,Polling Places,1
+TQ-1800.9000,Voter Registration Offices,1
+TQ-6500.6700,Political Parties,1
+TR-0400,Agricultural and Food Sciences Research,1
+TR-8000.1900,Education Research,1
+TR-8000.6400,Psychology Research,1

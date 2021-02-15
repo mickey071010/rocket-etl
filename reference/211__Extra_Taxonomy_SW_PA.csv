@@ -1,0 +1,90 @@
+code,service_term,level
+BH-0500.3200-300,Housing Related Coordinated Entry Lead Agencies,
+BH-0500,At Risk/Homeless Housing Related Assistance Programs,
+BH-3000.3550-360,Home Rehabilitation Loans,
+BH-3900.3050,Home Rental Listings,
+PH-3300.2740,Home Maintenance and Minor Repair Grants/Loans,
+TJ-3000.8500-850,211 Lead Agencies,
+TJ-3000.8500,211 Systems,
+TJ-3000,Information and Referral,
+B,Basic Needs,1
+D,Consumer Services,1
+F,Criminal Justice and Legal Services,1
+H,Education,1
+J,Environment and Public Health/Safety,1
+L,Health Care,1
+N,Income Support and Employment,1
+P,Individual and Family Life,1
+R,Mental Health and Substance Use Disorder Services,1
+T,Organizational/Community/International Services,1
+BD,Food,2
+BH,Housing/Shelter,2
+BM,Material Goods,2
+BT,Transportation,2
+BV,Utilities,2
+DD,Consumer Assistance and Protection,2
+DF,Consumer Regulation,2
+DM,Money Management,2
+DT,Tax Organizations and Services,2
+FC,Courts,2
+FF,Criminal Correctional System,2
+FJ,Judicial Services,2
+FL,Law Enforcement Agencies,2
+FN,Law Enforcement Services,2
+FP,Legal Assistance Modalities,2
+FS,Legal Expense Insurance,2
+FT,Legal Services,2
+FV,Legal Services Organizations,2
+HD,Educational Institutions/Schools,2
+HH,Educational Programs,2
+HL,Educational Support Services,2
+HP,Postsecondary Instructional Programs,2
+JD,Environmental Protection and Improvement,2
+JP,Public Health,2
+JR,Public Safety,2
+LD,Emergency Medical Care,2
+LE,General Medical Care,2
+LF,Health Screening/Diagnostic Services,2
+LH,Health Supportive Services,2
+LJ,Human Reproduction,2
+LL,Inpatient Health Facilities,2
+LM,Medical Laboratories,2
+LN,Outpatient Health Facilities,2
+LR,Rehabilitation/Habilitation Services,2
+LT,Specialized Treatment and Prevention,2
+LV,Specialty Medicine,2
+ND,Employment,2
+NL,Public Assistance Programs,2
+NS,Social Insurance Programs,2
+NT,Temporary Financial Assistance,2
+PB,Death Certification/Burial Arrangements,2
+PD,Domestic Animal Services,2
+PH,Individual and Family Support Services,2
+PL,Leisure Activities/Recreation,2
+PN,Mutual Support,2
+PS,Social Development and Enrichment,2
+PV,Spiritual Enrichment,2
+PW,Volunteer Development,2
+PX,Volunteer Opportunities,2
+RD,Counseling Approaches,2
+RF,Counseling Settings,2
+RM,Mental Health Care Facilities,2
+RP,Mental Health Assessment and Treatment,2
+RR,Mental Health Support Services,2
+RX,Substance Use Disorder Services,2
+TA,Arts and Culture,2
+TB,Community Economic Development and Finance,2
+TC,Community Facilities/Centers,2
+TD,Community Groups and Government/Administrative Offices,2
+TE,Community Planning and Public Works,2
+TF,Community Recognition,2
+TH,Disaster Services,2
+TI,Donor Services,2
+TJ,Information Services,2
+TL,International Affairs,2
+TM,Military Service,2
+TN,Occupational/Professional Associations,2
+TO,Organizational Development and Management Delivery Methods,2
+TP,Organizational Development and Management Services,2
+TQ,Political Organization and Participation,2
+TR,Research,2
