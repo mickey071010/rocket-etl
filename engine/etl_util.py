@@ -445,12 +445,18 @@ def get_package_by_id(package_id):
     return ckan.action.package_show(id=package_id)
 
 def create_data_table_view_if_needed(resource_id):
-    # Create a DataTable view if the resource has a datastore.
+    """Create a DataTable view if the resource has a datastore."""
+    import time
     try:
         resource = get_resource_by_id(resource_id)
     except ckanapi.errors.NotFound:
-        print("Unable to perform resource-level post-processing, as this resource does not exist.")
-    else:
+        time.sleep(10)
+        try:
+            resource = get_resource_by_id(resource_id)
+        except ckanapi.errors.NotFound:
+            print("Unable to perform resource-level post-processing, as this resource does not exist.")
+            resource = None
+    if resource is not None:
         package_id = resource['package_id']
         create_data_table_view(resource)
         try:
