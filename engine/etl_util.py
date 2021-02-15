@@ -410,7 +410,7 @@ def add_time_field(package, resource, job):
         extras = {}
 
     if 'time_field' in extras:
-        time_field_by_resource_id = extras['time_field']
+        time_field_by_resource_id = json.loads(extras['time_field'])
         # The time_field metadata is a dict where resource IDs are the keys, and
         # the values are the names of the fields representing a good time field
         # for the corresponding resource.
