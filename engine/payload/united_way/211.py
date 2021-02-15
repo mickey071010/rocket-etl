@@ -27,7 +27,7 @@ class Requests211Schema(pl.BaseSchema):
     county = fields.String(allow_none=True)
     state = fields.String(allow_none=True)
     needs_category = fields.String(allow_none=True)
-    needs_code = fields.String(allow_none=False)
+    needs_code = fields.String(allow_none=True) # Sometimes this is empty in the source data.
     level_1_classification = fields.String(allow_none=True)
     level_2_classification = fields.String(allow_none=True)
     needs_met = fields.Boolean(allow_none=False)
