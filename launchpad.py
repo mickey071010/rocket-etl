@@ -210,6 +210,7 @@ if __name__ == '__main__':
             lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
             msg = ''.join('!! ' + line for line in lines)
             print(msg) # Log it or whatever here
+            copy_of_args = list(args)
             if 'mute' not in copy_of_args and 'mute_alert' not in copy_of_args:
                 channel = "@david" if (test_mode or not PRODUCTION) else "#etl-hell"
                 if channel != "@david":
