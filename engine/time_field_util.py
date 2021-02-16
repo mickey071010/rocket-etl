@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from dateutil import parser
 from pprint import pprint
 
-from engine.etl_util import query_resource, get_resource_parameter
+from engine.etl_util import query_resource, get_resource_parameter, get_package_by_id, find_resource_id
 
 try:
     from icecream import ic
@@ -18,18 +18,24 @@ def random_string(stringLength=10):
     return ''.join(random.choice(letters) for i in range(stringLength))
 
 def find_extremes(resource_id, field):
-    from credentials import site, ckan_api_key as API_key
+    from engine.credentials import site, API_key
+    from engine.leash_util import initially_leashed, fill_bowl, empty_bowl
+    toggle = initially_leashed(resource_id)
+    if toggle:
+        fill_bowl(resource_id)
 
     biggest_name = 'biggest_' + random_string(5) # Append a random string to avoid query caching.
     query = 'SELECT min("{}") AS smallest, max("{}") as {} FROM "{}" LIMIT 1'.format(field,field,biggest_name,resource_id)
     record = query_resource(site=site, query=query, API_key=API_key)[0] # Note that query_resource doesn't
     # work for private datasets. Therefore it won't be possible to test the time_field aspects on a private dataset,
     # including partial filling from the last date of the dataset to the present date.
+
+    if toggle:
+        empty_bowl(resource_id)
     return record['smallest'], record[biggest_name]
 
 def find_extreme_dates(resource_id, time_field_lookup):
-    from credentials import site, ckan_api_key as API_key
-
+    from engine.credentials import site, API_key
     datastore_active = get_resource_parameter(site, resource_id, 'datastore_active', API_key)
     if datastore_active:
         if resource_id in time_field_lookup:
@@ -39,6 +45,7 @@ def find_extreme_dates(resource_id, time_field_lookup):
                 first = parser.parse(first)
                 last = parser.parse(last)
                 return first, last
+
     return None, None
 
 #def synthesize_pseudo_time_field_lookup(job):
@@ -54,7 +61,7 @@ def get_extant_time_range(job, **kwparameters):
         ## 3) But try to make every parameter into a potential list this way
         ## (at least by allowing one parameter at a time to be changed).
 
-        package = job.package
+        package = get_package_by_id(job.package)
         if 'extras' in package:
             extras_list = package['extras']
             # Keep definitions and uses of extras metadata updated here:
@@ -63,10 +70,11 @@ def get_extant_time_range(job, **kwparameters):
             #       u'extras': [{u'key': u'dcat_issued', u'value': u'2014-01-07T15:27:45.000Z'}, ...
             # not a dict, but a list of dicts.
             extras = {d['key']: d['value'] for d in extras_list}
-            #if 'dcat_issued' not in extras:
-            if 'time_field' in extras:
+            resource_id = find_resource_id(job.package, job.resource_name) # This adds a second call to get the
+                # package when it's already been obtained a few lines above.
+            if resource_id is not None and 'time_field' in extras and resource_id in json.loads(extras['time_field']):
                 time_field_lookup = json.loads(extras['time_field'])
-                first_date, last_date = find_extreme_dates(job.resource_id, time_field_lookup)
+                first_date, last_date = find_extreme_dates(resource_id, time_field_lookup)
                 return first_date, last_date
             else:
                 try:
