@@ -167,41 +167,56 @@ if __name__ == '__main__':
                         print("*** {} terminated with a FileNotFoundError. ***".format(module))
 
     elif len(sys.argv) != 1:
-        payload_path = sys.argv[1]
-        # Clean path 1: Remove optional ".py" extension
-        payload_path = re.sub('\.py$','',payload_path)
-        # Clean path 2: Remove optional leading directories. This allows tab completion
-        # from the level of launchpad.py, the engine directory, or the payload subdirectory.
-        payload_path = re.sub('^payload\/','',payload_path)
-        payload_path = re.sub('^engine\/payload\/','',payload_path)
-        # Verify path.
-        payload_parts = payload_path.split('/')
-        payload_location = '/'.join(payload_parts[:-1])
-        module_name = payload_parts[-1]
-        full_payload_path = BASE_DIR + 'engine/payload/' + payload_location
-        if not os.path.exists(full_payload_path):
-            raise ValueError("Unable to find payload directory at {}".format(full_payload_path))
-        module_path = full_payload_path + '/' + module_name + '.py'
-        if not os.path.exists(module_path):
-            raise ValueError("Unable to find payload module at {}".format(module_path))
+        try:
+            payload_path = sys.argv[1]
+            # Clean path 1: Remove optional ".py" extension
+            payload_path = re.sub('\.py$','',payload_path)
+            # Clean path 2: Remove optional leading directories. This allows tab completion
+            # from the level of launchpad.py, the engine directory, or the payload subdirectory.
+            payload_path = re.sub('^payload\/','',payload_path)
+            payload_path = re.sub('^engine\/payload\/','',payload_path)
+            # Verify path.
+            payload_parts = payload_path.split('/')
+            payload_location = '/'.join(payload_parts[:-1])
+            module_name = payload_parts[-1]
+            full_payload_path = BASE_DIR + 'engine/payload/' + payload_location
+            if not os.path.exists(full_payload_path):
+                raise ValueError("Unable to find payload directory at {}".format(full_payload_path))
+            module_path = full_payload_path + '/' + module_name + '.py'
+            if not os.path.exists(module_path):
+                raise ValueError("Unable to find payload module at {}".format(module_path))
 
-        module = import_module(module_path, module_name) # We want to import job_dicts
-        job_dicts = module.job_dicts
-        for job_dict in job_dicts:
-            job_dict['job_directory'] = payload_parts[-2]
+            module = import_module(module_path, module_name) # We want to import job_dicts
+            job_dicts = module.job_dicts
+            for job_dict in job_dicts:
+                job_dict['job_directory'] = payload_parts[-2]
 
-        args = sys.argv[2:]
-        copy_of_args = list(args)
-        mute_alerts = False
-        use_local_files = False
-        clear_first = False
-        wipe_data = False
-        migrate_schema = False
-        ignore_empty_rows = False
-        logging = False
-        test_mode = not PRODUCTION # Use PRODUCTION boolean from parameters/local_parameters.py to set whether test_mode defaults to True or False
-        wake_me_when_found = False
-        selected_job_codes = []
+            args = sys.argv[2:]
+            copy_of_args = list(args)
+            mute_alerts = False
+            use_local_files = False
+            clear_first = False
+            wipe_data = False
+            migrate_schema = False
+            ignore_empty_rows = False
+            logging = False
+            test_mode = not PRODUCTION # Use PRODUCTION boolean from parameters/local_parameters.py to set whether test_mode defaults to True or False
+            wake_me_when_found = False
+            selected_job_codes = []
+        except: # This is mainly to catch import_module errors and make sure
+            # that they result in Slack notifications.
+            e = sys.exc_info()[0]
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
+            msg = ''.join('!! ' + line for line in lines)
+            print(msg) # Log it or whatever here
+            if 'mute' not in copy_of_args and 'mute_alert' not in copy_of_args:
+                channel = "@david" if (test_mode or not PRODUCTION) else "#etl-hell"
+                if channel != "@david":
+                    msg = f"@david {msg}"
+                send_to_slack(msg, username='{}/{} ETL assistant'.format(payload_location, module_name), channel=channel, icon=':illuminati:')
+            raise
+
         if not PRODUCTION and 'test' not in copy_of_args and 'production' not in copy_of_args:
             print("Remember that to make changes to production datasets when on a PRODUCTION = False, it's necessary to use the command-line parameter 'production'.")
         try:
