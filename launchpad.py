@@ -168,6 +168,18 @@ if __name__ == '__main__':
 
     elif len(sys.argv) != 1:
         try:
+            args = sys.argv[2:]
+            copy_of_args = list(args)
+            mute_alerts = False
+            use_local_files = False
+            clear_first = False
+            wipe_data = False
+            migrate_schema = False
+            ignore_empty_rows = False
+            logging = False
+            test_mode = not PRODUCTION # Use PRODUCTION boolean from parameters/local_parameters.py to set whether test_mode defaults to True or False
+            wake_me_when_found = False
+
             payload_path = sys.argv[1]
             # Clean path 1: Remove optional ".py" extension
             payload_path = re.sub('\.py$','',payload_path)
@@ -191,17 +203,6 @@ if __name__ == '__main__':
             for job_dict in job_dicts:
                 job_dict['job_directory'] = payload_parts[-2]
 
-            args = sys.argv[2:]
-            copy_of_args = list(args)
-            mute_alerts = False
-            use_local_files = False
-            clear_first = False
-            wipe_data = False
-            migrate_schema = False
-            ignore_empty_rows = False
-            logging = False
-            test_mode = not PRODUCTION # Use PRODUCTION boolean from parameters/local_parameters.py to set whether test_mode defaults to True or False
-            wake_me_when_found = False
             selected_job_codes = []
         except: # This is mainly to catch import_module errors and make sure
             # that they result in Slack notifications.
