@@ -216,7 +216,7 @@ def main(use_local_files=False,clear_first=False,test_mode=False):
         locators_by_destination = process_job(job,use_local_files,clear_first,test_mode)
         for destination, resource_id in locators_by_destination.items():
             if destination == 'ckan':
-                post_process(resource_id)
+                post_process(resource_id, job)
 
 if __name__ == '__main__':
     mute_alerts = False
