@@ -4,7 +4,7 @@ import io
 from collections import OrderedDict
 from engine.wprdc_etl.pipeline.exceptions import IsHeaderException
 from xlrd import open_workbook, xldate_as_tuple, XL_CELL_DATE
-
+from openpyxl import load_workbook
 
 class Extractor(object):
     def __init__(self, connection):
@@ -129,13 +129,80 @@ class CSVExtractor(TableExtractor):
         reader = csv.reader(self.connection, delimiter=self.delimiter)
         return reader
 
-
 class ExcelExtractor(TableExtractor):
-    '''TableExtractor subclass for Microsoft Excel spreadsheet files (XLS, XLSX)
+    '''TableExtractor subclass for newer Microsoft Excel spreadsheet files (XLSX)
     '''
-
+    # XLSX files are compressed XML files.
     def __init__(self, connection, *args, **kwargs):
         super(ExcelExtractor, self).__init__(connection, *args, **kwargs)
+        self.firstline_headers = kwargs.get('firstline_headers', True)
+        self.sheet_index = kwargs.get('sheet_index', 0)
+        self.datemode = None
+        self.set_headers()
+
+    def set_headers(self, headers=None):
+        '''Sets headers from file or passed headers
+
+        This method sets two attributes on the class: the headers
+        attribute and the schema_headers attribute. schema_headers
+        must align with the schema attributes for the pipeline.
+
+        If no headers are passed, then we check the first line of the file.
+        The headers attribute is set from the first line, and schema
+        headers are by default created by lowercasing and replacing
+        spaces with underscores. Custom header -> schema header mappings can
+        be created by subclassing the CSVExtractor and overwriting the
+        create_schema_headers method.
+
+        Keyword Arguments:
+            headers: Optional headers that can be passed to be used
+                as the headers and schema headers
+
+        Raises:
+            RuntimeError: if self.headers is not passed and the
+            firstline_headers kwarg is not set.
+        '''
+        if headers:
+            self.headers = headers
+            self.schema_headers = self.headers
+            return
+        elif self.firstline_headers:
+            self.connection.seek(0)
+            workbook = load_workbook(self.connection, read_only=True, data_only=True)
+            # openpyxl's load_workbook function prefers to be sent a filename
+            # or a file-like object open in binary mode e.g., zipfile.ZipFile.
+            sheet = workbook.worksheets[self.sheet_index]
+            self.headers = [cell.value for cell in sheet[1]]
+            self.schema_headers = self.create_schema_headers(self.headers)
+        else:
+            raise RuntimeError('No headers were passed or detected.')
+
+    def process_connection(self):
+        data = []
+        self.connection.seek(0)
+        workbook = load_workbook(self.connection, read_only=True, data_only=True)
+        sheet = workbook.worksheets[self.sheet_index]
+        rows = sheet.rows
+        data = []
+        for row in rows:
+            values = []
+            for cell in row:
+                if cell.data_type == 's':
+                    values.append(cell.value.strip())
+                else:
+                    values.append(cell.value)
+            data.append(values)
+            if len(data) % 1000 == 0: print(len(data))
+
+        return iter(data)
+
+class OldExcelExtractor(TableExtractor):
+    '''TableExtractor subclass for Microsoft Excel spreadsheet files (XLS)
+    '''
+    # Note that this supposedly used to support XLSX files (I think that
+    # xlrd used to support XLSX files but no longer does).
+    def __init__(self, connection, *args, **kwargs):
+        super(OldExcelExtractor, self).__init__(connection, *args, **kwargs)
         self.firstline_headers = kwargs.get('firstline_headers', True)
         self.sheet_index = kwargs.get('sheet_index', 0)
         self.datemode = None
