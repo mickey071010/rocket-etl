@@ -114,6 +114,8 @@ class RemoteFileConnector(FileConnector):
 class HTTPConnector(Connector):
     ''' Connect to remote file via HTTP
     '''
+    # It looks like RemoteFileConnector is designed to handle a file served by a web server,
+    # while HTTPConnector is designed to pull text or JSON from a web server.
     def connect(self, target):
         response = requests.get(target)
         if response.status_code > 299:
