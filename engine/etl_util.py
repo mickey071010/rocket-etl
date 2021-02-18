@@ -558,6 +558,7 @@ class Job:
         self.custom_processing = job_dict['custom_processing'] if 'custom_processing' in job_dict else (lambda *args, **kwargs: None)
         self.custom_post_processing = job_dict['custom_post_processing'] if 'custom_post_processing' in job_dict else (lambda *args, **kwargs: None)
         self.schema = job_dict['schema'] if 'schema' in job_dict and job_dict['schema'] is not None else NullSchema
+        self.filters = job_dict['filters'] if 'filters' in job_dict else []
         self.primary_key_fields = job_dict['primary_key_fields'] if 'primary_key_fields' in job_dict else None
         self.time_field = job_dict['time_field'] if 'time_field' in job_dict else None # Specify the field that provides a good temporal key.
         self.upload_method = job_dict['upload_method'] if 'upload_method' in job_dict else None
@@ -768,7 +769,7 @@ class Job:
                 # END Destination-specific configuration
 
                 try:
-                    curr_pipeline = pl.Pipeline(self.job_code + ' pipeline', self.job_code + ' Pipeline', log_status=False, chunk_size=1000, settings_file=SETTINGS_FILE, retry_without_last_line = retry_without_last_line, ignore_empty_rows = ignore_empty_rows) \
+                    curr_pipeline = pl.Pipeline(self.job_code + ' pipeline', self.job_code + ' Pipeline', log_status=False, chunk_size=1000, settings_file=SETTINGS_FILE, retry_without_last_line = retry_without_last_line, ignore_empty_rows = ignore_empty_rows, filters = self.filters) \
                         .connect(self.source_connector, self.target, config_string=self.connector_config_string, encoding=self.encoding, local_cache_filepath=self.local_cache_filepath) \
                         .extract(self.extractor, firstline_headers=True) \
                         .schema(self.schema) \

@@ -29,7 +29,8 @@ class Pipeline(object):
             chunk_size=2500, start_from_chunk=0,
             strict_load=True,
             retry_without_last_line=False,
-            ignore_empty_rows=False
+            ignore_empty_rows=False,
+            filters = []
     ):
         '''
         Arguments:
@@ -70,6 +71,7 @@ class Pipeline(object):
         self.conn_name = conn_name
         self.strict_load = strict_load
         self.ignore_empty_rows = ignore_empty_rows
+        self.filters = filters
 
         if conn:
             self.conn = conn
@@ -205,6 +207,37 @@ class Pipeline(object):
             else:
                 self.data.append(self.__schema.dump(loaded.data).data)
 
+    def _apply_operator(self, value_1, value_2, operator):
+        if operator == "==":
+            return value_1 == value_2
+        if operator == "!=":
+            return value_1 != value_2
+        if operator == ">":
+            return value_1 > value_2
+        if operator == "<":
+            return value_1 > value_2
+        if operator == "in":
+            return value_1 in value_2
+        if operator == "not in":
+            return value_1 not in value_2
+        if operator == "includes": # Works for value_1 being a string or list.
+            return value2 in value_1
+        if operator in ["excludes", "not includes"]:
+            return value2 not in value_1
+        # Other possibilities would be regular expression matches/searches and XOR.
+        raise ValueError(f"apply_operator does not know how to use the {operator} operator.")
+
+    def apply_filters(self, data):
+        """Apply filters in the format [[field1, operator1, value1],...
+                                        [fieldN, operatorN, valueN]]
+           to single rows of data.
+        """
+        for data_filter in self.filters:
+            field, operator, value = data_filter
+            if not self._apply_operator(data[field], value, operator):
+                return []
+        return data # This assumes that data is just a single row.
+
     def enforce_full_pipeline(self):
         '''Ensure that a pipeline has an extractor, schema, and loader
 
@@ -337,7 +370,12 @@ class Pipeline(object):
                             line = next(raw)
                             if chunk_count >= self.start_from_chunk:
                                 data = _extractor.handle_line(line) # line can be a record or a file.
-                                self.load_line(data) # Queue whatever is in data for eventual loading.
+                                if self.filters in [None, []]:
+                                    self.load_line(data) # Queue whatever is in data for eventual loading.
+                                else:
+                                    filtered_data = self.apply_filters(data)
+                                    if filtered_data != []:
+                                        self.load_line(filtered_data) # Queue whatever is in data for eventual loading.
                         except IsHeaderException:
                             continue
                         except:
