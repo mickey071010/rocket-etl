@@ -550,7 +550,7 @@ class CKANDatastoreLoader(CKANLoader):
             return upsert_status, update_status
 
 class FileLoader(Loader):
-    """Write data to a local file, testing or as an intermediate step
+    """Write data to a local file, for testing or as an intermediate step
     in a chain of atomic pipeline actions."""
     has_tabular_output = True # For now, though eventually there might
     # be TabularFileLoader (with CSV as a type) and NontabularFileLoader.

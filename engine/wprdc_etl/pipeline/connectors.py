@@ -57,10 +57,10 @@ class FileConnector(Connector):
         Returns:
             A `file-object`_
         '''
-        if self.encoding:
+        if self.encoding and self.encoding != 'binary':
             self._file = open(target, 'r', encoding=self.encoding)
         else:
-            self._file = open(target, 'rb', encoding=self.encoding)
+            self._file = open(target, 'rb')
         return self._file
 
     def checksum_contents(self, target, blocksize=8192):
@@ -106,9 +106,14 @@ class RemoteFileConnector(FileConnector):
             target: Remote URL
 
         Returns:
-            :py:class:`io.TextIOWrapper` around the opened URL.
+            :py:class:`io.TextIOWrapper` around the opened URL unless
+            the encoding is 'binary', in which case it returns
+            a `io.BufferedReader` instance.
         '''
-        self._file = TextIOWrapper(urllib.request.urlopen(target), encoding=self.encoding)
+        if self.encoding == 'binary':
+            self._file = io.BytesIO(urllib.request.urlopen(target).read())
+        else:
+            self._file = TextIOWrapper(urllib.request.urlopen(target), encoding=self.encoding)
         return self._file
 
 class HTTPConnector(Connector):

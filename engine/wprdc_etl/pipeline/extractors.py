@@ -167,7 +167,7 @@ class ExcelExtractor(TableExtractor):
             self.schema_headers = self.headers
             return
         elif self.firstline_headers:
-            self.connection.seek(0)
+            self.connection.seek(0) # This line doesn't seem to do anything for an Excel file.
             workbook = load_workbook(self.connection, read_only=True, data_only=True)
             # openpyxl's load_workbook function prefers to be sent a filename
             # or a file-like object open in binary mode e.g., zipfile.ZipFile.
@@ -179,7 +179,7 @@ class ExcelExtractor(TableExtractor):
 
     def process_connection(self):
         data = []
-        self.connection.seek(0)
+        self.connection.seek(0) # This line doesn't seem to do anything for an Excel file.
         workbook = load_workbook(self.connection, read_only=True, data_only=True)
         sheet = workbook.worksheets[self.sheet_index]
         rows = sheet.rows
