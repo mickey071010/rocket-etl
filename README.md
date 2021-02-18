@@ -82,3 +82,34 @@ Finally, to search for all jobs in the payload directory and test them all (dire
 > python launchpad.py test_all
 ```
 This is useful for making sure that nothing breaks after you modify the ETL framework.
+
+# Writing ETL jobs
+
+## Job description
+Each atomic job unit is initially represented as a "job_dict", a dictionary specifying parameters of the job unit. This job_dict describes the job that fetches a CSV of dog-license records, processes them through the given schema and inserts them into a table (named "[CURRENT YEAR] Dog Licenses") on the default CKAN site, in the package with given the package ID.
+```
+    {
+        'job_code': 'dog_licenses_this_year',
+        'source_type': 'sftp',
+        'source_dir': 'Dog_Licenses',
+        'source_file': f'DL_gvData_{current_year}.csv',
+        'connector_config_string': 'sftp.county_sftp',
+        'encoding': 'utf-8-sig',
+        'schema': DogLicensesSchema,
+        'always_wipe_data': True,
+        'upload_method': 'insert',
+        #'destinations': ['file'], # These lines are just for testing
+        #'destination_file': f'{current_year}_dog_licenses.csv', # purposes.
+        'package': dog_licenses_package_id,
+        'resource_name': f'{current_year} Dog Licenses'
+    }
+```
+If `always_wipe_data` is True, all the records in the table will be deleted (though the table and the integrated data dictionary will remain) and replaced by whatever records are in the file.
+
+* The `encoding` field should have a value of `binary` when fetching from a remote web site something like an Excel file.
+* `primary_key_fields` can be used to specify a list of field names which together provide a unique key for upserting records to the destination.
+* The value of `destinations` is `['ckan']` by default, which sends the data to the specified CKAN datastore. Other supported values are `ckan_filestore` and `file` (which saves the records to a local file). A `destinations` field is paired with a `destinations_file` field to provide the name that the file should be saved to.
+* The `custom_post_processing` field gives the name of a function that should be invoked after the job is run to, for instance, delete the source file or run validation on the data at the destination.
+* The `custom_processing` field gives the name of a function that does pre-processing (for example, fetching a file from an API and then saving it to the correct source_files directory, from which the main join fetches it using `source_type = local`).
+* The `filters` value is a list of lists, where each list has three elements: 1) field name, 2) operator, and 3) value. The current implementation of filters is that a `filters` value of `[['breed', '==', 'Chihuahua']]` will filter the data down to only those records where the `breed` value is `Chihuahua`. Multiple filters are ANDed together, comprising an increasingly narrow filter. (This implementation was chosen since it's the kind of filtering that we tend to require.) Many other operators are supported, including `'!='`.
+* `time_field` is used to set the time field for a given resource (in the package metadata) and can also be used to make the ETL job time-aware (capable of pulling only the needed records to fill in the gap between the last published record and the present).
