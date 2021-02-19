@@ -46,7 +46,7 @@ def site_is_up(site):
 # End network functions #
 
 class MultifamilyInsuredMortgagesSchema(pl.BaseSchema):
-    job_code = 'mimortgages'
+    job_code = 'mf_mortgages'
     hud_property_name = fields.String(load_from='property_name', dump_to='hud_property_name')
     property_street_address = fields.String(load_from='property_street', dump_to='property_street_address', allow_none=True)
     fha_loan_id = fields.String(load_from='hud_project_number', dump_to='fha_loan_id')
@@ -91,12 +91,45 @@ class MultifamilyInsuredMortgagesSchema(pl.BaseSchema):
     @post_load
     def handle_weird_field_name(self, data):
         data['program_category'] = data['soa_category_sub_category']
+
+
+class MultifamilyProductionInitialCommitmentSchema(pl.BaseSchema):
+    job_code = 'mf_init_commit'
+    hud_property_name = fields.String(load_from='project_name', dump_to='hud_property_name')
+    fha_loan_id = fields.String(load_from='fha_number', dump_to='fha_loan_id')
+    city = fields.String(load_from='PROJECT_CITY'.lower(), dump_to='city')
+    state = fields.String(load_from='PROJECT_STATE'.lower(), dump_to='state')
+    date_of_initial_endorsement = fields.Date(load_from='Date of Initial Endorsement'.lower(), dump_to='initial_endorsement_date')
+    mortgage_at_initial_endorsement = fields.Integer(load_from='Mortgage at Initial Endorsement'.lower(), dump_to='original_mortgage_amount')
+    program_category = fields.String(load_from='Program Category'.lower())
+    unit_or_bed_count = fields.Integer(load_from='Unit or Bed Count'.lower(), dump_to='units')
+    basic_fha_risk_share_or_other = fields.String(load_from='basic_fha,_risk_share,_or_other', dump_to='basic_fha_risk_share_or_other')
+    current_status = fields.String(load_from='Current Status'.lower(), dump_to='current_status_of_loan')
+    date_of_firm_issue = fields.Date(load_from='Date of Firm Issue'.lower(), dump_to='date_of_firm_issue')
+    firm_commitment_lender = fields.String(load_from='Firm Commitment Lender'.lower(), dump_to='firm_commitment_lender')
+    final_endorsement_lender = fields.String(load_from='Final Endorsement Lender'.lower(), dump_to='holder_name', allow_none=True)
+
+    class Meta:
+        ordered = True
+
+    @pre_load
+    def fix_dates(self, data):
+        """Marshmallow doesn't know how to handle a datetime as input. It can only
+        take strings that represent datetimes and convert them to datetimes.:
+        https://github.com/marshmallow-code/marshmallow/issues/656
+        So this is a workaround.
+        """
+        ic(data)
+
+        date_fields = ['date_of_firm_issue', 'date_of_initial_endorsement']
+        for f in date_fields:
+            data[f] = data[f].date().isoformat()
 # dfg
 
 job_dicts = [
     {
         'update': 0,
-        'job_code': MultifamilyInsuredMortgagesSchema().job_code, #'mimortgages'
+        'job_code': MultifamilyInsuredMortgagesSchema().job_code, #'mf_mortgages'
         #This Excel 2018 file includes all active HUD Multifamily insured mortgages. The data is as of  January 4, 2021 and is updated monthly. It is extracted from MFIS and includes the following data elements:
         #   FHA Project Number
         #   Project Name
@@ -122,12 +155,11 @@ job_dicts = [
         #   Servicer State
         #   Section of the Act Code (SoA)
         #   Section of the Act Category/Sub Category (Note: SOA codes are available on this list: SoA_list.xlsx.)
-        #    
+        # 
         #   Tax Exempt Bond Financing Code (Mortgages financed by tax exempt bonds are indicated by "TE" code. This field was updated on new endorsements beginning in CY 2000).
-        #    
+        # 
         #   Tax Credit Code (Mortgages that include Low Income Housing Tax Credits (LIHTC) are indicated by the "TC" code. This field was updated on endorsements beginning in the middle of 1998.)
         'source_type': 'http',
-        #'source_type': 'local',
         'source_url_path': 'https://www.hud.gov/sites/dfiles/Housing/images',
         'source_file': 'FHA_BF90_RM_A_01042021.xlsx',
         'encoding': 'binary',
@@ -136,7 +168,22 @@ job_dicts = [
         'always_wipe_data': True,
         'primary_key_fields': ['hud_project_number'], # "HUD PROJECT NUMBER" seems pretty unique.
         'destinations': ['file'],
-        'destination_file': 'multifamily_insured_mortgages.csv',
+        'destination_file': 'mf_mortgages.csv',
+    },
+    {
+        'update': 0,
+        'job_code': MultifamilyProductionInitialCommitmentSchema().job_code, # 'mf_init_commit'
+        'source_type': 'http',
+        'source_url_path': 'https://www.hud.gov/sites/dfiles/Housing/documents',
+        'source_file': 'Initi_Endores_Firm%20Comm_DB_FY21_Q1.xlsx',
+        'encoding': 'binary',
+        'rows_to_skip': 3,
+        'schema': MultifamilyProductionInitialCommitmentSchema,
+        'filters': [['project_state', '==', 'PA']],
+        'always_wipe_data': True,
+        'primary_key_fields': ['fha_number'], # "HUD PROJECT NUMBER" seems pretty unique.
+        'destinations': ['file'],
+        'destination_file': 'mf_init_commit.csv',
     },
 ]
 
