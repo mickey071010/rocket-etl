@@ -20,7 +20,7 @@ except ImportError:  # Graceful fallback if IceCream isn't installed.
     ic = lambda *a: None if not a else (a[0] if len(a) == 1 else a)  # noqa
 
 class Requests211Schema(pl.BaseSchema):
-    date_of_call = fields.Date(allow_none=False)
+    contact_date = fields.Date(allow_none=False)
     gender = fields.String(allow_none=True)
     age_range = fields.String(allow_none=True)
     zip_code = fields.String(allow_none=True)
@@ -213,7 +213,7 @@ def decode_calls(calls):
         #    call['population_categories'] = '|'.join(population_categories)
 
         call['needs_code'] = call.get('TaxCode', None)
-        call['date_of_call'] = call.get('Date_of_Call', None)
+        call['contact_date'] = call.get('Date_of_Call', None)
     return calls
 
 def pull_211_requests_and_save_to_file(job, **kwparameters):
@@ -251,7 +251,7 @@ def pull_211_requests_and_save_to_file(job, **kwparameters):
         decoded_calls = decode_calls(cleaned_calls)
         filename = job.target
         fields_to_write = [
-                'date_of_call',
+                'contact_date',
                 'gender',
                 'age_range',
                 'zip_code', 'county', 'state',
@@ -275,7 +275,7 @@ job_dicts = [
         'encoding': 'utf-8-sig',
         'custom_processing': pull_211_requests_and_save_to_file,
         'schema': Requests211Schema,
-        'time_field': 'date_of_call',
+        'time_field': 'contact_date',
         'always_wipe_data': False,
         #'primary_key_fields': None, # There is an ID which could be hashed,
         # but we opted to use the date field as a guideline and just do
