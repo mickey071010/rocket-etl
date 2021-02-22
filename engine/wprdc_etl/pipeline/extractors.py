@@ -137,6 +137,7 @@ class ExcelExtractor(TableExtractor):
         super(ExcelExtractor, self).__init__(connection, *args, **kwargs)
         self.firstline_headers = kwargs.get('firstline_headers', True)
         self.sheet_index = kwargs.get('sheet_index', 0)
+        self.rows_to_skip = kwargs.get('rows_to_skip', 0)
         self.datemode = None
         self.set_headers()
 
@@ -172,7 +173,7 @@ class ExcelExtractor(TableExtractor):
             # openpyxl's load_workbook function prefers to be sent a filename
             # or a file-like object open in binary mode e.g., zipfile.ZipFile.
             sheet = workbook.worksheets[self.sheet_index]
-            self.headers = [cell.value for cell in sheet[1]]
+            self.headers = [cell.value for cell in sheet[1 + self.rows_to_skip]] # The first row in an Excel file is row 1.
             self.schema_headers = self.create_schema_headers(self.headers)
         else:
             raise RuntimeError('No headers were passed or detected.')
@@ -184,7 +185,9 @@ class ExcelExtractor(TableExtractor):
         sheet = workbook.worksheets[self.sheet_index]
         rows = sheet.rows
         data = []
-        for row in rows:
+        for k, row in enumerate(rows):
+            if k < self.rows_to_skip:
+                continue
             values = []
             for cell in row:
                 if cell.data_type == 's':
