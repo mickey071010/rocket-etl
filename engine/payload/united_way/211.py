@@ -62,7 +62,7 @@ def get_calls_in_date_range(first_date, last_date):
         print(f"No calls found between {first_date} and {last_date}.")
     else:
         calls = d['NewDataSet']['Table']
-    # Tables look like this:
+    # Records look something like this:
     #OrderedDict([('Count', '1'),
     #             ('transaction_id', '254051'),
     #             ('TaxCode', 'BD-1800.2000'),
@@ -145,10 +145,16 @@ def initialize_zip_code_lookup():
 
 def initialize_taxonomy_lookups():
     from engine.parameters.local_parameters import REFERENCE_DIR
+    description_by_code = {}
+    with open(f'{REFERENCE_DIR}211__taxonomy_categories.csv', 'r') as f:
+        reader = csv.DictReader(f)
+        rows = list(reader)
+        for row in rows:
+            description_by_code[row['code']] = row['service_term']
+
     with open(f'{REFERENCE_DIR}211__Taxonomy_SW_PA_code_freq.csv', 'r') as f:
         reader = csv.DictReader(f)
         rows = list(reader)
-        description_by_code = {}
         for row in rows:
             description_by_code[row['code']] = row['service_term']
 
