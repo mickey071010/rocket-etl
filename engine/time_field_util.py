@@ -82,8 +82,8 @@ def get_extant_time_range(job, **kwparameters):
                 except AttributeError:
                     return None, None
                 else:
-                    time_field_lookup = {job.resource_id: time_field}
-                    first_date, last_date = find_extreme_dates(job.resource_id, time_field_lookup)
+                    time_field_lookup = {resource_id: time_field}
+                    first_date, last_date = find_extreme_dates(resource_id, time_field_lookup)
                     return first_date, last_date
                 return None, None
         else:
