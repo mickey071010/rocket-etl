@@ -72,7 +72,9 @@ def get_extant_time_range(job, **kwparameters):
             extras = {d['key']: d['value'] for d in extras_list}
             resource_id = find_resource_id(job.package, job.resource_name) # This adds a second call to get the
                 # package when it's already been obtained a few lines above.
-            if resource_id is not None and 'time_field' in extras and resource_id in json.loads(extras['time_field']):
+            if resource_id is None: # The resource does not yet exist.
+                return None, None
+            if 'time_field' in extras and resource_id in json.loads(extras['time_field']):
                 time_field_lookup = json.loads(extras['time_field'])
                 first_date, last_date = find_extreme_dates(resource_id, time_field_lookup)
                 return first_date, last_date
