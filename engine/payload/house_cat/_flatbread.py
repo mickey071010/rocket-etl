@@ -8,6 +8,7 @@ from marshmallow import fields, pre_load, post_load
 from engine.wprdc_etl import pipeline as pl
 from engine.etl_util import fetch_city_file
 from engine.notify import send_to_slack
+from engine.parameters.local_parameters import SOURCE_DIR
 
 try:
     from icecream import ic
@@ -119,11 +120,46 @@ class MultifamilyProductionInitialCommitmentSchema(pl.BaseSchema):
         https://github.com/marshmallow-code/marshmallow/issues/656
         So this is a workaround.
         """
-        ic(data)
-
         date_fields = ['date_of_firm_issue', 'date_of_initial_endorsement']
         for f in date_fields:
             data[f] = data[f].date().isoformat()
+
+class HousingInspectionScoresSchema(pl.BaseSchema):
+    job_code = 'housing_inspections'
+    state = fields.String(load_from='STATE_NAME'.lower(), dump_to='state')
+    latitude = fields.Float(load_from='LATITUDE'.lower(), allow_none=True)
+    longitude = fields.Float(load_from='LONGITUDE'.lower(), allow_none=True)
+    fips_county_code = fields.String(load_from='COUNTY_CODE'.lower(), dump_to='fips_county_code', allow_none=True)
+    hud_property_name = fields.String(load_from='development_name', dump_to='hud_property_name')
+    property_street_address = fields.String(load_from='ADDRESS'.lower(), dump_to='property_street_address')
+    inspection_id = fields.Integer(load_from='INSPECTION_ID'.lower())
+    inspection_property_id = fields.String(load_from='DEVELOPMENT_ID'.lower(), dump_to='inspection_property_id')
+    inspection_score = fields.Integer(load_from='INSPECTION_SCORE'.lower(), dump_to='inspection_score')
+    inspection_date = fields.Date(load_from='INSPECTION DATE'.lower(), dump_to='inspection_date')
+    pha_code = fields.String(load_from='PHA_CODE'.lower(), dump_to='participant_code')
+    pha_name = fields.String(load_from='PHA_NAME'.lower(), dump_to='formal_participant_name')
+
+    class Meta:
+        ordered = True
+
+    @pre_load
+    def synthesize_fips_county_code(self, data):
+        if data['county_code'] is None or data['state_code'] is None:
+            data['fips_county_code'] = None
+        else:
+            data['fips_county_code'] = f"{str(data['state_code'])}{str(data['county_code'])}"
+            assert len(data['fips_county_code']) == 5
+
+    @pre_load
+    def fix_dates(self, data):
+        """Marshmallow doesn't know how to handle a datetime as input. It can only
+        take strings that represent datetimes and convert them to datetimes.:
+        https://github.com/marshmallow-code/marshmallow/issues/656
+        So this is a workaround.
+        """
+        date_fields = ['inspection_date']
+        for f in date_fields:
+            data[f] = parser.parse(data[f]).date().isoformat()
 # dfg
 
 job_dicts = [
@@ -184,6 +220,21 @@ job_dicts = [
         'primary_key_fields': ['fha_number'], # "HUD PROJECT NUMBER" seems pretty unique.
         'destinations': ['file'],
         'destination_file': 'mf_init_commit.csv',
+    },
+    {
+        'update': 0,
+        'job_code': HousingInspectionScoresSchema().job_code, # 'housing_inspections'
+        'source_type': 'http',
+        'source_url_path': 'https://www.huduser.gov/portal/sites/default/files/xls',
+        'source_file': 'public_housing_physical_inspection_scores_0620.xlsx',
+        'encoding': 'binary',
+        'rows_to_skip': 0,
+        'schema': HousingInspectionScoresSchema,
+        'filters': [['state_name', '==', 'PA']], # use 'fips_county_code == 42003' to limit to Allegheny County
+        'always_wipe_data': True,
+        'primary_key_fields': ['fha_number'], # "HUD PROJECT NUMBER" seems pretty unique.
+        'destinations': ['file'],
+        'destination_file': 'housing_inspections.csv',
     },
 ]
 
