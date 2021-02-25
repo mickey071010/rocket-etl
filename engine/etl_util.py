@@ -550,7 +550,6 @@ class Job:
     def __init__(self, job_dict):
         self.job_directory = job_dict['job_directory']
         self.source_type = job_dict['source_type']
-        self.source_url_path = job_dict['source_url_path'] if 'source_url_path' in job_dict else None
         self.source_full_url = job_dict['source_full_url'] if 'source_full_url' in job_dict else None
         self.source_file = job_dict['source_file'] if 'source_file' in job_dict else None
         self.source_dir = job_dict['source_dir'] if 'source_dir' in job_dict else ''
@@ -606,7 +605,7 @@ class Job:
                     if self.source_full_url is not None:
                         self.target = self.source_full_url
                     else:
-                        self.target = self.source_url_path + '/' + self.source_file
+                        raise ValueError(f"No source_full_url specified for job code {self.job_code}.")
             elif self.source_type == 'sftp':
                 self.target = ftp_target(self)
                 self.source_connector = pl.SFTPConnector
@@ -711,8 +710,7 @@ class Job:
                 elif not use_local_files and self.source_type in ['http']: # [ ] Test this untested block.
                     # This could also happen in default_setup, but really everything under "if destination == 'ckan_filestore'"
                     # should be moved/eliminated once a CKANFileStoreLoader is written.
-                    source_url = f"{self.source_url_path}/{self.source_file}"
-                    self.target = cached_source_file_path = download_file_to_path(source_url, local_dir=WAITING_ROOM_DIR)
+                    self.target = cached_source_file_path = download_file_to_path(self.source_full_url, local_dir=WAITING_ROOM_DIR)
                     upload_kwargs['upload'] = open(self.target, 'r') # target is the source file path
                 elif not use_local_files and self.source_type in ['sftp']:
                     #ftp_connector = pl.SFTPConnector(host =

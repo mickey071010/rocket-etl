@@ -67,11 +67,8 @@ asset_package_id = "cd2b3e27-ca31-43e0-a8c6-2e6c43b4050a" # Production version o
 job_dicts = [
         {
         'source_type': 'http',
-        #'source_url_path': 'https://www.portauthority.org/external_data_sharing', # This is a stand-in for source_dir, so
-        # it maintains the convention of not having a trailing slash and allows source_file to still be parsed
-        # and easily used for whatever it was previously used for (specifying the file format in run_pipeline).
-        'source_url_path': 'https://assets.wprdc.org',
         'source_file': 'asset_dump.csv',
+        'source_full_url': 'https://assets.wprdc.org/asset_dump.csv',
         'encoding': 'utf-8-sig',
         'schema': AssetSchema,
         #'primary_key_fields': ['synthesized_key'],
