@@ -7,6 +7,7 @@ from collections import OrderedDict, defaultdict
 from marshmallow import fields, pre_load, post_load
 from engine.wprdc_etl import pipeline as pl
 from engine.etl_util import fetch_city_file
+from engine.arcgis_util import get_arcgis_data_url
 from engine.notify import send_to_slack
 from engine.parameters.local_parameters import SOURCE_DIR
 
@@ -160,6 +161,97 @@ class HousingInspectionScoresSchema(pl.BaseSchema):
         date_fields = ['inspection_date']
         for f in date_fields:
             data[f] = parser.parse(data[f]).date().isoformat()
+
+
+class HUDPublicHousingSchema(pl.BaseSchema):
+    job_code = 'hud_public_housing'
+    property_id = fields.String(load_from='DEVELOPMENT_CODE'.lower(), dump_to='property_id', allow_none=True) # Duplicated in "development_code" below.
+    latitude = fields.Float(load_from='\ufeffX'.lower(), dump_to='latitude', allow_none=True)
+    longitude = fields.Float(load_from='Y'.lower(), dump_to='longitude', allow_none=True)
+    lvl2kx = fields.String(load_from='LVL2KX', dump_to='geocoding_accuracy')
+        # 'R' - Interpolated rooftop (high degree of accuracy, symbolized as green)
+        # '4' - ZIP+4 centroid (high degree of accuracy, symbolized as green)
+        # 'B' - Block group centroid (medium degree of accuracy, symbolized as yellow)
+        # 'T' - Census tract centroid (low degree of accuracy, symbolized as red)
+        # '2' - ZIP+2 centroid (low degree of accuracy, symbolized as red)
+        # 'Z' - ZIP5 centroid (low degree of accuracy, symbolized as red)
+        # '5' - ZIP5 centroid (same as above, low degree of accuracy, symbolized as red)
+        # Null - Could not be geocoded (does not appear on the map)
+        # "For the purposes of displaying the location of an address on a map only use
+        # addresses and their associated lat/long coordinates where the LVL2KX field is
+        # coded 'R' or '4'. These codes ensure that the address is displayed on the
+        # correct street segment and in the correct census block."
+    county_level = fields.String(load_from='COUNTY_LEVEL'.lower(), dump_to='county_fips_code', allow_none=True)
+    tract_level = fields.String(load_from='TRACT_LEVEL'.lower(),dump_to='census_tract', allow_none=True)
+    curcosub = fields.String(load_from='CURCOSUB'.lower(),dump_to='municipality_fips', allow_none=True)
+    curcosub_nm = fields.String(load_from='CURCOSUB_NM'.lower(),dump_to='municipality_name', allow_none=True)
+    hud_property_name =  fields.String(load_from='PROJECT_NAME'.lower(), dump_to='hud_property_name')
+    property_street_address = fields.String(load_from='STD_ADDR'.lower(), dump_to='property_street_address', allow_none=True)
+    city = fields.String(load_from='STD_CITY'.lower(), dump_to='city')
+    state = fields.String(load_from='STD_ST'.lower(), dump_to='state')
+    zip_code = fields.String(load_from='STD_ZIP5'.lower(), dump_to='zip_code')
+    units = fields.Integer(load_from='TOTAL_UNITS'.lower(), dump_to='units')
+    owner_name = fields.String(load_from='FORMAL_PARTICIPANT_NAME'.lower(), dump_to='owner_name')
+
+    # Public-Housing-Project-specific fields
+    participant_code = fields.String(load_from='PARTICIPANT_CODE'.lower(), dump_to='participant_code')
+    formal_participant_name = fields.String(load_from='FORMAL_PARTICIPANT_NAME'.lower(), dump_to='formal_participant_name')
+    development_code = fields.String(load_from='DEVELOPMENT_CODE'.lower())
+    project_name = fields.String(load_from='PROJECT_NAME'.lower(), dump_to='project_name')
+    scattered_site_ind = fields.String(load_from='SCATTERED_SITE_IND'.lower(), dump_to='scattered_site_ind')
+    pd_status_type_code = fields.String(load_from='PD_STATUS_TYPE_CODE'.lower(), dump_to='pd_status_type_code')
+    total_dwelling_units = fields.Integer(load_from='TOTAL_DWELLING_UNITS'.lower(), dump_to='total_dwelling_units')
+    acc_units = fields.Integer(load_from='ACC_UNITS'.lower(), dump_to='acc_units')
+    total_occupied = fields.Integer(load_from='TOTAL_OCCUPIED'.lower(), dump_to='total_occupied')
+    regular_vacant = fields.Integer(load_from='REGULAR_VACANT'.lower(), dump_to='regular_vacant')
+    total_units = fields.Integer(load_from='TOTAL_UNITS'.lower(), dump_to='total_units')
+    pha_total_units = fields.Integer(load_from='PHA_TOTAL_UNITS'.lower(), dump_to='pha_total_units')
+    percent_occupied = fields.String(load_from='PCT_OCCUPIED'.lower(), dump_to='percent_occupied', allow_none=True)
+    people_per_unit = fields.Float(load_from='PEOPLE_PER_UNIT'.lower(), dump_to='people_per_unit', allow_none=True)
+    people_total = fields.Integer(load_from='PEOPLE_TOTAL'.lower(), dump_to='people_total', allow_none=True)
+    rent_per_month = fields.Integer(load_from='RENT_PER_MONTH'.lower(), dump_to='rent_per_month', allow_none=True)
+    median_inc_amnt = fields.Integer(load_from='MEDIAN_INC_AMNT'.lower(), dump_to='median_inc_amnt', allow_none=True)
+    hh_income = fields.Integer(load_from='HH_INCOME'.lower(), dump_to='hh_income', allow_none=True)
+    person_income = fields.Integer(load_from='PERSON_INCOME'.lower(), dump_to='person_income', allow_none=True)
+    pct_lt5k = fields.Float(load_from='PCT_LT5K'.lower(), dump_to='pct_lt5k', allow_none=True)
+    pct_5k_lt10k = fields.Float(load_from='PCT_5K_LT10K'.lower(), dump_to='pct_5k_lt10k', allow_none=True)
+    pct_10k_lt15k = fields.Float(load_from='PCT_10K_LT15K'.lower(), dump_to='pct_10k_lt15k', allow_none=True)
+    pct_15k_lt20k = fields.Float(load_from='PCT_15K_LT20K'.lower(), dump_to='pct_15k_lt20k', allow_none=True)
+    pct_ge20k = fields.Float(load_from='PCT_GE20K'.lower(), dump_to='pct_ge20k', allow_none=True)
+    pct_lt80_median = fields.String(load_from='PCT_LT80_MEDIAN'.lower(), dump_to='pct_lt80_median', allow_none=True)
+    pct_lt50_median = fields.Float(load_from='PCT_LT50_MEDIAN'.lower(), dump_to='pct_lt50_median', allow_none=True)
+    pct_lt30_median = fields.Float(load_from='PCT_LT30_MEDIAN'.lower(), dump_to='pct_lt30_median', allow_none=True)
+    pct_bed1 = fields.Float(load_from='PCT_BED1'.lower(), dump_to='pct_bed1', allow_none=True)
+    pct_bed2 = fields.Float(load_from='PCT_BED2'.lower(), dump_to='pct_bed2', allow_none=True)
+    pct_bed3 = fields.Float(load_from='PCT_BED3'.lower(), dump_to='pct_bed3', allow_none=True)
+    pct_overhoused = fields.Float(load_from='PCT_OVERHOUSED'.lower(), dump_to='pct_overhoused', allow_none=True)
+    tminority = fields.String(load_from='TMINORITY'.lower(), dump_to='tminority', allow_none=True)
+    tpoverty = fields.String(load_from='TPOVERTY'.lower(), dump_to='tpoverty', allow_none=True)
+    tpct_ownsfd = fields.String(load_from='TPCT_OWNSFD'.lower(), dump_to='tpct_ownsfd', allow_none=True)
+    chldrn_mbr_cnt = fields.Integer(load_from='CHLDRN_MBR_CNT'.lower(), dump_to='chldrn_mbr_cnt', allow_none=True)
+    eldly_prcnt = fields.String(load_from='ELDLY_PRCNT'.lower(), dump_to='eldly_prcnt', allow_none=True)
+    pct_disabled_lt62_all = fields.String(load_from='PCT_DISABLED_LT62_ALL'.lower(), dump_to='pct_disabled_lt62_all', allow_none=True)
+
+
+    class Meta:
+        ordered = True
+
+    @pre_load
+    def fix_obscured_values(self, data):
+        """ 'In an effort to protect Personally Identifiable Information (PII), the characteristics
+        for each building are suppressed with a -4 value when the "Number_Reported" is equal to,
+        or less than 10.' - https://hudgis-hud.opendata.arcgis.com/datasets/public-housing-buildings
+        """
+        fields = ['pct_occupied', 'people_per_unit', 'people_total', 'rent_per_month',
+                'hh_income', 'person_income', 'pct_lt5k', 'pct_5k_lt10k', 'pct_10k_lt15k',
+                'pct_15k_lt20k', 'pct_ge20k', 'pct_lt50_median', 'pct_lt30_median',
+                'pct_bed1', 'pct_bed2', 'pct_bed3', 'pct_overhoused', 'tminority',
+                'tpoverty', 'tpct_ownsfd', 'chldrn_mbr_cnt', 'eldly_prcnt',
+                'pct_disabled_lt62_all', 'pct_lt80_median', 'median_inc_amnt',
+                ]
+        for f in fields:
+            if data[f] == '-4':
+                data[f] = None
 # dfg
 
 job_dicts = [
@@ -191,9 +283,9 @@ job_dicts = [
         #   Servicer State
         #   Section of the Act Code (SoA)
         #   Section of the Act Category/Sub Category (Note: SOA codes are available on this list: SoA_list.xlsx.)
-        # 
+        #
         #   Tax Exempt Bond Financing Code (Mortgages financed by tax exempt bonds are indicated by "TE" code. This field was updated on new endorsements beginning in CY 2000).
-        # 
+        #
         #   Tax Credit Code (Mortgages that include Low Income Housing Tax Credits (LIHTC) are indicated by the "TC" code. This field was updated on endorsements beginning in the middle of 1998.)
         'source_type': 'http',
         'source_file': 'FHA_BF90_RM_A_01042021.xlsx',
@@ -235,6 +327,20 @@ job_dicts = [
         'primary_key_fields': ['fha_number'], # "HUD PROJECT NUMBER" seems pretty unique.
         'destinations': ['file'],
         'destination_file': 'housing_inspections.csv',
+    },
+    {
+        'update': 0,
+        'job_code': HUDPublicHousingSchema().job_code, # 'hud_public_housing'
+        'source_type': 'http',
+        'source_file': get_arcgis_data_url('https://hudgis-hud.opendata.arcgis.com/data.json', 'Public Housing Developments', 'CSV')[1],
+        'source_full_url': get_arcgis_data_url('https://hudgis-hud.opendata.arcgis.com/data.json', 'Public Housing Developments', 'CSV')[0],
+        'encoding': 'utf-8',
+        'schema': HUDPublicHousingSchema,
+        'filters': [['std_st', '==', 'PA']], # Coordinates could be used to filter to Allegheny County.
+        'always_wipe_data': True,
+        #'primary_key_fields': # DEVELOPMENT_CODE seems like a possible unique key.
+        'destinations': ['file'],
+        'destination_file': 'public_housing.csv',
     },
 ]
 
