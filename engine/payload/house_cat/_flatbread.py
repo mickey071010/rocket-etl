@@ -196,11 +196,11 @@ job_dicts = [
         # 
         #   Tax Credit Code (Mortgages that include Low Income Housing Tax Credits (LIHTC) are indicated by the "TC" code. This field was updated on endorsements beginning in the middle of 1998.)
         'source_type': 'http',
-        'source_url_path': 'https://www.hud.gov/sites/dfiles/Housing/images',
         'source_file': 'FHA_BF90_RM_A_01042021.xlsx',
+        'source_full_url': 'https://www.hud.gov/sites/dfiles/Housing/images/FHA_BF90_RM_A_01042021.xlsx',
         'encoding': 'binary',
         'schema': MultifamilyInsuredMortgagesSchema,
-        'filters': [['property_state', '==', 'PA']],
+        'filters': [['property_state', '==', 'PA']], # Location information includes city, state, and ZIP code.
         'always_wipe_data': True,
         'primary_key_fields': ['hud_project_number'], # "HUD PROJECT NUMBER" seems pretty unique.
         'destinations': ['file'],
@@ -210,12 +210,12 @@ job_dicts = [
         'update': 0,
         'job_code': MultifamilyProductionInitialCommitmentSchema().job_code, # 'mf_init_commit'
         'source_type': 'http',
-        'source_url_path': 'https://www.hud.gov/sites/dfiles/Housing/documents',
         'source_file': 'Initi_Endores_Firm%20Comm_DB_FY21_Q1.xlsx',
+        'source_full_url': 'https://www.hud.gov/sites/dfiles/Housing/documents/Initi_Endores_Firm%20Comm_DB_FY21_Q1.xlsx',
         'encoding': 'binary',
         'rows_to_skip': 3,
         'schema': MultifamilyProductionInitialCommitmentSchema,
-        'filters': [['project_state', '==', 'PA']],
+        'filters': [['project_state', '==', 'PA']], # No county field. Just city and state. (And Pittsburgh is misspelled as "Pittsburg".)
         'always_wipe_data': True,
         'primary_key_fields': ['fha_number'], # "HUD PROJECT NUMBER" seems pretty unique.
         'destinations': ['file'],
@@ -225,12 +225,12 @@ job_dicts = [
         'update': 0,
         'job_code': HousingInspectionScoresSchema().job_code, # 'housing_inspections'
         'source_type': 'http',
-        'source_url_path': 'https://www.huduser.gov/portal/sites/default/files/xls',
         'source_file': 'public_housing_physical_inspection_scores_0620.xlsx',
+        'source_full_url': 'https://www.huduser.gov/portal/sites/default/files/xls/public_housing_physical_inspection_scores_0620.xlsx',
         'encoding': 'binary',
         'rows_to_skip': 0,
         'schema': HousingInspectionScoresSchema,
-        'filters': [['state_name', '==', 'PA']], # use 'fips_county_code == 42003' to limit to Allegheny County
+        'filters': [['state_name', '==', 'PA']], # use 'county_fips_code == 42003' to limit to Allegheny County
         'always_wipe_data': True,
         'primary_key_fields': ['fha_number'], # "HUD PROJECT NUMBER" seems pretty unique.
         'destinations': ['file'],

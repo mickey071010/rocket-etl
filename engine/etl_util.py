@@ -551,6 +551,7 @@ class Job:
         self.job_directory = job_dict['job_directory']
         self.source_type = job_dict['source_type']
         self.source_url_path = job_dict['source_url_path'] if 'source_url_path' in job_dict else None
+        self.source_full_url = job_dict['source_full_url'] if 'source_full_url' in job_dict else None
         self.source_file = job_dict['source_file'] if 'source_file' in job_dict else None
         self.source_dir = job_dict['source_dir'] if 'source_dir' in job_dict else ''
         self.encoding = job_dict['encoding'] if 'encoding' in job_dict else 'utf-8' # wprdc-etl/pipeline/connectors.py also uses UTF-8 as the default encoding.
@@ -602,7 +603,10 @@ class Job:
                 # such things.
                 self.source_connector = pl.RemoteFileConnector # This is the connector to use for files available via HTTP.
                 if not use_local_files:
-                    self.target = self.source_url_path + '/' + self.source_file
+                    if self.source_full_url is not None:
+                        self.target = self.source_full_url
+                    else:
+                        self.target = self.source_url_path + '/' + self.source_file
             elif self.source_type == 'sftp':
                 self.target = ftp_target(self)
                 self.source_connector = pl.SFTPConnector
