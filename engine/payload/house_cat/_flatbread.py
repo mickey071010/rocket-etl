@@ -129,7 +129,7 @@ class HousingInspectionScoresSchema(pl.BaseSchema):
     state = fields.String(load_from='STATE_NAME'.lower(), dump_to='state')
     latitude = fields.Float(load_from='LATITUDE'.lower(), allow_none=True)
     longitude = fields.Float(load_from='LONGITUDE'.lower(), allow_none=True)
-    fips_county_code = fields.String(load_from='COUNTY_CODE'.lower(), dump_to='fips_county_code', allow_none=True)
+    county_fips_code = fields.String(load_from='COUNTY_CODE'.lower(), dump_to='county_fips_code', allow_none=True)
     hud_property_name = fields.String(load_from='development_name', dump_to='hud_property_name')
     property_street_address = fields.String(load_from='ADDRESS'.lower(), dump_to='property_street_address')
     inspection_id = fields.Integer(load_from='INSPECTION_ID'.lower())
@@ -145,10 +145,10 @@ class HousingInspectionScoresSchema(pl.BaseSchema):
     @pre_load
     def synthesize_fips_county_code(self, data):
         if data['county_code'] is None or data['state_code'] is None:
-            data['fips_county_code'] = None
+            data['county_fips_code'] = None
         else:
-            data['fips_county_code'] = f"{str(data['state_code'])}{str(data['county_code'])}"
-            assert len(data['fips_county_code']) == 5
+            data['county_fips_code'] = f"{str(data['state_code'])}{str(data['county_code'])}"
+            assert len(data['county_fips_code']) == 5
 
     @pre_load
     def fix_dates(self, data):
