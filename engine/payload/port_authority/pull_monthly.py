@@ -77,11 +77,8 @@ otp_package_id = "b8b5fee7-2281-4426-a68e-2e05c6dec365" # Production version of 
 job_dicts = [
         {
         'source_type': 'http',
-        #'source_url_path': 'https://www.portauthority.org/external_data_sharing', # This is a stand-in for source_dir, so
-        # it maintains the convention of not having a trailing slash and allows source_file to still be parsed
-        # and easily used for whatever it was previously used for (specifying the file format in run_pipeline).
-        'source_url_path': 'https://generalfilesfordownload.portauthority.org', # A replacement for the previous server.
         'source_file': 'ridershipMonthAvg.csv',
+        'source_full_url': 'https://generalfilesfordownload.portauthority.org/ridershipMonthAvg.csv',
         'encoding': 'utf-8-sig',
         'schema': AverageRidershipSchema,
         'primary_key_fields': ['route', 'month_start', 'day_type'],
@@ -92,11 +89,8 @@ job_dicts = [
     },
     {
         'source_type': 'http',
-        #'source_url_path': 'https://www.portauthority.org/external_data_sharing', # This is a stand-in for source_dir, so
-        # it maintains the convention of not having a trailing slash and allows source_file to still be parsed
-        # and easily used for whatever it was previously used for (specifying the file format in run_pipeline).
-        'source_url_path': 'https://generalfilesfordownload.portauthority.org', # A replacement for the previous server.
         'source_file': 'routeMonthlyOTP.csv',
+        'source_full_url': 'https://generalfilesfordownload.portauthority.org/routeMonthlyOTP.csv',
         'encoding': 'utf-8-sig',
         'schema': OnTimePerformanceSchema,
         'primary_key_fields': ['route', 'month_start', 'day_type'],
