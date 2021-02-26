@@ -165,8 +165,6 @@ class HousingInspectionScoresSchema(pl.BaseSchema):
 
 
 class HUDPublicHousingSchema(pl.BaseSchema):
-    job_code = 'hud_public_housing'
-    property_id = fields.String(load_from='DEVELOPMENT_CODE'.lower(), dump_to='property_id', allow_none=True) # Duplicated in "development_code" below.
     latitude = fields.Float(load_from='\ufeffX'.lower(), dump_to='latitude', allow_none=True)
     longitude = fields.Float(load_from='Y'.lower(), dump_to='longitude', allow_none=True)
     lvl2kx = fields.String(load_from='LVL2KX', dump_to='geocoding_accuracy')
@@ -199,8 +197,8 @@ class HUDPublicHousingSchema(pl.BaseSchema):
     formal_participant_name = fields.String(load_from='FORMAL_PARTICIPANT_NAME'.lower(), dump_to='formal_participant_name')
     development_code = fields.String(load_from='DEVELOPMENT_CODE'.lower())
     project_name = fields.String(load_from='PROJECT_NAME'.lower(), dump_to='project_name')
-    scattered_site_ind = fields.String(load_from='SCATTERED_SITE_IND'.lower(), dump_to='scattered_site_ind')
-    pd_status_type_code = fields.String(load_from='PD_STATUS_TYPE_CODE'.lower(), dump_to='pd_status_type_code')
+    #scattered_site_ind = fields.String(load_from='SCATTERED_SITE_IND'.lower(), dump_to='scattered_site_ind') # Projects-only
+    #pd_status_type_code = fields.String(load_from='PD_STATUS_TYPE_CODE'.lower(), dump_to='pd_status_type_code') # Projects-only
     total_dwelling_units = fields.Integer(load_from='TOTAL_DWELLING_UNITS'.lower(), dump_to='total_dwelling_units')
     acc_units = fields.Integer(load_from='ACC_UNITS'.lower(), dump_to='acc_units')
     total_occupied = fields.Integer(load_from='TOTAL_OCCUPIED'.lower(), dump_to='total_occupied')
@@ -253,6 +251,18 @@ class HUDPublicHousingSchema(pl.BaseSchema):
         for f in fields:
             if data[f] == '-4':
                 data[f] = None
+
+class HUDPublicHousingProjectsSchema(HUDPublicHousingSchema):
+    job_code = 'hud_public_housing_projects'
+    property_id = fields.String(load_from='DEVELOPMENT_CODE'.lower(), dump_to='property_id', allow_none=True) # Duplicated in "development_code" below.
+
+    scattered_site_ind = fields.String(load_from='SCATTERED_SITE_IND'.lower(), dump_to='scattered_site_ind') # Projects-only
+    pd_status_type_code = fields.String(load_from='PD_STATUS_TYPE_CODE'.lower(), dump_to='pd_status_type_code') # Projects-only
+
+class HUDPublicHousingBuildingsSchema(HUDPublicHousingSchema):
+    job_code = 'hud_public_housing_buildings'
+    property_id = fields.String(load_from='PROPERTY_ID'.lower(), dump_to='property_id', allow_none=True)
+
 # dfg
 
 job_dicts = [
@@ -334,17 +344,32 @@ job_dicts = [
     },
     {
         'update': 0,
-        'job_code': HUDPublicHousingSchema().job_code, # 'hud_public_housing'
+        'job_code': HUDPublicHousingProjectsSchema().job_code, # 'hud_public_housing_projects'
         'source_type': 'http',
         'source_file': get_arcgis_data_url('https://hudgis-hud.opendata.arcgis.com/data.json', 'Public Housing Developments', 'CSV')[1],
         'source_full_url': get_arcgis_data_url('https://hudgis-hud.opendata.arcgis.com/data.json', 'Public Housing Developments', 'CSV')[0],
         'encoding': 'utf-8',
-        'schema': HUDPublicHousingSchema,
+        'schema': HUDPublicHousingProjectsSchema,
         'filters': [['std_st', '==', 'PA']], # Coordinates could be used to filter to Allegheny County.
         'always_wipe_data': True,
         #'primary_key_fields': # DEVELOPMENT_CODE seems like a possible unique key.
         'destinations': ['file'],
-        'destination_file': 'public_housing.csv',
+        'destination_file': 'public_housing_projects.csv',
+    },
+    {
+        'update': 0,
+        'job_code': HUDPublicHousingBuildingsSchema().job_code, # 'hud_public_housing_buildings'
+        'source_type': 'http',
+        'source_file': get_arcgis_data_url('https://hudgis-hud.opendata.arcgis.com/data.json', 'Public Housing Buildings', 'CSV')[1], # The downside to this
+            # is that it can not be run offline, even if the file is cached ins source_files/house_cat/.
+        'source_full_url': get_arcgis_data_url('https://hudgis-hud.opendata.arcgis.com/data.json', 'Public Housing Buildings', 'CSV')[0],
+        'encoding': 'utf-8',
+        'schema': HUDPublicHousingBuildingsSchema,
+        'filters': [['std_st', '==', 'PA']], # Coordinates could be used to filter to Allegheny County.
+        'always_wipe_data': True,
+        #'primary_key_fields': # PROJECT_ID seems like a possible unique key.
+        'destinations': ['file'],
+        'destination_file': 'public_housing_buildings.csv',
     },
 ]
 
