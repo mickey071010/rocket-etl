@@ -9,6 +9,7 @@ from engine.wprdc_etl import pipeline as pl
 from engine.etl_util import fetch_city_file
 from engine.arcgis_util import get_arcgis_data_url
 from engine.notify import send_to_slack
+from engine.scraping_util import scrape_nth_link
 from engine.parameters.local_parameters import SOURCE_DIR
 
 try:
@@ -289,7 +290,8 @@ job_dicts = [
         #   Tax Credit Code (Mortgages that include Low Income Housing Tax Credits (LIHTC) are indicated by the "TC" code. This field was updated on endorsements beginning in the middle of 1998.)
         'source_type': 'http',
         'source_file': 'FHA_BF90_RM_A_01042021.xlsx',
-        'source_full_url': 'https://www.hud.gov/sites/dfiles/Housing/images/FHA_BF90_RM_A_01042021.xlsx',
+        #'source_full_url': 'https://www.hud.gov/sites/dfiles/Housing/images/FHA_BF90_RM_A_01042021.xlsx',
+        'source_full_url': scrape_nth_link('https://www.hud.gov/program_offices/housing/comp/rpts/mfh/mf_f47', 'xlsx', 1, 2, 'FHA'),
         'encoding': 'binary',
         'schema': MultifamilyInsuredMortgagesSchema,
         'filters': [['property_state', '==', 'PA']], # Location information includes city, state, and ZIP code.
@@ -303,7 +305,8 @@ job_dicts = [
         'job_code': MultifamilyProductionInitialCommitmentSchema().job_code, # 'mf_init_commit'
         'source_type': 'http',
         'source_file': 'Initi_Endores_Firm%20Comm_DB_FY21_Q1.xlsx',
-        'source_full_url': 'https://www.hud.gov/sites/dfiles/Housing/documents/Initi_Endores_Firm%20Comm_DB_FY21_Q1.xlsx',
+        #'source_full_url': 'https://www.hud.gov/sites/dfiles/Housing/documents/Initi_Endores_Firm%20Comm_DB_FY21_Q1.xlsx',
+        'source_full_url': scrape_nth_link('https://www.hud.gov/program_offices/housing/mfh/mfdata/mfproduction', 'xlsx', 0, 2, 'Q'),
         'encoding': 'binary',
         'rows_to_skip': 3,
         'schema': MultifamilyProductionInitialCommitmentSchema,
@@ -318,7 +321,8 @@ job_dicts = [
         'job_code': HousingInspectionScoresSchema().job_code, # 'housing_inspections'
         'source_type': 'http',
         'source_file': 'public_housing_physical_inspection_scores_0620.xlsx',
-        'source_full_url': 'https://www.huduser.gov/portal/sites/default/files/xls/public_housing_physical_inspection_scores_0620.xlsx',
+        #'source_full_url': 'https://www.huduser.gov/portal/sites/default/files/xls/public_housing_physical_inspection_scores_0620.xlsx',
+        'source_full_url': scrape_nth_link('https://www.huduser.gov/portal/datasets/pis.html', 'xlsx', 0, None, 'public'), # The number of links increases each year.
         'encoding': 'binary',
         'rows_to_skip': 0,
         'schema': HousingInspectionScoresSchema,
