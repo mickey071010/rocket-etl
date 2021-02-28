@@ -89,7 +89,8 @@ class MultifamilyInsuredMortgagesSchema(pl.BaseSchema):
         """
         date_fields = ['maturity_date', 'initial_endorsement_date']
         for f in date_fields:
-            data[f] = data[f].date().isoformat()
+            if data[f] is not None:
+                data[f] = data[f].date().isoformat()
 
     @post_load
     def handle_weird_field_name(self, data):
@@ -161,7 +162,8 @@ class HousingInspectionScoresSchema(pl.BaseSchema):
         """
         date_fields = ['inspection_date']
         for f in date_fields:
-            data[f] = parser.parse(data[f]).date().isoformat()
+            if data[f] is not None:
+                data[f] = parser.parse(data[f]).date().isoformat()
 
 
 class HUDPublicHousingSchema(pl.BaseSchema):
