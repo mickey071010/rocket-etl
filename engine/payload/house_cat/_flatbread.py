@@ -265,6 +265,183 @@ class HUDPublicHousingBuildingsSchema(HUDPublicHousingSchema):
     job_code = 'hud_public_housing_buildings'
     property_id = fields.String(load_from='PROPERTY_ID'.lower(), dump_to='property_id', allow_none=True)
 
+class MultifamilyProjectsSubsidySection8Schema(pl.BaseSchema):
+    job_code = 'mf_subsidy_8'
+    property_id = fields.String(load_from='property_id'.lower(), dump_to='property_id')
+    county_code = fields.String(load_from='county_code'.lower(), dump_to='county_code')
+    congressional_district_code = fields.String(load_from='congressional_district_code'.lower(), dump_to='congressional_district_code')
+    placed_base_city_name_text = fields.String(load_from='placed_base_city_name_text'.lower(), dump_to='municipality_name', allow_none=True)
+    property_name_text = fields.String(load_from='property_name_text'.lower(), dump_to='hud_property_name')
+    address_line1_text = fields.String(load_from='address_line1_text'.lower(), dump_to='property_street_address')
+    city_name_text = fields.String(load_from='city_name_text'.lower(), dump_to='city')
+    state_code = fields.String(load_from='state_code'.lower(), dump_to='state')
+    zip_code = fields.Integer(load_from='zip_code'.lower(), dump_to='zip_code')
+    # Should ZIP+4 be added for easy of matching with other datasets?
+    property_total_unit_count = fields.Integer(load_from='property_total_unit_count'.lower(), dump_to='units')
+    property_category_name = fields.String(load_from='property_category_name'.lower(), dump_to='property_category_name')
+    owner_organization_name = fields.String(load_from='owner_organization_name'.lower(), dump_to='owner_organization_name', allow_none=True)
+    owner_address = fields.String(load_from='owner_address_line1'.lower(), dump_to='owner_address')
+    #owner_address_line1 = fields.String(load_from='owner_address_line1'.lower(), dump_to='owner_address_line1')
+    #owner_address_line2 = fields.String(load_from='owner_address_line2'.lower(), dump_to='owner_address_line2')
+    #owner_city_name = fields.String(load_from='owner_city_name'.lower(), dump_to='owner_city_name')
+    #owner_state_code = fields.String(load_from='owner_state_code'.lower(), dump_to='owner_state_code')
+    #owner_zip_code = fields.String(load_from='owner_zip_code'.lower(), dump_to='owner_zip_code')
+    owner_main_phone_number_text = fields.String(load_from='owner_main_phone_number_text'.lower(), dump_to='owner_phone')
+    owner_company_type = fields.String(load_from='owner_company_type'.lower(), dump_to='owner_type', allow_none=True)
+    ownership_effective_date = fields.Date(load_from='ownership_effective_date'.lower(), dump_to='ownership_effective_date', allow_none=True)
+    owner_participant_id = fields.Integer(load_from='owner_participant_id'.lower(), dump_to='owner_id')
+
+    mgmt_agent_full_name = fields.String(load_from='mgmt_agent_full_name'.lower(), dump_to='property_manager_name', allow_none=True)
+    mgmt_agent_org_name = fields.String(load_from='mgmt_agent_org_name'.lower(), dump_to='property_manager_company', allow_none=True)
+    mgmt_agent_address = fields.String(load_from='mgmt_agent_address_line1'.lower(), dump_to='mgmt_agent_address', allow_none=True)
+    #mgmt_agent_address_line1 = fields.String(load_from='mgmt_agent_address_line1'.lower(), dump_to='mgmt_agent_address_line1')
+    #mgmt_agent_address_line2 = fields.String(load_from='mgmt_agent_address_line2'.lower(), dump_to='mgmt_agent_address_line2')
+    #mgmt_agent_city_name = fields.String(load_from='mgmt_agent_city_name'.lower(), dump_to='mgmt_agent_city_name')
+    #mgmt_agent_state_code = fields.String(load_from='mgmt_agent_state_code'.lower(), dump_to='mgmt_agent_state_code')
+    #mgmt_agent_zip_code = fields.String(load_from='mgmt_agent_zip_code'.lower(), dump_to='mgmt_agent_zip_code')
+    mgmt_agent_main_phone_number = fields.String(load_from='mgmt_agent_main_phone_number'.lower(), dump_to='property_manager_phone', allow_none=True)
+    mgmt_contact_email_text = fields.String(load_from='mgmt_contact_email_text'.lower(), dump_to='property_manager_email', allow_none=True)
+    mgmt_agent_company_type = fields.String(load_from='mgmt_agent_company_type'.lower(), dump_to='property_manager_type', allow_none=True)
+    servicing_site_name_text = fields.String(load_from='servicing_site_name_text'.lower(), dump_to='servicing_site_name')
+
+    class Meta:
+        ordered = True
+
+    @pre_load
+    def fix_dates(self, data):
+        """Marshmallow doesn't know how to handle a datetime as input. It can only
+        take strings that represent datetimes and convert them to datetimes.:
+        https://github.com/marshmallow-code/marshmallow/issues/656
+        So this is a workaround.
+        """
+        date_fields = ['ownership_effective_date']
+        for f in date_fields:
+            if data[f] is not None:
+                data[f] = data[f].date().isoformat()
+
+    @pre_load
+    def transform_int_to_strings(self, data):
+        fields = ['property_id', 'county_code', 'congressional_district_code', 'mgmt_agent_main_phone_number',
+                'owner_main_phone_number_text', 'placed_base_city_name_text']
+        for f in fields:
+            if data[f] is not None:
+                data[f] = str(data[f])
+
+    @pre_load
+    def form_addresses(self, data):
+        address = f"{data['owner_address_line1']}, {str(data['owner_address_line2'])+', ' if data['owner_address_line2'] is not None else ''}{data['owner_city_name']}, {data['owner_state_code']} {data['owner_zip_code']}"
+        data['owner_address'] = address
+        address = f"{data['mgmt_agent_address_line1']}, {str(data['mgmt_agent_address_line2'])+', ' if data['mgmt_agent_address_line2'] is not None else ''}{data['mgmt_agent_city_name']}, {data['mgmt_agent_state_code']} {data['mgmt_agent_zip_code']}"
+        data['property_manager_address'] = address
+
+class MultifamilyProjectsSection8ContractsSchema(pl.BaseSchema):
+    job_code = 'mf_contracts_8'
+    property_id = fields.String(load_from='property_id'.lower(), dump_to='property_id')
+    property_name_text = fields.String(load_from='property_name_text'.lower(), dump_to='hud_property_name')
+    assisted_units_count = fields.Integer(load_from='assisted_units_count'.lower(), dump_to='assisted_units')
+    count_0br = fields.Integer(load_from='0BR_count'.lower(), dump_to='count_0br', allow_none=True)
+    count_1br = fields.Integer(load_from='1BR_count'.lower(), dump_to='count_1br', allow_none=True)
+    count_2br = fields.Integer(load_from='2BR_count'.lower(), dump_to='count_2br', allow_none=True)
+    count_3br = fields.Integer(load_from='3BR_count'.lower(), dump_to='count_3br', allow_none=True)
+    count_4br = fields.Integer(load_from='4BR_count'.lower(), dump_to='count_4br', allow_none=True)
+    count_5plusbr = fields.Integer(load_from='5plusBR_count'.lower(), dump_to='count_5plusbr', allow_none=True)
+    contract_number = fields.String(load_from='contract_number'.lower(), dump_to='contract_id')
+    program_type_name = fields.String(load_from='program_type_name'.lower(), dump_to='program_type', allow_none=True)
+    tracs_effective_date = fields.Date(load_from='tracs_effective_date'.lower(), dump_to='subsidy_start_date', allow_none=True)
+    tracs_overall_expiration_date = fields.String(load_from='tracs_overall_expiration_date'.lower(), dump_to='subsidy_expiration_date', allow_none=True)
+    contract_term_months_qty = fields.Integer(load_from='contract_term_months_qty'.lower(), dump_to='contract_duration_months')
+
+    class Meta:
+        ordered = True
+
+    @pre_load
+    def fix_dates(self, data):
+        """Marshmallow doesn't know how to handle a datetime as input. It can only
+        take strings that represent datetimes and convert them to datetimes.:
+        https://github.com/marshmallow-code/marshmallow/issues/656
+        So this is a workaround.
+        """
+        date_fields = ['tracs_effective_date',
+                'tracs_overall_expiration_date']
+        for f in date_fields:
+            if data[f] is not None:
+                data[f] = data[f].date().isoformat()
+
+    @pre_load
+    def transform_int_to_strings(self, data):
+        fields = ['property_id', 'assisted_units_count', '0br_count', '1br_count',
+                '2br_count', '3br_count', '4br_count', '5plusbr_count',
+                'contract_term_months_qty'
+                ]
+        for f in fields:
+            if data[f] is not None:
+                data[f] = str(data[f])
+
+class MultifamilyGuaranteedLoansSchema(pl.BaseSchema):
+    job_code = 'mf_loans'
+    property_id = fields.String(load_from='property_id'.lower(), dump_to='property_id')
+    latitude = fields.Float(load_from='\ufeffX'.lower(), dump_to='latitude', allow_none=True)
+    longitude = fields.Float(load_from='Y'.lower(), dump_to='longitude', allow_none=True)
+    lvl2kx = fields.String(load_from='LVL2KX', dump_to='geocoding_accuracy')
+        # 'R' - Interpolated rooftop (high degree of accuracy, symbolized as green)
+        # '4' - ZIP+4 centroid (high degree of accuracy, symbolized as green)
+        # 'B' - Block group centroid (medium degree of accuracy, symbolized as yellow)
+        # 'T' - Census tract centroid (low degree of accuracy, symbolized as red)
+        # '2' - ZIP+2 centroid (low degree of accuracy, symbolized as red)
+        # 'Z' - ZIP5 centroid (low degree of accuracy, symbolized as red)
+        # '5' - ZIP5 centroid (same as above, low degree of accuracy, symbolized as red)
+        # Null - Could not be geocoded (does not appear on the map)
+        # "For the purposes of displaying the location of an address on a map only use
+        # addresses and their associated lat/long coordinates where the LVL2KX field is
+        # coded 'R' or '4'. These codes ensure that the address is displayed on the
+        # correct street segment and in the correct census block."
+    cnty2kx = fields.String(load_from='CNTY2KX'.lower(), dump_to='county_fips_code', allow_none=True)
+    congressional_district_code = fields.String(load_from='congressional_district_code'.lower(), dump_to='congressional_district_code', allow_none=True)
+    tract2kx = fields.String(load_from='TRACT2KX'.lower(),dump_to='census_tract', allow_none=True)
+    curcosub = fields.String(load_from='CURCOSUB'.lower(),dump_to='municipality_fips', allow_none=True)
+    placed_base_city_name_text = fields.String(load_from='placed_base_city_name_text'.lower(), dump_to='municipality_name', allow_none=True)
+    property_name_text = fields.String(load_from='property_name_text'.lower(), dump_to='hud_property_name')
+    address_line1_text = fields.String(load_from='address_line1_text'.lower(), dump_to='property_street_address')
+    std_city = fields.String(load_from='std_city'.lower(), dump_to='city', allow_none=True)
+    std_st = fields.String(load_from='std_st'.lower(), dump_to='state')
+    std_zip5 = fields.String(load_from='std_zip5'.lower(), dump_to='zip_code')
+    # Should ZIP+4 be added for easy of matching with other datasets?
+
+    total_unit_count = fields.Integer(load_from='total_unit_count'.lower(), dump_to='units')
+    total_assisted_unit_count = fields.Integer(load_from='total_assisted_unit_count'.lower(), dump_to='assisted_units')
+    property_category_name = fields.String(load_from='property_category_name'.lower(), dump_to='property_category_name')
+    project_manager_name_text = fields.String(load_from='project_manager_name_text'.lower(), dump_to='property_manager_name', allow_none=True)
+    property_on_site_phone_number = fields.String(load_from='property_on_site_phone_number'.lower(), dump_to='property_manager_phone', allow_none=True)
+
+
+    servicing_site_name_text = fields.String(load_from='servicing_site_name_text'.lower(), dump_to='servicing_site_name_loan', allow_none=True)
+
+    class Meta:
+        ordered = True
+
+#    @pre_load
+#    def fix_dates(self, data):
+#        """Marshmallow doesn't know how to handle a datetime as input. It can only
+#        take strings that represent datetimes and convert them to datetimes.:
+#        https://github.com/marshmallow-code/marshmallow/issues/656
+#        So this is a workaround.
+#        """
+#        date_fields = ['initial_endorsement_date', 'maturity_date']
+#        for f in date_fields:
+#            if data[f] is not None:
+#                data[f] = data[f].date().isoformat()
+
+    @pre_load
+    def transform_int_to_strings(self, data):
+        fields = ['property_id', 'cnty2kx', 'congressional_district_code',
+                'property_on_site_phone_number', 'placed_base_city_name_text',
+                'tract2kx', 'std_zip5', 'total_unit_count',
+                'total_assisted_unit_count',
+                ]
+        for f in fields:
+            if data[f] is not None:
+                data[f] = str(data[f])
+
 # dfg
 
 job_dicts = [
@@ -363,7 +540,7 @@ job_dicts = [
         'job_code': HUDPublicHousingBuildingsSchema().job_code, # 'hud_public_housing_buildings'
         'source_type': 'http',
         'source_file': get_arcgis_data_url('https://hudgis-hud.opendata.arcgis.com/data.json', 'Public Housing Buildings', 'CSV')[1], # The downside to this
-            # is that it can not be run offline, even if the file is cached ins source_files/house_cat/.
+            # is that it can not be run offline, even if the file is cached in source_files/house_cat/.
         'source_full_url': get_arcgis_data_url('https://hudgis-hud.opendata.arcgis.com/data.json', 'Public Housing Buildings', 'CSV')[0],
         'encoding': 'utf-8',
         'schema': HUDPublicHousingBuildingsSchema,
@@ -372,6 +549,51 @@ job_dicts = [
         #'primary_key_fields': # PROJECT_ID seems like a possible unique key.
         'destinations': ['file'],
         'destination_file': 'public_housing_buildings.csv',
+    },
+    {
+        'update': 0,
+        'job_code': MultifamilyProjectsSubsidySection8Schema().job_code, # 'mf_subsidy_8'
+        'source_type': 'http',
+        'source_file': 'MF_Properties_with_Assistance_\&_Sec8_Contracts.xlsx',
+        'source_full_url': scrape_nth_link('https://www.hud.gov/program_offices/housing/mfh/exp/mfhdiscl', 'xlsx', 0, 2, 'roperties'),
+        'encoding': 'binary',
+        'rows_to_skip': 0,
+        'schema': MultifamilyProjectsSubsidySection8Schema,
+        'filters': [['state_code', '==', 'PA']], # use 'county_code == 3' to limit to Allegheny County
+        'always_wipe_data': True,
+        'primary_key_fields': ['property_id'],
+        'destinations': ['file'],
+        'destination_file': 'mf_subsidy_8.csv',
+    },
+    {
+        'update': 0,
+        'job_code': MultifamilyProjectsSection8ContractsSchema().job_code, # 'mf_contracts_8'
+        'source_type': 'http',
+        'source_file': 'MF_Assistance_&_Sec8_Contracts.xlsx',
+        'source_full_url': scrape_nth_link('https://www.hud.gov/program_offices/housing/mfh/exp/mfhdiscl', 'xlsx', 1, 2, 'ontracts'),
+        'encoding': 'binary',
+        'rows_to_skip': 0,
+        'schema': MultifamilyProjectsSection8ContractsSchema,
+        #'filters': # Nothing to directly filter on here. The property_id needs to be joined to mf_subsidy_8 to determine the property locations.
+        'always_wipe_data': True,
+        'primary_key_fields': ['property_id'],
+        'destinations': ['file'],
+        'destination_file': 'mf_8_contracts.csv',
+    },
+    {
+        'update': 0,
+        'job_code': MultifamilyGuaranteedLoansSchema().job_code, # 'mf_loans'
+        'source_type': 'http',
+        'source_file': get_arcgis_data_url('https://hudgis-hud.opendata.arcgis.com/data.json', 'HUD Insured Multifamily Properties', 'CSV')[1], # The downside to this
+            # is that it can not be run offline, even if the file is cached in source_files/house_cat/.
+        'source_full_url': get_arcgis_data_url('https://hudgis-hud.opendata.arcgis.com/data.json', 'HUD Insured Multifamily Properties', 'CSV')[0],
+        'encoding': 'utf-8',
+        'schema': MultifamilyGuaranteedLoansSchema,
+        'filters': [['std_st', '==', 'PA']], # cnty2kx could be used to filter to Allegheny County.
+        'always_wipe_data': True,
+        #'primary_key_fields': # POTENTIAL PRIMARY KEY FIELDS: ['PROPERTY_ID', 'PRIMARY_FHA_NUMBER', 'ASSOCIATED_FHA_NUMBER', 'FHA_NUM1']
+        'destinations': ['file'],
+        'destination_file': 'mf_loans.csv',
     },
 ]
 
