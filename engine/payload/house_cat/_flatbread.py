@@ -525,7 +525,6 @@ job_dicts = [
         'update': 0,
         'job_code': HUDPublicHousingProjectsSchema().job_code, # 'hud_public_housing_projects'
         'source_type': 'http',
-        'source_file': get_arcgis_data_url('https://hudgis-hud.opendata.arcgis.com/data.json', 'Public Housing Developments', 'CSV')[1],
         'source_full_url': get_arcgis_data_url('https://hudgis-hud.opendata.arcgis.com/data.json', 'Public Housing Developments', 'CSV')[0],
         'encoding': 'utf-8',
         'schema': HUDPublicHousingProjectsSchema,
@@ -539,8 +538,6 @@ job_dicts = [
         'update': 0,
         'job_code': HUDPublicHousingBuildingsSchema().job_code, # 'hud_public_housing_buildings'
         'source_type': 'http',
-        'source_file': get_arcgis_data_url('https://hudgis-hud.opendata.arcgis.com/data.json', 'Public Housing Buildings', 'CSV')[1], # The downside to this
-            # is that it can not be run offline, even if the file is cached in source_files/house_cat/.
         'source_full_url': get_arcgis_data_url('https://hudgis-hud.opendata.arcgis.com/data.json', 'Public Housing Buildings', 'CSV')[0],
         'encoding': 'utf-8',
         'schema': HUDPublicHousingBuildingsSchema,
@@ -584,9 +581,9 @@ job_dicts = [
         'update': 0,
         'job_code': MultifamilyGuaranteedLoansSchema().job_code, # 'mf_loans'
         'source_type': 'http',
-        'source_file': get_arcgis_data_url('https://hudgis-hud.opendata.arcgis.com/data.json', 'HUD Insured Multifamily Properties', 'CSV')[1], # The downside to this
-            # is that it can not be run offline, even if the file is cached in source_files/house_cat/.
         'source_full_url': get_arcgis_data_url('https://hudgis-hud.opendata.arcgis.com/data.json', 'HUD Insured Multifamily Properties', 'CSV')[0],
+        # The downside to pulling the filename from the data.json file is that there is currently no support for offline caching
+        # for testing purposes, but this could be remedied.
         'encoding': 'utf-8',
         'schema': MultifamilyGuaranteedLoansSchema,
         'filters': [['std_st', '==', 'PA']], # cnty2kx could be used to filter to Allegheny County.

@@ -551,7 +551,7 @@ class Job:
         self.job_directory = job_dict['job_directory']
         self.source_type = job_dict['source_type']
         self.source_full_url = job_dict['source_full_url'] if 'source_full_url' in job_dict else None
-        self.source_file = job_dict['source_file'] if 'source_file' in job_dict else None
+        self.source_file = job_dict['source_file'] if 'source_file' in job_dict else job_dict['source_full_url'].split('/')[-1] if 'source_full_url' in job_dict else None
         self.source_dir = job_dict['source_dir'] if 'source_dir' in job_dict else ''
         self.encoding = job_dict['encoding'] if 'encoding' in job_dict else 'utf-8' # wprdc-etl/pipeline/connectors.py also uses UTF-8 as the default encoding.
         self.rows_to_skip = job_dict['rows_to_skip'] if 'rows_to_skip' in job_dict else 0 # Necessary when extracting from poorly formatted Excel files.
@@ -584,7 +584,7 @@ class Job:
         ic(self.job_code, self.resource_name)
         #self.clear_first = job['clear_first'] if 'clear_first' in job else False
         self.target, self.local_directory = local_file_and_dir(self, base_dir = SOURCE_DIR)
-        self.local_cache_filepath = self.local_directory + job_dict['source_file']
+        self.local_cache_filepath = self.local_directory + self.source_file
 
     def default_setup(self, use_local_files): # Rename this to reflect how it modifies parameters based on command-line-arguments.
         print("==============\n" + self.job_code)
