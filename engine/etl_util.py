@@ -662,7 +662,9 @@ class Job:
         extension = (self.source_file.split('.')[-1]).lower()
         if extension == 'csv':
             self.extractor = pl.CSVExtractor
-        elif extension in ['xls', 'xlsx']:
+        elif extension in ['xls']:
+            self.extractor = pl.OldExcelExtractor
+        elif extension in ['xlsx']:
             self.extractor = pl.ExcelExtractor
         elif extension in ['zip']:
             self.extractor = pl.CompressedFileExtractor
