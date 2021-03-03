@@ -740,15 +740,23 @@ class Job:
                     result = ckan.action.resource_update(**upload_kwargs)
                     print('Uploading file to filestore...')
             else:
-                self.select_extractor()
+                self.select_extractor() # This could be done in default_setup.
 
                 # BEGIN Destination-specific configuration
                 if destination == 'ckan':
                     loader = pl.CKANDatastoreLoader
                 elif destination == 'file':
-                    loader = pl.FileLoader
-                    self.upload_method = 'insert' # Note that this will always append records to an existing file
-                    # unless 'always_clear_first' (or 'always_wipe_data') is set to True.
+                    # The tabularity of the data (that is, whether the loader is going
+                    # to be handed a record (list of dicts) or a file or file-like object
+                    # should determine which kind of file loader will be used.
+                    if destination_file_format is None:
+                        raise ValueError("Destination == 'file' but destination_file_format is None!")
+                    elif destination_file_format.lower() in ['csv'] and self.compressed_file_to_extract is None:
+                        loader = pl.TabularFileLoader # Isn't this actually very CSV-specific, given the write_or_append_to_csv_file function it uses?
+                        self.upload_method = 'insert' # Note that this will always append records to an existing file
+                        # unless 'always_clear_first' (or 'always_wipe_data') is set to True.
+                    else:
+                        loader = pl.NontabularFileLoader
                 elif destination == 'ckan_filestore':
                     loader = pl.CKANFilestoreLoader
                 else:

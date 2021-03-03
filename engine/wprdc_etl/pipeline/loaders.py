@@ -552,11 +552,35 @@ class CKANDatastoreLoader(CKANLoader):
 class FileLoader(Loader):
     """Write data to a local file, for testing or as an intermediate step
     in a chain of atomic pipeline actions."""
-    has_tabular_output = True # For now, though eventually there might
-    # be TabularFileLoader (with CSV as a type) and NontabularFileLoader.
 
     def __init__(self, *args, **kwargs):
         super(FileLoader, self).__init__(*args, **kwargs)
+        self.filepath = kwargs.get('filepath')
+        self.file_format = kwargs.get('file_format').lower()
+        self.clear_first = kwargs.get('clear_first', False)
+        self.wipe_data = kwargs.get('wipe_data', False)
+        self.first_pass = True
+
+    def delete_file(self, filepath):
+        """Delete the file."""
+        if os.path.exists(filepath):
+            os.remove(filepath)
+
+    def clear_file(self, clear, first, wipe_data):
+        if clear and first:
+            self.delete_file(self.filepath)
+        elif wipe_data and first: # Strictly speaking, maybe this option should delete all but the first line
+            self.delete_file(self.filepath) # of a CSV file, but for implemented purposes, this is probably fine.
+            print("As implemented, wipe_data is just deleting the file, rather than retaining the schema.")
+
+class TabularFileLoader(FileLoader):
+    """At present, this just handles CSV files. It could be modified to handle
+    TSV files with small changes.
+    """
+    has_tabular_output = True
+
+    def __init__(self, *args, **kwargs):
+        super(TabularFileLoader, self).__init__(*args, **kwargs)
         self.filepath = kwargs.get('filepath')
         self.file_format = kwargs.get('file_format').lower()
         self.fields = kwargs.get('fields', None)
@@ -583,10 +607,10 @@ class FileLoader(Loader):
             ``None`` otherwise
         '''
 
-        if filepath.split('.')[-1].lower() != 'csv': # Eventually change this to file_format.lower():
+        if filepath.split('.')[-1].lower() != file_format.lower():
             raise ValueError("Why does the end of the filename not have the same extension as the file_format?")
 
-        # How should the situation when the file already exists be handled?
+        # How should the situation when the file already exists be handled? Probably just overwrite it.
         # For a CSV file, creating the file could just require outputing the header line.
         #if not os.path.exists(filepath):
         #    raise RuntimeError("{} was not created.".format(filepath))
@@ -604,18 +628,6 @@ class FileLoader(Loader):
             # Use extant_keys so that the new values go into the correct columns of the existing file.
             dict_writer = csv.DictWriter(output_file, extant_keys, extrasaction='ignore', lineterminator='\n')
             dict_writer.writerows(list_of_dicts)
-
-    def delete_file(self, filepath):
-        """Delete the file."""
-        if os.path.exists(filepath):
-            os.remove(filepath)
-
-    def clear_file(self, fields, clear, first, wipe_data):
-        if clear and first:
-            self.delete_file(self.filepath)
-        elif wipe_data and first: # Strictly speaking, maybe this option should delete all but the first line
-            self.delete_file(self.filepath) # of a CSV file, but for implemented purposes, this is probably fine.
-            print("As implemented, wipe_data is just deleting the file, rather than retaining the schema.")
 
     def insert(self, filepath, data, method='insert'):
         """Insert data into the file
@@ -640,17 +652,45 @@ class FileLoader(Loader):
             data: a list of records to be inserted into or upserted
                 to the configured local file
 
-        Raises:
-            RuntimeError if the upsert or update metadata
-                calls are unsuccessful
-
         Returns:
-            A two-tuple of the status codes for the upsert
-            and metadata update calls
+            The filepath
         '''
 
-        self.clear_file(self.fields, self.clear_first, self.first_pass, self.wipe_data)
+        self.clear_file(self.clear_first, self.first_pass, self.wipe_data)
         self.check_format(self.filepath, self.file_format)
         self.insert(self.filepath, data, self.method)
+        self.first_pass = False
+        return self.filepath
+
+class NontabularFileLoader(FileLoader):
+    has_tabular_output = False
+
+    def insert(self, filepath, data):
+        """Insert data into the file
+
+        Params:
+            filepath: path to save file to
+            data: file object to save
+
+        Returns:
+            request status
+        """
+        with open(filepath, 'wb') as f: # [ ] Should this be 'wb' sometimes?
+            f.write(data.read())
+
+    def load(self, data):
+        '''Load data into a local file
+
+        Arguments:
+            data: a list of file objects to be saved to local files
+
+        Returns:
+            The filepath
+        '''
+
+        self.clear_file(self.clear_first, self.first_pass, self.wipe_data)
+        #self.check_format(self.filepath, self.file_format)
+        for file_object in data:
+            self.insert(self.filepath, file_object)
         self.first_pass = False
         return self.filepath
