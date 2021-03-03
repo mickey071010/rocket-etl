@@ -394,6 +394,7 @@ class MultifamilyGuaranteedLoansSchema(pl.BaseSchema):
         # addresses and their associated lat/long coordinates where the LVL2KX field is
         # coded 'R' or '4'. These codes ensure that the address is displayed on the
         # correct street segment and in the correct census block."
+    cnty_nm2kx = fields.String(load_from='CNTY_NM2KX'.lower(), dump_to='county', allow_none=True)
     cnty2kx = fields.String(load_from='CNTY2KX'.lower(), dump_to='county_fips_code', allow_none=True)
     congressional_district_code = fields.String(load_from='congressional_district_code'.lower(), dump_to='congressional_district_code', allow_none=True)
     tract2kx = fields.String(load_from='TRACT2KX'.lower(),dump_to='census_tract', allow_none=True)
