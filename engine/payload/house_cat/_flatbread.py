@@ -411,36 +411,21 @@ class MultifamilyGuaranteedLoansSchema(pl.BaseSchema):
     property_category_name = fields.String(load_from='property_category_name'.lower(), dump_to='property_category_name')
     project_manager_name_text = fields.String(load_from='project_manager_name_text'.lower(), dump_to='property_manager_name', allow_none=True)
     property_on_site_phone_number = fields.String(load_from='property_on_site_phone_number'.lower(), dump_to='property_manager_phone', allow_none=True)
-
-
+    primary_fha_number = fields.String(load_from='PRIMARY_FHA_NUMBER'.lower(), dump_to='fha_loan_id')
+    associated_fha_number = fields.String(load_from='ASSOCIATED_FHA_NUMBER'.lower(), dump_to='associated_fha_loan_id')
+    initial_endorsement_date = fields.Date(load_from='INITIAL_ENDORSEMENT_DATE'.lower(), dump_to='initial_endorsement_date', allow_none=True)
+    original_loan_amount = fields.Integer(load_from='ORIGINAL_LOAN_AMOUNT'.lower(), dump_to='original_loan_amount')
+    loan_maturity_date = fields.Date(load_from='LOAN_MATURITY_DATE'.lower(), dump_to='maturity_date', allow_none=True)
+    program_type1 = fields.String(load_from='PROGRAM_TYPE1'.lower(), dump_to='program_category', allow_none=True)
+    program_type2 = fields.String(load_from='PROGRAM_TYPE2'.lower(), dump_to='program_category_2', allow_none=True)
+    unit_mrkt_rent_cnt = fields.Integer(load_from='UNIT_MRKT_RENT_CNT'.lower(), dump_to='loan_units') # The number of market-rate units.
+    client_group_name = fields.String(load_from='CLIENT_GROUP_NAME'.lower(), dump_to='client_group_name', allow_none=True)
+    client_group_type = fields.String(load_from='CLIENT_GROUP_TYPE'.lower(), dump_to='client_group_type', allow_none=True)
+    soacode1 = fields.String(load_from='SOACODE1'.lower(), dump_to='section_of_act_code', allow_none=True)
     servicing_site_name_text = fields.String(load_from='servicing_site_name_text'.lower(), dump_to='servicing_site_name_loan', allow_none=True)
 
     class Meta:
         ordered = True
-
-#    @pre_load
-#    def fix_dates(self, data):
-#        """Marshmallow doesn't know how to handle a datetime as input. It can only
-#        take strings that represent datetimes and convert them to datetimes.:
-#        https://github.com/marshmallow-code/marshmallow/issues/656
-#        So this is a workaround.
-#        """
-#        date_fields = ['initial_endorsement_date', 'maturity_date']
-#        for f in date_fields:
-#            if data[f] is not None:
-#                data[f] = data[f].date().isoformat()
-
-    @pre_load
-    def transform_int_to_strings(self, data):
-        fields = ['property_id', 'cnty2kx', 'congressional_district_code',
-                'property_on_site_phone_number', 'placed_base_city_name_text',
-                'tract2kx', 'std_zip5', 'total_unit_count',
-                'total_assisted_unit_count',
-                ]
-        for f in fields:
-            if data[f] is not None:
-                data[f] = str(data[f])
-
 
 class LIHTCSchema(pl.BaseSchema):
     job_code = 'lihtc'
@@ -712,7 +697,7 @@ job_dicts = [
         'update': 0,
         'job_code': MultifamilyGuaranteedLoansSchema().job_code, # 'mf_loans'
         'source_type': 'http',
-        'source_full_url': get_arcgis_data_url('https://hudgis-hud.opendata.arcgis.com/data.json', 'HUD Insured Multifamily Properties', 'CSV')[0],
+        'source_full_url': get_arcgis_data_url('https://hudgis-hud.opendata.arcgis.com/data.json', 'HUD Insured Multifamily Properties', 'CSV')[0], # HUD_Insured_Multifamily_Properties.csv
         # The downside to pulling the filename from the data.json file is that there is currently no support for offline caching
         # for testing purposes, but this could be remedied.
         'encoding': 'utf-8',
