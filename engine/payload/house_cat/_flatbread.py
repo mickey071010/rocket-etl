@@ -441,6 +441,113 @@ class MultifamilyGuaranteedLoansSchema(pl.BaseSchema):
             if data[f] is not None:
                 data[f] = str(data[f])
 
+
+class LIHTCSchema(pl.BaseSchema):
+    job_code = 'lihtc'
+    hud_id = fields.String(load_from='\ufeffhud_id'.lower(), dump_to='hud_id')
+    latitude = fields.String(load_from='latitude'.lower(), dump_to='latitude', allow_none=True)
+    longitude = fields.String(load_from='longitude'.lower(), dump_to='longitude', allow_none=True)
+
+    fips2010 = fields.String(load_from='fips2010'.lower(), dump_to='census_tract')
+    place2010 = fields.Integer(load_from='place2010'.lower(), dump_to='municipality_fips', allow_none=True)
+    project = fields.String(load_from='project'.lower(), dump_to='hud_property_name')
+    proj_add = fields.String(load_from='proj_add'.lower(), dump_to='property_street_address', allow_none=True)
+    proj_cty = fields.String(load_from='proj_cty'.lower(), dump_to='city', allow_none=True)
+    proj_st = fields.String(load_from='proj_st'.lower(), dump_to='state')
+    proj_zip = fields.String(load_from='proj_zip'.lower(), dump_to='zip_code', allow_none=True)
+    n_units = fields.Integer(load_from='n_units'.lower(), dump_to='units', allow_none=True)
+    li_units = fields.Integer(load_from='li_units'.lower(), dump_to='assisted_units', allow_none=True)
+    n_0br = fields.Integer(load_from='n_0br'.lower(), dump_to='count_0br', allow_none=True)
+    n_1br = fields.Integer(load_from='n_1br'.lower(), dump_to='count_1br', allow_none=True)
+    n_2br = fields.Integer(load_from='n_2br'.lower(), dump_to='count_2br', allow_none=True)
+    n_3br = fields.Integer(load_from='n_3br'.lower(), dump_to='count_3br', allow_none=True)
+    n_4br = fields.Integer(load_from='n_4br'.lower(), dump_to='count_4br', allow_none=True)
+    contact = fields.String(load_from='contact'.lower(), dump_to='owner_organization_name', allow_none=True)
+    owner_address = fields.String(load_from='co_add', dump_to='property_manager_address', allow_none=True)
+    company = fields.String(load_from='company'.lower(), dump_to='property_manager_company', allow_none=True)
+    co_tel = fields.String(load_from='co_tel'.lower(), dump_to='property_manager_phone', allow_none=True)
+
+    lihtc_federal_id = fields.String(load_from='\ufeffhud_id'.lower(), dump_to='federal_id')
+    state_id = fields.String(load_from='state_id'.lower(), dump_to='state_id', allow_none=True)
+    credit = fields.Integer(load_from='credit'.lower(), dump_to='lihtc_credit', allow_none=True)
+
+    construction_type = fields.String(load_from='type'.lower(), dump_to='lihtc_construction_type', allow_none=True)
+    yr_alloc = fields.Integer(load_from='yr_alloc'.lower(), dump_to='lihtc_year_allocated')
+    yr_pis = fields.Integer(load_from='yr_pis'.lower(), dump_to='lihtc_year_placed_into_service')
+    allocamt = fields.String(load_from='allocamt'.lower(), dump_to='lihtc_amount', allow_none=True)
+    fmha_514 = fields.Boolean(load_from='fmha_514'.lower(), dump_to='fmha_514_loan', allow_none=True)
+    fmha_515 = fields.Boolean(load_from='fmha_515'.lower(), dump_to='fmha_515_loan', allow_none=True)
+    fmha_538 = fields.Boolean(load_from='fmha_538'.lower(), dump_to='fmha_538_loan', allow_none=True)
+    scattered_site_cd = fields.String(load_from='scattered_site_cd'.lower(), dump_to='scattered_site_ind', allow_none=True)
+
+    class Meta:
+        ordered = True
+
+    @pre_load
+    def form_address(self, data): # [ ] Is there any chance we want to keep these parts as separate fields?
+        address = ''
+        if data['co_add'] != '':
+            address += f"{data['co_add']}, "
+        if data['co_cty'] != '':
+            address += f"{data['co_cty']}, "
+        if data['co_st'] != '':
+            address += f"{data['co_st']} "
+        if data['co_zip'] != '':
+            address += f"{data['co_zip']}"
+        address = address.strip()
+        if address == '':
+            address = None
+        data['property_manager_address'] = address
+
+    @pre_load
+    def pre_decode_booleans(self, data):
+        fs = ['fmha_514', 'fmha_515', 'fmha_538']
+        for f in fs:
+            if f in data and data[f] is not None:
+                if str(data[f]) == '1':
+                    data[f] = True
+                elif str(data[f]) == '2':
+                    data[f] = False
+
+    @post_load
+    def decode_fields(self, data):
+        f = 'lihtc_construction_type'
+        if f in data and data[f] is not None:
+            construction_type_lookup = {'1': 'New construction',
+                    '2': 'Acquisition and Rehab',
+                    '3': 'Both new construction and A/R',
+                    '4': 'Existing',
+                    '': None}
+            if data[f] in construction_type_lookup:
+                data[f] = construction_type_lookup[data[f]]
+        f = 'lihtc_credit'
+        if f in data and data[f] is not None:
+            credit_type_lookup = {'1': '30 percent present value',
+                    '2': '70 percent present value',
+                    '3': 'Both',
+                    '4': 'Tax Credit Exchange Program only',
+                    '': None}
+            if data[f] in credit_type_lookup:
+                data[f] = credit_type_lookup[data[f]]
+        f = 'scattered_site_cd'
+        if f in data and data[f] is not None:
+            lookup = {'1': 'Y',
+                    '2': 'N',
+                    '': None}
+            if data[f] in lookup:
+                data[f] = lookup[data[f]]
+
+    @pre_load
+    def transform_int_to_strings(self, data):
+        fields = ['place2010', 'n_units', 'li_units',
+                'n_0br', 'n_1br', 'n_2br', 'n_3br',
+                'n_4br', 'credit', 'type',
+                'yr_pis', 'yr_alloc',
+                ]
+        for f in fields:
+            if data[f] is not None:
+                data[f] = str(data[f])
+
 # dfg
 
 job_dicts = [
@@ -503,6 +610,31 @@ job_dicts = [
         'primary_key_fields': ['fha_number'], # "HUD PROJECT NUMBER" seems pretty unique.
         'destinations': ['file'],
         'destination_file': 'mf_init_commit.csv',
+    },
+    {
+        'update': 0,
+        'job_code': f'unzip_{LIHTCSchema().job_code}', # 'unzip_lihtc'
+        'source_type': 'http',
+        'source_full_url': 'https://lihtc.huduser.gov/lihtcpub.zip',
+        'source_file': 'lihtcpub.zip',
+        'compressed_file_to_extract': 'LIHTCPUB.csv',
+        'encoding': 'binary',
+        'always_wipe_data': True,
+        'destinations': ['file'],
+        'destination_file': f'{SOURCE_DIR}house_cat/LIHTCPUB.csv', # Needing to specify the
+        # job directory makes this more of a hack than I would like.
+        # Alternatives: Set the destination file in the Extractor or in default_setup.
+    },
+    {
+        'update': 0,
+        'job_code': LIHTCSchema().job_code, # 'lihtc'
+        'source_type': 'local',
+        'source_file': 'LIHTCPUB.csv',
+        'schema': LIHTCSchema,
+        'filters': [['proj_st', '==', 'PA']], # use 'county_fips_code == 42003' to limit to Allegheny County
+        'always_wipe_data': True,
+        'destinations': ['file'],
+        'destination_file': f'lihtcpub.csv',
     },
     {
         'update': 0,
