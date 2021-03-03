@@ -167,6 +167,7 @@ class HousingInspectionScoresSchema(pl.BaseSchema):
 
 
 class HUDPublicHousingSchema(pl.BaseSchema):
+    property_id = fields.String(load_from='DEVELOPMENT_CODE'.lower(), dump_to='property_id', allow_none=True) # Duplicated in "development_code" below.
     latitude = fields.Float(load_from='\ufeffX'.lower(), dump_to='latitude', allow_none=True)
     longitude = fields.Float(load_from='Y'.lower(), dump_to='longitude', allow_none=True)
     lvl2kx = fields.String(load_from='LVL2KX', dump_to='geocoding_accuracy')
@@ -197,7 +198,7 @@ class HUDPublicHousingSchema(pl.BaseSchema):
     # Public-Housing-Project-specific fields
     participant_code = fields.String(load_from='PARTICIPANT_CODE'.lower(), dump_to='participant_code')
     formal_participant_name = fields.String(load_from='FORMAL_PARTICIPANT_NAME'.lower(), dump_to='formal_participant_name')
-    development_code = fields.String(load_from='DEVELOPMENT_CODE'.lower())
+    #development_code = fields.String(load_from='DEVELOPMENT_CODE'.lower()) # This is just another name for property_id.
     project_name = fields.String(load_from='PROJECT_NAME'.lower(), dump_to='project_name')
     #scattered_site_ind = fields.String(load_from='SCATTERED_SITE_IND'.lower(), dump_to='scattered_site_ind') # Projects-only
     #pd_status_type_code = fields.String(load_from='PD_STATUS_TYPE_CODE'.lower(), dump_to='pd_status_type_code') # Projects-only
@@ -256,14 +257,12 @@ class HUDPublicHousingSchema(pl.BaseSchema):
 
 class HUDPublicHousingProjectsSchema(HUDPublicHousingSchema):
     job_code = 'hud_public_housing_projects'
-    property_id = fields.String(load_from='DEVELOPMENT_CODE'.lower(), dump_to='property_id', allow_none=True) # Duplicated in "development_code" below.
-
     scattered_site_ind = fields.String(load_from='SCATTERED_SITE_IND'.lower(), dump_to='scattered_site_ind') # Projects-only
     pd_status_type_code = fields.String(load_from='PD_STATUS_TYPE_CODE'.lower(), dump_to='pd_status_type_code') # Projects-only
 
 class HUDPublicHousingBuildingsSchema(HUDPublicHousingSchema):
     job_code = 'hud_public_housing_buildings'
-    property_id = fields.String(load_from='PROPERTY_ID'.lower(), dump_to='property_id', allow_none=True)
+    national_bldg_id = fields.String(load_from='NATIONAL_BLDG_ID'.lower(), dump_to='national_building_id', allow_none=True)
 
 class MultifamilyProjectsSubsidySection8Schema(pl.BaseSchema):
     job_code = 'mf_subsidy_8'
