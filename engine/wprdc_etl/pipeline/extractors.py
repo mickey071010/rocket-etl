@@ -50,6 +50,45 @@ class FileExtractor(Extractor):
         # needed to complete this kind of vectorized pipeline.
         return reader
 
+class CompressedFileExtractor(FileExtractor):
+    '''Extractor subclass for extracting files from a compressed file.
+    '''
+
+    def __init__(self, connection, *args, **kwargs):
+        super(FileExtractor, self).__init__(connection)
+        self.compressed_file_to_extract = kwargs.get('compressed_file_to_extract', None)
+
+    def handle_line(self, line):
+        '''Sets up the element from the iterable to be handled by the loader's load_line function.
+        '''
+        return line # Just return the file.
+
+    def _uncompress(self):
+        # Uses self.connection and self.compressed_file_to_extract.
+        # Keep the file around in some form (maybe a temp file or memory).
+        # Eventually the loader saves it to job.destination_file.
+        from zipfile import ZipFile
+        with ZipFile(self.connection, 'r') as zip_ref:
+            with zip_ref.open(self.compressed_file_to_extract, 'r') as desired_file_ref:
+                desired_file = io.BytesIO(desired_file_ref.read())
+                return desired_file
+
+    def process_connection(self):
+        '''This function gets the file returned from the Connector.connect()
+        function, uncompresses it to obtain the desired file, and puts the
+        desired file in an iterator.
+        '''
+        if self.compressed_file_to_extract is not None:
+            desired_file = self._uncompress()
+            reader = iter([desired_file])
+        else:
+            reader = iter([])
+        # Eventually update the Connector to support a list of files.
+        # resource_names_list might have to be specified in the job_dict
+        # and an AllOrSelectedFilesInADirectoryHTTPExtractor would be
+        # needed to complete this kind of vectorized pipeline.
+        return reader
+
 class TableExtractor(Extractor):
     '''Abstract Extractor subclass for extracting data in a tabular format
     '''

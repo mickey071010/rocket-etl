@@ -1,4 +1,4 @@
-from engine.wprdc_etl.pipeline.extractors import FileExtractor, CSVExtractor, ExcelExtractor
+from engine.wprdc_etl.pipeline.extractors import FileExtractor, CSVExtractor, ExcelExtractor, CompressedFileExtractor
 from engine.wprdc_etl.pipeline.connectors import (
     FileConnector, RemoteFileConnector, HTTPConnector,
     SFTPConnector, FTPConnector

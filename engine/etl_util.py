@@ -556,6 +556,7 @@ class Job:
         self.encoding = job_dict['encoding'] if 'encoding' in job_dict else 'utf-8' # wprdc-etl/pipeline/connectors.py also uses UTF-8 as the default encoding.
         self.rows_to_skip = job_dict['rows_to_skip'] if 'rows_to_skip' in job_dict else 0 # Necessary when extracting from poorly formatted Excel files.
         self.connector_config_string = job_dict['connector_config_string'] if 'connector_config_string' in job_dict else ''
+        self.compressed_file_to_extract = job_dict['compressed_file_to_extract'] if 'compressed_file_to_extract' in job_dict else None
         self.custom_processing = job_dict['custom_processing'] if 'custom_processing' in job_dict else (lambda *args, **kwargs: None)
         self.custom_post_processing = job_dict['custom_post_processing'] if 'custom_post_processing' in job_dict else (lambda *args, **kwargs: None)
         self.schema = job_dict['schema'] if 'schema' in job_dict and job_dict['schema'] is not None else NullSchema
@@ -572,9 +573,19 @@ class Job:
             # file ever appears.)
 
         self.destinations = job_dict['destinations'] if 'destinations' in job_dict else ['ckan']
-        self.destination_file = job_dict.get('destination_file', None) # What should be done if destination_file is None?
+        self.destination_file = job_dict.get('destination_file', None)
         if 'file' in self.destinations and self.destination_file is None:
-            raise ValueError("Since the 'destinations' parameter includes 'file', either the 'destination_file' parameter should be set, or a reasonable default should be coded into this framework.")
+            # Situations where it would be a good idea to just copy the source_file value over to destination_file
+
+            # Situations where the destination_file value(s) should be determined by something else:
+            if job.files_to_extract not in [None, []]:
+                # When ~extracting~ files from a .zip file, the filenames can come from compressed_file_to_extract.
+                self.destination_file = f'{SOURCE_DIR}{self.job_directory}/{self.compressed_file_to_extract}'
+            elif self.source_file is not None:
+                self.destination_file = self.source_file
+            else:
+                raise ValueError("No destination_file specified but 'file' is in self.destinations.")
+
         self.package = job_dict['package'] if 'package' in job_dict else None
         self.resource_name = job_dict['resource_name'] if 'resource_name' in job_dict else None # resource_name is expecting to have a string value
         # for use in naming pipelines. For non-CKAN destinations, this field could be eliminated, but then a different field (like job_code)
@@ -653,6 +664,8 @@ class Job:
             self.extractor = pl.CSVExtractor
         elif extension in ['xls', 'xlsx']:
             self.extractor = pl.ExcelExtractor
+        elif extension in ['zip']:
+            self.extractor = pl.CompressedFileExtractor
         else:
             self.extractor = pl.FileExtractor
 
@@ -665,16 +678,12 @@ class Job:
         # The retry_without_last_line option is a way of dealing with CSV files
         # that abruptly end mid-line.
         locators_by_destination = {}
-        source_file_format = destination_file_format = self.source_file.split('.')[-1].lower()
-        # 1) The downside to extracting the file format from the source file name
-        # is that it couples the source and destination a bit too tightly.
-        # One can imagine a scenario where tabular data is obtained from an API
-        # and it's supposed to be uploaded as a CSV file somewhere. In this case
-        # a separate "destination_file_format" would need to be specified.
-        #
+        source_file_format = self.source_file.split('.')[-1].lower()
+        if self.destination_file is not None:
+            destination_file_format = self.destination_file.split('.')[-1].lower()
         # 2) While wprdc_etl uses 'CSV' as a
         # format that it sends to CKAN, I'm inclined to switch to 'csv',
-        # and uniformly lowercasing all file formats.
+        # and uniformly lowercase all file formats.
 
         # Though given a format of 'geojson', the CKAN API resource_create
         # response lists format as 'GeoJSON', so CKAN is doing some kind
@@ -774,7 +783,7 @@ class Job:
                 try:
                     curr_pipeline = pl.Pipeline(self.job_code + ' pipeline', self.job_code + ' Pipeline', log_status=False, chunk_size=1000, settings_file=SETTINGS_FILE, retry_without_last_line = retry_without_last_line, ignore_empty_rows = ignore_empty_rows, filters = self.filters) \
                         .connect(self.source_connector, self.target, config_string=self.connector_config_string, encoding=self.encoding, local_cache_filepath=self.local_cache_filepath) \
-                        .extract(self.extractor, firstline_headers=True, rows_to_skip=self.rows_to_skip) \
+                        .extract(self.extractor, firstline_headers=True, rows_to_skip=self.rows_to_skip, compressed_file_to_extract=self.compressed_file_to_extract) \
                         .schema(self.schema) \
                         .load(loader, self.loader_config_string,
                               filepath = self.destination_file_path,
