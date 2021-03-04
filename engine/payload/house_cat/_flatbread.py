@@ -534,6 +534,57 @@ class LIHTCSchema(pl.BaseSchema):
             if data[f] is not None:
                 data[f] = str(data[f])
 
+class BaseMultifamilyInspectionsSchema(pl.BaseSchema):
+    job_code = 'mf_inspections'
+    rems_property_id = fields.String(load_from='REMS Property Id'.lower(), dump_to='property_id')
+    property_name = fields.String(load_from='Property Name'.lower(), dump_to='hud_property_name')
+    inspection_property_id = fields.String(load_from='REMS_Property_Id'.lower(), dump_to='inspection_property_id')
+    city = fields.String(load_from='city'.lower(), dump_to='city')
+    state_code = fields.String(load_from='state_code'.lower(), dump_to='state')
+
+    class Meta:
+        ordered = True
+
+    @pre_load
+    def transform_float_to_strings(self, data):
+        fields = ['rems_property_id', 'inspection_id_1',
+                'inspection_id_2', 'inspection_id_3',
+                ]
+        for f in fields:
+            if data[f] is not None:
+                data[f] = str(int(data[f]))
+
+#    @pre_load
+#    def fix_dates(self, data):
+#        """Marshmallow doesn't know how to handle a datetime as input. It can only
+#        take strings that represent datetimes and convert them to datetimes.:
+#        https://github.com/marshmallow-code/marshmallow/issues/656
+#        So this is a workaround.
+#        """
+#        date_fields = ['release_date_1',
+#                'release_date_2', 'release_date_3']
+#        for f in date_fields:
+#            if data[f] is not None:
+#                data[f] = data[f].date().isoformat()
+
+class MultifamilyInspectionsSchema1(BaseMultifamilyInspectionsSchema):
+    job_code = 'mf_inspections_1'
+    inspection_id = fields.String(load_from='inspection_id_1'.lower(), dump_to='inspection_id', allow_none=True)
+    inspection_score = fields.String(load_from='inspection_score1'.lower(), dump_to='inspection_score', allow_none=True)
+    inspection_date = fields.Date(load_from='release_date_1'.lower(), dump_to='inspection_date', allow_none=True)
+
+class MultifamilyInspectionsSchema2(BaseMultifamilyInspectionsSchema):
+    job_code = 'mf_inspections_2'
+    inspection_id = fields.String(load_from='inspection_id_2'.lower(), dump_to='inspection_id', allow_none=True)
+    inspection_score = fields.String(load_from='inspection_score2'.lower(), dump_to='inspection_score', allow_none=True)
+    inspection_date = fields.Date(load_from='release_date_2'.lower(), dump_to='inspection_date', allow_none=True)
+
+class MultifamilyInspectionsSchema3(BaseMultifamilyInspectionsSchema):
+    job_code = 'mf_inspections_3'
+    inspection_id = fields.String(load_from='inspection_id_3'.lower(), dump_to='inspection_id', allow_none=True)
+    inspection_score = fields.String(load_from='inspection_score3'.lower(), dump_to='inspection_score', allow_none=True)
+    inspection_date = fields.Date(load_from='release_date_3'.lower(), dump_to='inspection_date', allow_none=True)
+
 # dfg
 
 job_dicts = [
@@ -709,6 +760,54 @@ job_dicts = [
         'destinations': ['file'],
         'destination_file': 'mf_loans.csv',
     },
+    { # The source file is in a weird wide format, listing three different columns
+      # for each of the three last inspections.
+      # To convert this into a narrow format (with properties possibly appearing on
+      # multiple rows), we run slight variants of the job three times, plucking
+      # the correct inspection columns and filtering out the empty ones.
+        'update': 0,
+        'job_code': MultifamilyInspectionsSchema1().job_code, # 'mf_inspections_1'
+        'source_type': 'http',
+        'source_file': 'MF_Inspection_Report02252021.xls',
+        'source_full_url': scrape_nth_link('https://www.hud.gov/program_offices/housing/mfh/rems/remsinspecscores/remsphysinspscores', 'xls', 0, 1, 'nspection'),
+        'encoding': 'binary',
+        'rows_to_skip': 0,
+        'schema': MultifamilyInspectionsSchema1,
+        'filters': [['state_code', '==', 'PA']], # city and REMS_Property_ID are the only fields that could be used to geographically narrow this filter.
+        'always_wipe_data': True,
+        'primary_key_fields': ['rems_property_id'],
+        'destinations': ['file'],
+        'destination_file': 'mf_inspections.csv',
+    },
+    {
+        'update': 0,
+        'job_code': MultifamilyInspectionsSchema2().job_code, # 'mf_inspections_2'
+        'source_type': 'http',
+        'source_file': 'MF_Inspection_Report02252021.xls',
+        'source_full_url': scrape_nth_link('https://www.hud.gov/program_offices/housing/mfh/rems/remsinspecscores/remsphysinspscores', 'xls', 0, 1, 'nspection'),
+        'encoding': 'binary',
+        'rows_to_skip': 0,
+        'schema': MultifamilyInspectionsSchema2,
+        'filters': [['state_code', '==', 'PA'], ['inspection_id_2', '!=', None]], # city and REMS_Property_ID are the only fields that could be used to geographically narrow this filter.
+        'primary_key_fields': ['rems_property_id'],
+        'destinations': ['file'],
+        'destination_file': 'mf_inspections.csv',
+    },
+    {
+        'update': 0,
+        'job_code': MultifamilyInspectionsSchema3().job_code, # 'mf_inspections_3'
+        'source_type': 'http',
+        'source_file': 'MF_Inspection_Report02252021.xls',
+        'source_full_url': scrape_nth_link('https://www.hud.gov/program_offices/housing/mfh/rems/remsinspecscores/remsphysinspscores', 'xls', 0, 1, 'nspection'),
+        'encoding': 'binary',
+        'rows_to_skip': 0,
+        'schema': MultifamilyInspectionsSchema3,
+        'filters': [['state_code', '==', 'PA'], ['inspection_id_3', '!=', None]], # city and REMS_Property_ID are the only fields that could be used to geographically narrow this filter.
+        'primary_key_fields': ['rems_property_id'],
+        'destinations': ['file'],
+        'destination_file': 'mf_inspections.csv',
+    },
+
 ]
 
 assert len(job_dicts) == len({d['job_code'] for d in job_dicts}) # Verify that all job codes are unique.
