@@ -683,6 +683,9 @@ class Job:
         source_file_format = self.source_file.split('.')[-1].lower()
         if self.destination_file is not None:
             destination_file_format = self.destination_file.split('.')[-1].lower()
+        else:
+            destination_file_format = source_file_format
+
         # 2) While wprdc_etl uses 'CSV' as a
         # format that it sends to CKAN, I'm inclined to switch to 'csv',
         # and uniformly lowercase all file formats.
