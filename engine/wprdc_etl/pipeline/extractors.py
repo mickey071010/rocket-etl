@@ -273,10 +273,10 @@ class OldExcelExtractor(TableExtractor):
                 xldate_tuple = xldate_as_tuple(cell.value, self.datemode)
                 if xldate_tuple[0]:
                     date = datetime.datetime(*xldate_as_tuple(cell.value, self.datemode))
-                    dt = date.strftime('%m/%d/%Y')  # todo: return datetime and handle the formatting elsewhere
+                    dt = date.isoformat() #strftime('%m/%d/%Y')  # todo: return datetime and handle the formatting elsewhere
                 else:
                     time = datetime.time(*xldate_tuple[3:])
-                    dt = time.strftime('%H:%M:%S')
+                    dt = time.isoformat() #strftime('%H:%M:%S')
                 line.append(dt)
             else:
                 line.append(cell.value)
