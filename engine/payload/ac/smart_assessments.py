@@ -145,11 +145,7 @@ def name_file_resource(resource_type=None):
         year -= 1            # set year to last year
     last_month_name = calendar.month_abbr[last_month_num].upper()
 
-    file_title = "Property Assessments Parcel Data"
-    if resource_type == 'lmaz':
-        file_title = "{month}-{year} {file_title}".format(month=last_month_name, year=year, file_title=file_title)
-#    elif resource_type == '
-
+    file_title = f"{last_month_name}-{year} Property Assessments Parcel Data"
     return file_title
 
 
@@ -200,6 +196,22 @@ def custom_processing(job, **kwparameters):
 
 job_dicts = [
     {
+        'job_code': 'assessments_filestore'
+        'source_type': 'sftp',
+        'source_dir': 'property_assessments',
+        'source_file': 'ALLEGHENY_COUNTY_MASTER_FILE.csv',
+        'encoding': 'latin-1', # Taken from assessments.py and used instead of the default, 'utf-8'.
+        'connector_config_string': 'sftp.county_sftp', # This is just used to look up parameters in the settings.json file.
+        'schema': None,
+        'always_wipe_data': True,
+        'destinations': ['ckan_filestore'],
+        'destination_file': 'assessments.csv',
+        'package': assessments_archive_package_id,
+        'resource_name': name_file_resource()
+    },
+    # Instead of all the LMAZ stuff, just save the file to a secret archive package.
+    {
+        'job_code': 'assessments_archive'
         'source_type': 'sftp',
         'source_dir': 'property_assessments',
         'source_file': 'ALLEGHENY_COUNTY_MASTER_FILE.csv',
@@ -213,6 +225,7 @@ job_dicts = [
         'resource_name': name_file_resource()
     },
     {
+        'job_code': 'assessments_datastore'
         'source_type': 'sftp',
         'source_dir': 'property_assessments',
         'source_file': 'ALLEGHENY_COUNTY_MASTER_FILE.csv',
@@ -224,17 +237,5 @@ job_dicts = [
         'always_wipe_data': True,
         'package': assessments_package_id,
         'resource_name': 'Property Assessments Parcel Data',
-    },
-    {
-        'source_type': 'sftp',
-        'source_dir': 'property_assessments',
-        'source_file': 'ALLEGHENY_COUNTY_MASTER_FILE.csv',
-        'encoding': 'latin-1', # Taken from assessments.py and used instead of the default, 'utf-8'.
-        'connector_config_string': 'sftp.county_sftp',
-        'schema': None,
-        'destinations': ['local_monthly_archive_zipped'],
-        'destination_file': 'assessments.csv.zip', # [ ] This is not right yet.
-        'package': assessments_package_id,
-        'resource_name': name_file_resource(resource_type='lmaz')
     },
 ]
