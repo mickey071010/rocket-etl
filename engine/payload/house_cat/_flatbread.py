@@ -129,6 +129,7 @@ class MultifamilyProductionInitialCommitmentSchema(pl.BaseSchema):
 
 class HousingInspectionScoresSchema(pl.BaseSchema):
     job_code = 'housing_inspections'
+    property_id = fields.String(load_from='DEVELOPMENT_ID'.lower(), dump_to='property_id')
     state = fields.String(load_from='STATE_NAME'.lower(), dump_to='state')
     latitude = fields.Float(load_from='LATITUDE'.lower(), allow_none=True)
     longitude = fields.Float(load_from='LONGITUDE'.lower(), allow_none=True)
@@ -267,7 +268,7 @@ class MultifamilyProjectsSubsidySection8Schema(pl.BaseSchema):
     job_code = 'mf_subsidy_8'
     property_id = fields.String(load_from='property_id'.lower(), dump_to='property_id')
     county_code = fields.String(load_from='county_code'.lower(), dump_to='county_code')
-    congressional_district_code = fields.String(load_from='congressional_district_code'.lower(), dump_to='congressional_district_code')
+    congressional_district_code = fields.String(load_from='congressional_district_code'.lower(), dump_to='congressional_district_code', allow_none=True)
     placed_base_city_name_text = fields.String(load_from='placed_base_city_name_text'.lower(), dump_to='municipality_name', allow_none=True)
     property_name_text = fields.String(load_from='property_name_text'.lower(), dump_to='hud_property_name')
     address_line1_text = fields.String(load_from='address_line1_text'.lower(), dump_to='property_street_address')
@@ -284,7 +285,7 @@ class MultifamilyProjectsSubsidySection8Schema(pl.BaseSchema):
     #owner_city_name = fields.String(load_from='owner_city_name'.lower(), dump_to='owner_city_name')
     #owner_state_code = fields.String(load_from='owner_state_code'.lower(), dump_to='owner_state_code')
     #owner_zip_code = fields.String(load_from='owner_zip_code'.lower(), dump_to='owner_zip_code')
-    owner_main_phone_number_text = fields.String(load_from='owner_main_phone_number_text'.lower(), dump_to='owner_phone')
+    owner_main_phone_number_text = fields.String(load_from='owner_main_phone_number_text'.lower(), dump_to='owner_phone', allow_none=True)
     owner_company_type = fields.String(load_from='owner_company_type'.lower(), dump_to='owner_type', allow_none=True)
     ownership_effective_date = fields.Date(load_from='ownership_effective_date'.lower(), dump_to='ownership_effective_date', allow_none=True)
     owner_participant_id = fields.Integer(load_from='owner_participant_id'.lower(), dump_to='owner_id')
