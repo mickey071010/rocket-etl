@@ -57,8 +57,6 @@ job_dicts = [
         #'primary_key_fields': [],
         'always_wipe_data': True,
         'upload_method': 'insert',
-        #'destinations': ['file'], # These lines are just for testing
-        #'destination_file': f'ranger_contacts.csv', # purposes.
         'package': rangers_package_id,
         'resource_name': 'Allegheny County Parks Ranger Outreach',
     },

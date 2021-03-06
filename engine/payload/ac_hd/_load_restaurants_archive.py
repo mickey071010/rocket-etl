@@ -147,8 +147,6 @@ def custom_processing(job, **kwparameters):
     else:
         job.target = job.source_dir + "/" + job.source_file
 
-    assert len(job.destinations) == 1
-
 job_dicts = [
     {
         'source_type': 'sftp',
@@ -160,7 +158,7 @@ job_dicts = [
         'schema': RestaurantsSchema,
         'primary_key_fields': ['id'],
         'upload_method': 'upsert',
-        'destinations': ['ckan'],
+        'destination': 'ckan',
         'package': restaurants_package_id,
         'resource_name': 'Geocoded Food Facilities',
     },
@@ -208,7 +206,6 @@ def process_job(**kwparameters):
 
     resource_id = find_resource_id(package_id, resource_name)
     locators_by_destination = {destinations[0]: resource_id}
-    assert len(destinations) == 1
     return locators_by_destination
 
 def main(use_local_files=False,clear_first=False,test_mode=False):

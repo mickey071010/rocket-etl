@@ -163,8 +163,7 @@ job_dicts = [
         'primary_key_fields': ['date', 'site', 'program', 'parameter'],
         'always_wipe_data': False,
         'upload_method': 'upsert',
-        #'destinations': ['file'], # These lines are just for testing
-        #'destination_file': f'air_daily.csv', # purposes.
+        #'destination_file': f'air_daily.csv',
         'package': air_quality_package_id,
         'resource_name': f'Daily Air Quality Data (new format)'
     },
@@ -179,8 +178,7 @@ job_dicts = [
         'primary_key_fields': ['datetime_utc', 'site', 'program', 'parameter'],
         'always_wipe_data': False,
         'upload_method': 'upsert',
-        #'destinations': ['file'], # These lines are just for testing
-        #'destination_file': f'air_hourly.csv', # purposes.
+        #'destination_file': f'air_hourly.csv',
         'package': air_quality_package_id,
         'resource_name': f'Hourly Air Quality Data (new format)'
     },
@@ -195,8 +193,7 @@ job_dicts = [
         'primary_key_fields': ['datetime_utc', 'site', 'program', 'parameter'],
         'always_wipe_data': True,
         'upload_method': 'upsert',
-        #'destinations': ['file'], # These lines are just for testing
-        #'destination_file': f'air_max_today.csv', # purposes.
+        #'destination_file': f'air_max_today.csv',
         'package': air_quality_package_id,
         'resource_name': f"Current Maximum Air Quality Readings for Today (new format)",
 #        'custom_post_processing': express_load_then_delete_file
@@ -212,7 +209,6 @@ job_dicts = [
         'primary_key_fields': ['site_name'],
         'always_wipe_data': True,
         'upload_method': 'upsert',
-        #'destinations': ['file'],
         #'destination_file': f'sourcesites.csv',
         'package': air_quality_package_id,
         'resource_name': f"Sensor Locations",
@@ -225,9 +221,8 @@ job_dicts = [
         'connector_config_string': 'sftp.county_sftp',
         'encoding': 'utf-8-sig',
         'schema': None,
-        #'destinations': ['file'],
         #'destination_file': f'sourcesites.geojson',
-        'destinations': ['ckan_filestore'],
+        'destination': 'ckan_filestore',
         'destination_file': 'sourcesites.geojson', # This sets the
         # filename that CKANFilestoreLoader will use to name the file.
         'package': air_quality_package_id,

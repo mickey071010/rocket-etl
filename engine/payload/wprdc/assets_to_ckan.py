@@ -74,8 +74,6 @@ job_dicts = [
         #'primary_key_fields': ['synthesized_key'],
         'always_wipe_data': True,
         'upload_method': 'insert',
-        #'destinations': ['file'],
-        #'destination_file': f'asset_dump.csv',
         'package': asset_package_id,
         'resource_name': 'All Allegheny County Assets for the Asset map'
     },

@@ -81,7 +81,7 @@ job_dicts = [
         'encoding': 'utf-8-sig',
         'custom_processing': conditionally_get_city_files,
         'schema': None,
-        'destinations': ['ckan_filestore'],
+        'destination': 'ckan_filestore',
         'package': smart_trash_cans_package_id, # [ ] Change this field to package_id
         'resource_name': 'Smart Trash Containers (GeoJSON)'
     },

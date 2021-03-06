@@ -105,8 +105,8 @@ job_dicts = [
         'always_wipe_data': True,
         #'primary_key_fields': [],
         'upload_method': 'insert',
-        'destinations': ['file'], # These lines are just for testing
-        'destination_file': f'budget.csv', # purposes. 
+        'destination': 'file', # This is being done this way to set up
+        'destination_file': f'budget.csv', # express_load_then_delete_file.
         'package': budget_package_id,
         'resource_name': "City Wide Revenues and Expenses",
         'custom_post_processing': express_load_then_delete_file,

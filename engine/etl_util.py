@@ -572,9 +572,9 @@ class Job:
             # data from the previous year in a separate file in the month of January. (Though really, we should check if this
             # file ever appears.)
 
-        self.destinations = job_dict['destinations'] if 'destinations' in job_dict else ['ckan']
+        self.destination = job_dict['destination'] if 'destination' in job_dict else 'ckan'
         self.destination_file = job_dict.get('destination_file', None)
-        if 'file' in self.destinations and self.destination_file is None:
+        if self.destination == 'file' and self.destination_file is None:
             # Situations where it would be a good idea to just copy the source_file value over to destination_file
 
             # Situations where the destination_file value(s) should be determined by something else:
@@ -584,7 +584,7 @@ class Job:
             elif self.source_file is not None:
                 self.destination_file = self.source_file
             else:
-                raise ValueError("No destination_file specified but 'file' is in self.destinations.")
+                raise ValueError("No destination_file specified but self.destination == 'file'.")
 
         self.package = job_dict['package'] if 'package' in job_dict else None
         self.resource_name = job_dict['resource_name'] if 'resource_name' in job_dict else None # resource_name is expecting to have a string value
@@ -695,7 +695,7 @@ class Job:
         # of correction.
 
 
-        for destination in self.destinations:
+        if True: # This can be eliminated by unindenting the block of code below.
             package_id = get_package_id(self, test_mode) # This is the effective package ID,
             # taking into account whether test mode is active.
 
@@ -704,9 +704,9 @@ class Job:
             self.select_extractor() # This could be done in default_setup.
 
             # BEGIN Destination-specific configuration
-            if destination == 'ckan':
+            if self.destination == 'ckan':
                 loader = pl.CKANDatastoreLoader
-            elif destination == 'file':
+            elif self.destination == 'file':
                 # The tabularity of the data (that is, whether the loader is going
                 # to be handed a record (list of dicts) or a file or file-like object
                 # should determine which kind of file loader will be used.
@@ -718,10 +718,10 @@ class Job:
                     # unless 'always_clear_first' (or 'always_wipe_data') is set to True.
                 else:
                     loader = pl.NontabularFileLoader
-            elif destination == 'ckan_filestore':
+            elif self.destination == 'ckan_filestore':
                 loader = pl.CKANFilestoreLoader
             else:
-                raise ValueError(f"run_pipeline does not know how to handle destination = {destination}")
+                raise ValueError(f"run_pipeline does not know how to handle destination = {self.destination}")
 
             clear_first = clear_first or self.always_clear_first or migrate_schema # If migrate_schema == True, 1) backup the data dictionary,
             # 2) delete the Data Table view, 3) clear the datastore, 4) run the job, and 5) try to restore the data dictionary.
@@ -731,7 +731,7 @@ class Job:
             if clear_first and wipe_data:
                 raise ValueError("clear_first and wipe_data should not both be True simultaneously. To clear a datastore for a job that has always_wipe_data = True, add the command-line argument 'override_wipe_data'.")
             elif clear_first:
-                if destination in ['ckan']:
+                if self.destination in ['ckan']:
                     if datastore_exists(package_id, self.resource_name):
                         # It should be noted that this will wipe out any integrated data_dictionary (but it's being preserved at the launchpad.py level).
                         print("Clearing the datastore for {}".format(self.resource_name)) # Actually done by the pipeline.
@@ -739,7 +739,7 @@ class Job:
                         print("Since it makes no sense to try to clear a datastore that does not exist, clear_first is being toggled to False.")
                         clear_first = False
             elif wipe_data:
-                if destination in ['ckan']:
+                if self.destination in ['ckan']:
                     if datastore_exists(package_id, self.resource_name):
                         print("Wiping records from the datastore for {}".format(self.resource_name))
                     else:
@@ -770,11 +770,11 @@ class Job:
                 else:
                     raise
 
-            if destination in ['ckan', 'ckan_filestore', 'local_monthly_archive_zipped']:
+            if self.destination in ['ckan', 'ckan_filestore']:
                 resource_id = find_resource_id(package_id, self.resource_name) # This IS determined in the pipeline, so it would be nice if the pipeline would return it.
-                locators_by_destination[destination] = resource_id
-            elif destination in ['file']:
-                locators_by_destination[destination] = self.destination_file_path
+                locators_by_destination[self.destination] = resource_id
+            elif self.destination in ['file']:
+                locators_by_destination[self.destination] = self.destination_file_path
         return locators_by_destination
 
     def process_job(self, **kwparameters):

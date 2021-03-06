@@ -629,7 +629,7 @@ job_dicts = [
         'filters': [['property_state', '==', 'PA']], # Location information includes city, state, and ZIP code.
         'always_wipe_data': True,
         'primary_key_fields': ['hud_project_number'], # "HUD PROJECT NUMBER" seems pretty unique.
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': 'mf_mortgages.csv',
     },
     {
@@ -645,7 +645,7 @@ job_dicts = [
         'filters': [['project_state', '==', 'PA']], # No county field. Just city and state. (And Pittsburgh is misspelled as "Pittsburg".)
         'always_wipe_data': True,
         'primary_key_fields': ['fha_number'], # "HUD PROJECT NUMBER" seems pretty unique.
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': 'mf_init_commit.csv',
     },
     {
@@ -657,7 +657,7 @@ job_dicts = [
         'compressed_file_to_extract': 'LIHTCPUB.csv',
         'encoding': 'binary',
         'always_wipe_data': True,
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': f'{SOURCE_DIR}house_cat/LIHTCPUB.csv', # Needing to specify the
         # job directory makes this more of a hack than I would like.
         # Alternatives: Set the destination file in the Extractor or in default_setup.
@@ -670,7 +670,7 @@ job_dicts = [
         'schema': LIHTCSchema,
         'filters': [['proj_st', '==', 'PA']], # use 'county_fips_code == 42003' to limit to Allegheny County
         'always_wipe_data': True,
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': f'lihtcpub.csv',
     },
     {
@@ -686,7 +686,7 @@ job_dicts = [
         'filters': [['state_name', '==', 'PA']], # use 'county_fips_code == 42003' to limit to Allegheny County
         'always_wipe_data': True,
         'primary_key_fields': ['fha_number'], # "HUD PROJECT NUMBER" seems pretty unique.
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': 'housing_inspections.csv',
     },
     {
@@ -699,7 +699,7 @@ job_dicts = [
         'filters': [['std_st', '==', 'PA']], # Coordinates could be used to filter to Allegheny County.
         'always_wipe_data': True,
         #'primary_key_fields': # DEVELOPMENT_CODE seems like a possible unique key.
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': 'public_housing_projects.csv',
     },
     {
@@ -712,7 +712,7 @@ job_dicts = [
         'filters': [['std_st', '==', 'PA']], # Coordinates could be used to filter to Allegheny County.
         'always_wipe_data': True,
         #'primary_key_fields': # DEVELOPMENT_CODE seems like a possible unique key.
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': 'public_housing_buildings.csv',
     },
     {
@@ -727,7 +727,7 @@ job_dicts = [
         'filters': [['state_code', '==', 'PA']], # use 'county_code == 3' to limit to Allegheny County
         'always_wipe_data': True,
         'primary_key_fields': ['property_id'],
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': 'mf_subsidy_8.csv',
     },
     {
@@ -742,7 +742,7 @@ job_dicts = [
         #'filters': # Nothing to directly filter on here. The property_id needs to be joined to mf_subsidy_8 to determine the property locations.
         'always_wipe_data': True,
         'primary_key_fields': ['property_id'],
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': 'mf_8_contracts.csv',
     },
     {
@@ -757,7 +757,7 @@ job_dicts = [
         'filters': [['std_st', '==', 'PA']], # cnty2kx could be used to filter to Allegheny County.
         'always_wipe_data': True,
         #'primary_key_fields': # POTENTIAL PRIMARY KEY FIELDS: ['PROPERTY_ID', 'PRIMARY_FHA_NUMBER', 'ASSOCIATED_FHA_NUMBER', 'FHA_NUM1']
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': 'mf_loans.csv',
     },
     { # The source file is in a weird wide format, listing three different columns
@@ -776,7 +776,7 @@ job_dicts = [
         'filters': [['state_code', '==', 'PA']], # city and REMS_Property_ID are the only fields that could be used to geographically narrow this filter.
         'always_wipe_data': True,
         'primary_key_fields': ['rems_property_id'],
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': 'mf_inspections.csv',
     },
     {
@@ -790,7 +790,7 @@ job_dicts = [
         'schema': MultifamilyInspectionsSchema2,
         'filters': [['state_code', '==', 'PA'], ['inspection_id_2', '!=', None]], # city and REMS_Property_ID are the only fields that could be used to geographically narrow this filter.
         'primary_key_fields': ['rems_property_id'],
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': 'mf_inspections.csv',
     },
     {
@@ -804,7 +804,7 @@ job_dicts = [
         'schema': MultifamilyInspectionsSchema3,
         'filters': [['state_code', '==', 'PA'], ['inspection_id_3', '!=', None]], # city and REMS_Property_ID are the only fields that could be used to geographically narrow this filter.
         'primary_key_fields': ['rems_property_id'],
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': 'mf_inspections.csv',
     },
 

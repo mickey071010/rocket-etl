@@ -103,8 +103,7 @@ job_dicts = [
         #'primary_key_fields': [],
         'always_wipe_data': True,
         'upload_method': 'insert',
-        #'destinations': ['file'], # These lines are just for testing
-        #'destination_file': f'{current_year}_farmers_markets.csv', # purposes.
+        #'destination_file': f'{current_year}_farmers_markets.csv',
         'package': farmers_markets_package_id,
         'resource_name': f'Current Farmers Markets'
     },

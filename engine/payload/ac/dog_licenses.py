@@ -82,8 +82,6 @@ job_dicts = [
 #        #'primary_key_fields': [],
 #        'always_wipe_data': True,
 #        'upload_method': 'insert',
-#        #'destinations': ['file'],
-#        #'destination_file': f'{old_year}_dog_licenses.csv',
 #        'package': dog_licenses_package_id,
 #        'resource_name': f'{old_year} Dog Licenses'
 #    },
@@ -98,7 +96,6 @@ job_dicts = [
         #'primary_key_fields': [],
         'always_wipe_data': True,
         'upload_method': 'insert',
-        #'destinations': ['file'], # These lines are just for testing
         #'destination_file': f'{current_year}_dog_licenses.csv', # purposes.
         'package': dog_licenses_package_id,
         'resource_name': f'{current_year} Dog Licenses'

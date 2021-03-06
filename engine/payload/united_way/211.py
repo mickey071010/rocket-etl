@@ -291,8 +291,6 @@ job_dicts = [
         # fill in the gap between the last published date and the present
         # (yesterday's requests).
         'upload_method': 'insert',
-        #'destinations': ['file'],
-        #'destination_file': f'211.csv',
         'package': requests_211_package_id,
         'resource_name': '2-1-1 Requests',
     },

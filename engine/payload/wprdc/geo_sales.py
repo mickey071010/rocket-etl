@@ -76,8 +76,6 @@ job_dicts = [
         'always_wipe_data': False, # Should this be True or is it better for this table to be a cumulative archive
         # (in constrast with how the sales table currently works)?
         'upload_method': 'upsert',
-        #'destinations': ['file'], # These lines are just for testing
-        #'destination_file': f'air_daily.csv', # purposes.
         'package': geo_property_package_id,
         'resource_name': 'Property Sales Data with Parcel Centroids',
     },

@@ -101,7 +101,7 @@ job_dicts = [
         #'primary_key_fields': [],
         'always_wipe_data': True,
         'upload_method': 'insert',
-        #'destinations': ['ckan_filestore'],
+        #'destination': 'ckan_filestore',
         'package': accidental_overdoses_package_id,
         'resource_name': 'Fatal Accidental Overdoses'
     },

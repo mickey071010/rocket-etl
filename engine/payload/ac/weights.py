@@ -101,8 +101,6 @@ job_dicts = [ # Notes: "Each of these is a dump with all the data, so it should 
         #'primary_key_fields': [],
         'always_wipe_data': True,
         'upload_method': 'insert',
-        #'destinations': ['file'], # These lines are just for testing
-        #'destination_file': f'{current_year}_dog_licenses.csv', # purposes.
         'package': weights_and_measures_package_id,
         'resource_name': 'Devices',
     },

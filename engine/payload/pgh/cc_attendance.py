@@ -34,6 +34,7 @@ cc_attendance_package_id = "5b0b8acc-d8fc-4278-bc57-684e2e4faab5" # Production v
 
 job_dicts = [
     {
+        'job_code': 'cc_attendance',
         'source_type': 'local',
         'source_dir': '',
         'source_file': 'RecCenterDailyAtten.csv',
@@ -41,8 +42,6 @@ job_dicts = [
         'custom_processing': conditionally_get_city_files,
         'schema': RecCenterAttendanceSchema,
         'always_wipe_data': True,
-        #'destinations': ['file'], # These lines are just for testing
-        #'destination_file': f'cc_attendance.csv', # purposes.
         'primary_key_fields': ['date', 'center_name'],
         'upload_method': 'upsert',
         'package': cc_attendance_package_id,

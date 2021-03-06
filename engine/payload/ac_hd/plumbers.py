@@ -56,8 +56,7 @@ job_dicts = [
         #'primary_key_fields': [], # Multiple records can exist for each registration number.
         'always_wipe_data': True,
         'upload_method': 'insert',
-        #'destinations': ['file'], # These lines are just for testing
-        #'destination_file': f'plumbers.csv', # purposes.
+        #'destination_file': f'plumbers.csv',
         'package': plumbers_package_id,
         'resource_name': f'Plumbers'
     },

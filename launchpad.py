@@ -28,18 +28,16 @@ def import_module(path,name):
 # Source fields: source_dir (a path, such as on a remote FTP site)
 #                source_file (a file name)
 #                source [To Be Added to distinguish County FTP site, from City FTP site from
-#                other sites/APIs, but where should the lookup table for all this be stored?
-#                Another Python file?]
+#                  other sites/APIs, but where should the lookup table for all this be stored?
+#                  Another Python file?]
 # Transformation schema (where the value is the Marshmallow schema to be used for the transformation)
 # fields:
-# Destination    destinations (a list, like ['file','ckan']... the default value is ['ckan']; this could also
-# fields:        be modified to change 'file' to particular file types; another option would be to link
-#                jobs (for multi-step transformations) explicitly through destinations (or possibly the
-#                source field
+# Destination    destination (a code for the type of destination, like 'file', 'ckan', or
+# fields:          'ckan_filestore'... the default value is ['ckan'])
 #                package_id (for CKAN destinations)
 #                resource_name (for CKAN destinations)
 #                destination_file (a file name that overrides just using the source_file name in the
-#                output_files/ directory)
+#                  output_files/ directory)
 
 def code_is_in_job_dict(code, job_dict):
     """Identify jobs by a command-line-specified job code which could be 1) the full name of
@@ -90,11 +88,13 @@ def main(**kwargs):
     # server to be searched for unharvested tables.
     for job in selected_jobs:
         kwparameters = dict(kwargs)
-        if 'ckan' in job.destinations:
+        if job.destination == 'ckan': # This deliberately excludes 'ckan_filestore'
+            # because the shenanigans below (Data Tables and data dictionaries)
+            # are datastore-specific.
             package_id = get_package_id(job, test_mode) # This stuff needs to be tested.
             resource_id = find_resource_id(package_id, job.resource_name)
 
-        if migrate_schema and 'ckan' in job.destinations:
+        if migrate_schema and job.destination == 'ckan':
             # Delete the Data Table view to avoid new fields not getting added to an existing view.
             delete_datatable_views(resource_id)
             # Is this really necessary though? In etl_util.py, migrate_schema being True is already going to force clear_first to be True
@@ -104,7 +104,8 @@ def main(**kwargs):
             # the other values.
             print("Note that setting migrate_schema = True is going to clear the associated datastore.")
 
-        if (clear_first or migrate_schema) and 'ckan' in job.destinations: # if the target is a CKAN resource being cleared
+        if (clear_first or migrate_schema) and job.destination == 'ckan': # if the target is a CKAN datastore
+                                                                          # resource being cleared
             # [ ] Maybe add a check to see if an integrated data dictionary exists.
             data_dictionary = get_data_dictionary(resource_id) # If so, obtain it.
             # Save it to a local file as a backup.

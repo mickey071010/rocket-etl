@@ -2984,7 +2984,7 @@ job_dicts = [
         'schema': FarmersMarketsSchema,
         #'primary_key_fields': Nothing solid.
         'always_wipe_data': True,
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + '2019_farmers-markets.csv',
     },
     {
@@ -2997,7 +2997,7 @@ job_dicts = [
         'schema': FishFriesSchema,
         'always_wipe_data': True,
         #'primary_key_fields': Nothing solid. The 'id' field only has values for the fries with publish = False.
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + '2020_pittsburgh_fish_fry_locations-validated.csv',
     },
     {
@@ -3009,7 +3009,7 @@ job_dicts = [
         'schema': LibrariesSchema,
         'always_wipe_data': True,
         'primary_key_fields': ['clpid'], # A solid primary key.
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'CLP_Library_Locations.csv',
     },
     {
@@ -3021,7 +3021,7 @@ job_dicts = [
         'schema': FaithBasedFacilitiesSchema,
         'always_wipe_data': True,
         #'primary_key_fields': Nothing solid.
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'AlleghenyCountyChurches.csv',
     },
     {
@@ -3035,7 +3035,7 @@ job_dicts = [
         'always_wipe_data': True,
         'primary_key_fields': ['objectid'], # It's not clear whether these will be fixed under updates
         # since it's just a sequence of integers. I'll call it a Possibly Unreliable Key.
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'FamilySupportCtrs-disambiguate-column-names.csv',
     },
     {
@@ -3047,7 +3047,7 @@ job_dicts = [
         'schema': SeniorCentersSchema,
         'always_wipe_data': True,
         'primary_key_fields': ['id'], # Possibly Unreliable Key
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'FamilySeniorServices-fixed.csv',
     },
     {
@@ -3059,7 +3059,7 @@ job_dicts = [
         'schema': PollingPlacesSchema,
         'always_wipe_data': True,
         #'primary_key_fields': ['objectid_1'], # Unique in the current file but possibly unreliable key
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'Allegheny_County_Polling_Places_May2019.csv',
     },
     {
@@ -3071,7 +3071,7 @@ job_dicts = [
         'schema': ACHACommunitySitesSchema,
         'always_wipe_data': True,
         #'primary_key_fields': ['objectid'],  # Possibly Unreliable Key # 'id' would also be another (Possibly Unreliable)  option.
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'ACHA_CommunitySitesMap-fixed.csv',
     },
     {
@@ -3083,7 +3083,7 @@ job_dicts = [
         'schema': ClinicsSchema,
         'always_wipe_data': True,
         #'primary_key_fields': ['objectid_1'], # Possibly Unreliable Key
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'ACHD_Clinic.csv',
     },
     {
@@ -3095,7 +3095,7 @@ job_dicts = [
         'schema': AffordableHousingSchema,
         'always_wipe_data': True,
         #'primary_key_fields': Nothing solid.
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'Affordable_Housing.csv',
     },
     {
@@ -3107,7 +3107,7 @@ job_dicts = [
         'schema': WICVendorsSchema,
         'always_wipe_data': True,
         #'primary_key_fields': ['objectid'], # Possibly Unreliable Key
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'Allegheny_County_WIC_Vendor_Locations-nonempty-rows-transgeocoded.csv',
     },
     {
@@ -3125,7 +3125,7 @@ job_dicts = [
         'schema': HomelessSheltersSchema,
         'always_wipe_data': True,
         #'primary_key_fields': [''], No solid key.
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'BigBurghServices-shelters.csv',
     },
     # To get homeless shelters from BigBurghServices, filter out just the six rows containing the string 'roof-overnight'.
@@ -3145,7 +3145,7 @@ job_dicts = [
         'schema': BusStopsSchema,
         'always_wipe_data': True,
         'primary_key_fields': ['stop_id'],
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'bussStopUsageByRoute_STOP_ID_CURRENT_STOP_not_No.csv',
     },
     # Filter bussStopUseageByRoute.csv, eliminating CURRENT_STOP != 'No', aggregate so STOP_NAME is unique
@@ -3158,7 +3158,7 @@ job_dicts = [
         'schema': CatholicSchema,
         'always_wipe_data': True,
         'primary_key_fields': ['id'],
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'Catholic.csv',
     },
     {
@@ -3170,7 +3170,7 @@ job_dicts = [
         'schema': MoreLibrariesSchema,
         'always_wipe_data': True,
         #'primary_key_fields': ['objectid_12_13'], # Possibly Unreliable Key
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'LibrariesAll.csv',
     },
     {
@@ -3182,7 +3182,7 @@ job_dicts = [
         'schema': MuseumsSchema,
         'always_wipe_data': True,
         #'primary_key_fields': ['fid'], # Nothing solid. fid is just the row number.
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'Museums.csv',
     },
     {
@@ -3194,7 +3194,7 @@ job_dicts = [
         'schema': WICOfficesSchema,
         'always_wipe_data': True,
         #'primary_key_fields': ['phone'], The value of the 'phone' field might be the most reliable key.
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'WIC_Offices.csv',
     },
     {
@@ -3206,7 +3206,7 @@ job_dicts = [
         'schema': RecCentersSchema,
         'always_wipe_data': True,
         'primary_key_fields': ['id'], # This is a good primary key. parcel_id could also work.
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'City_of_Pgh_Facilities_just_rec_centers.csv',
     },
     {
@@ -3218,7 +3218,7 @@ job_dicts = [
         'schema': FedQualHealthCentersSchema,
         'always_wipe_data': True,
         #'primary_key_fields': ['objectid'], # Possibly Unreliable
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'FederallyQualifiedHealthCtr.csv',
     },
     {
@@ -3231,7 +3231,7 @@ job_dicts = [
         'always_wipe_data': True,
         'primary_key_fields': ['id'], # The 'id' field looks good as a primary key, but it's not known
         # whether it will persist across source updates.
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'PlacesOfWorship.csv',
     },
     {
@@ -3244,7 +3244,7 @@ job_dicts = [
         'always_wipe_data': True,
         #'primary_key_fields': ['id'], # These primary keys are really only primary keys for the source file
         # and could fail if multiple sources are combined.
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'ParkandRides_1909-w-manual-addresses.csv',
     },
     {
@@ -3256,7 +3256,7 @@ job_dicts = [
         'schema': PreschoolSchema,
         'always_wipe_data': True,
         #'primary_key_fields': ['objectid'], # Possibly Unreliable Key
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'PreschoolACLA.csv',
     },
     {
@@ -3268,7 +3268,7 @@ job_dicts = [
         'schema': SeniorCommunityCentersSchema,
         'always_wipe_data': True,
         #'primary_key_fields': ['objectid'], # Possibly Unreliable Key
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'SeniorCommunityCenter.csv',
     },
     {
@@ -3281,7 +3281,7 @@ job_dicts = [
         'always_wipe_data': True,
         #'primary_key_fields': ['fid'], #'fid' is just row number and is not solid.
         # About 40% of rows have a BUILDING_C (code) value, but the rest don't.
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'PublicBuildings.csv',
     },
     {
@@ -3294,7 +3294,7 @@ job_dicts = [
         'always_wipe_data': True,
         'primary_key_fields': ['unique_id'], # There are other contenders for primary keys
         # in this file, but 'unique_id' seems suitable.
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'VA_FacilitiesPA-Allegheny.csv',
     },
     {
@@ -3306,7 +3306,7 @@ job_dicts = [
         'schema': VetSocialOrgsSchema,
         'always_wipe_data': True,
         #'primary_key_fields': ['objectid'], # Possibly Unreliable Key.
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'VeteransSocialOrg-fixed.csv',
     },
     {
@@ -3319,7 +3319,7 @@ job_dicts = [
         'always_wipe_data': True,
         'primary_key_fields': ['facility_i'], # These primary keys are really only primary keys for the source file
         # and could fail if multiple sources are combined.
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'DOH_NursingHome201806.csv',
     },
     {
@@ -3332,7 +3332,7 @@ job_dicts = [
         'always_wipe_data': True,
         'primary_key_fields': ['licensenumber'], # These primary keys are really only primary keys for the source file
         # and could fail if multiple sources are combined.
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'LicenseData_Active_Allegheny_Dentists.csv',
     },
     {
@@ -3345,7 +3345,7 @@ job_dicts = [
         'always_wipe_data': True,
         'primary_key_fields': ['licensenumber'], # These primary keys are really only primary keys for the source file
         # and could fail if multiple sources are combined.
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'LicenseData_Active_Allegheny_Barbers.csv',
     },
     {
@@ -3358,7 +3358,7 @@ job_dicts = [
         'always_wipe_data': True,
         'primary_key_fields': ['licensenumber'], # These primary keys are really only primary keys for the source file
         # and could fail if multiple sources are combined.
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'LicenseData_Active_Allegheny_Nail_Salons.csv',
     },
     {
@@ -3371,7 +3371,7 @@ job_dicts = [
         'always_wipe_data': True,
         'primary_key_fields': ['licensenumber'], # These primary keys are really only primary keys for the source file
         # and could fail if multiple sources are combined.
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'LicenseData_Active_Allegheny_Hair_Salons.csv',
     },
     {
@@ -3384,7 +3384,7 @@ job_dicts = [
         'always_wipe_data': True,
         'primary_key_fields': ['licensenumber'], # These primary keys are really only primary keys for the source file
         # and could fail if multiple sources are combined.
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'LicenseData_Active_Allegheny_Pharmacies.csv',
     },
     {
@@ -3397,7 +3397,7 @@ job_dicts = [
         'always_wipe_data': True,
         'primary_key_fields': ['store_id'], # These primary keys are really only primary keys for the source file
         # and could fail if multiple sources are combined.
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'wmd-laundromats.csv',
     },
     {
@@ -3410,7 +3410,7 @@ job_dicts = [
         'always_wipe_data': True,
         'primary_key_fields': ['store_id'], # These primary keys are really only primary keys for the source file
         # and could fail if multiple sources are combined.
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'wmd-gas-vendors.csv',
     },
     {
@@ -3424,7 +3424,7 @@ job_dicts = [
         'always_wipe_data': True,
         'primary_key_fields': ['store_id'], # These primary keys are really only primary keys for the source file
         # and could fail if multiple sources are combined.
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'wmd-coffee.csv',
     },
     {
@@ -3436,7 +3436,7 @@ job_dicts = [
         'schema': ChildCareCentersSchema,
         'always_wipe_data': True,
         'primary_key_fields': ['license_number'], # A good primary key
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'Child_Care_Providers_Listing_Child_Care_Center_Allegheny.csv',
     },
     {
@@ -3448,7 +3448,7 @@ job_dicts = [
         'schema': ApartmentsSchema,
         'always_wipe_data': True,
         'primary_key_fields': ['parid'], # A strong primary key
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'apartments20plus20200117.csv',
     },
     {
@@ -3461,7 +3461,7 @@ job_dicts = [
         'always_wipe_data': True,
         'primary_key_fields': [], # These primary keys are really only primary keys for the source file
         # and could fail if multiple sources are combined.
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'Universities.csv'
     },
     {
@@ -3475,7 +3475,7 @@ job_dicts = [
         'primary_key_fields': [], # This file is an oddball. For some LEA types,
         # there is a school_number field which is a primary key, but for others
         # this value is 0000, so a substitute primary key would be needed there.
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'Public_and_Private_Education_Institutions_2017_Education_Allegheny-minus_PO_Boxes.csv'
     },
     {
@@ -3487,7 +3487,7 @@ job_dicts = [
         'schema': ParkFacilitiesSchema,
         'always_wipe_data': True,
         'primary_key_fields': ['gloablid'],
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'Allegheny_County_Park_Facilities.csv',
     },
     {
@@ -3499,7 +3499,7 @@ job_dicts = [
         'schema': CityParksSchema,
         'always_wipe_data': True,
         'primary_key_fields': ['globalid_2'],
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'Pittsburgh_Parks.csv'
     },
 #    {
@@ -3513,7 +3513,7 @@ job_dicts = [
 #        'primary_key_fields': ['name'], # This is a so-so primary key field as the name
 #           or spelling or other features of the name can change, so I'm switching to
 #           using playground equipment as the assets because of their actual primary keys.
-#        'destinations': ['file'],
+#        'destination': 'file',
 #        'destination_file': ASSET_MAP_PROCESSED_DIR + 'playgroundequipment_averaged.csv'
 #    },
     {
@@ -3525,7 +3525,7 @@ job_dicts = [
         'schema': CityPlaygroundEquipmentSchema,
         'always_wipe_data': True,
         'primary_key_fields': ['id'],
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'playgroundequipment.csv'
     },
     {
@@ -3537,7 +3537,7 @@ job_dicts = [
         'schema': BigBurghRecCentersSchema,
         'always_wipe_data': True,
         #'primary_key_fields': No solid key.
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'BigBurghServices-rec_centers.csv'
     },
     {
@@ -3605,7 +3605,7 @@ job_dicts = [
         'schema': GeocodedRestaurantsSchema,
         'always_wipe_data': True,
         'primary_key_fields': ['id'],
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'GeocodedFoodFacilities-filtered-restaurants.csv',
     },
     {
@@ -3617,7 +3617,7 @@ job_dicts = [
         'schema': GeocodedSupermarketsSchema,
         'always_wipe_data': True,
         'primary_key_fields': ['id'],
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'GeocodedFoodFacilities-filtered-supermarkets.csv',
     },
     {
@@ -3629,7 +3629,7 @@ job_dicts = [
         'schema': GeocodedFoodBanksSchema,
         'always_wipe_data': True,
         'primary_key_fields': ['id'],
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'GeocodedFoodFacilities-filtered-food-banks.csv',
     },
     {
@@ -3641,7 +3641,7 @@ job_dicts = [
         'schema': PrimaryCareSchema,
         'always_wipe_data': True,
         #'primary_key_fields': [], # No solid key.
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'data-primary-care-access-facilities.csv',
     },
     {
@@ -3657,7 +3657,7 @@ job_dicts = [
         'schema': IRSGeocodedSchema,
         'always_wipe_data': True,
         'primary_key_fields': ['ein'],
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'IRS_pregeocoded+Allegheny_County_Zip_Codes-just-allegheny.csv',
     },
     {
@@ -3670,7 +3670,7 @@ job_dicts = [
         'schema': GeocodedSocialClubsSchema,
         'always_wipe_data': True,
         'primary_key_fields': ['id'],
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'GeocodedFoodFacilities-filtered-social-club-bar-only.csv',
     },
     {
@@ -3683,7 +3683,7 @@ job_dicts = [
         'schema': LiquorSocialClubsSchema,
         'always_wipe_data': True,
         'primary_key_fields': ['lid'],
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'PLCBLicenseListWithSecondaries-allegheny-clubs-non-expired.csv',
     },
     {
@@ -3696,7 +3696,7 @@ job_dicts = [
         'schema': PostOfficesSchema,
         'always_wipe_data': True,
         'primary_key_fields': ['fdb_id_(all)'],
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'pa-allegheny-post-office.csv',
     },
     {
@@ -3709,7 +3709,7 @@ job_dicts = [
         'schema': FDICSchema,
         'always_wipe_data': True,
         'primary_key_fields': ['uninum'], # A strong primary key
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'fdic-banks-locations-allegheny.csv',
     },
     {
@@ -3722,7 +3722,7 @@ job_dicts = [
         'schema': HealthyRideSchema,
         'always_wipe_data': True,
         'primary_key_fields': ['station_#'], # A strong primary key
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'healthy-ride-station-locations-q3-2019.csv',
     },
     {
@@ -3735,7 +3735,7 @@ job_dicts = [
         'schema': BigBurghPantriesSchema,
         'always_wipe_data': True,
         #'primary_key_fields': No solid primary key
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'BigBurghServices-pantries.csv',
     },
     {
@@ -3747,7 +3747,7 @@ job_dicts = [
         'schema': HotelsSchema,
         'always_wipe_data': True,
         'primary_key_fields': ['address_id'], # A strong primary key
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'Allegheny_County__Addressing_Landmarks-hotels.csv',
     },
     {
@@ -3759,7 +3759,7 @@ job_dicts = [
         'schema': PreventionPointSchema,
         'always_wipe_data': True,
         #'primary_key_fields': None,
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'PreventionPoint.csv',
     },
     {
@@ -3771,7 +3771,7 @@ job_dicts = [
         'schema': PublicArtSchema,
         'always_wipe_data': True,
         'primary_key_fields': ['id'],
-        'destinations': ['file'],
+        'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'public-art-pgh.csv',
     },
 ]

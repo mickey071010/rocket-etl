@@ -125,8 +125,8 @@ job_dicts = [
         #'primary_key_fields': [],
         'always_wipe_data': True,
         'upload_method': 'insert',
-        'destinations': ['file'], # These lines are just for testing
-        'destination_file': f'covid_19_death_demographics.csv', # purposes.
+        'destination': 'file',
+        'destination_file': f'covid_19_death_demographics.csv',
         'package': covid_19_package_id,
         'resource_name': f'Allegheny County COVID-19 Deaths by Demographic Groups',
         'custom_post_processing': express_load_then_delete_file
@@ -142,8 +142,8 @@ job_dicts = [
         #'primary_key_fields': [],
         'always_wipe_data': True,
         'upload_method': 'insert',
-        'destinations': ['file'], # These lines are just for testing
-        'destination_file': f'covid_19_deaths_by_date.csv', # purposes.
+        'destination': 'file',
+        'destination_file': f'covid_19_deaths_by_date.csv',
         'package': covid_19_package_id,
         'resource_name': f'Allegheny County COVID-19 Deaths by Date',
         'custom_post_processing': express_load_then_delete_file
@@ -159,8 +159,8 @@ job_dicts = [
         #'primary_key_fields': [],
         'always_wipe_data': True,
         'upload_method': 'insert',
-        'destinations': ['file'], # These lines are just for testing
-        'destination_file': f'covid_19_cases_by_place.csv', # purposes.
+        'destination': 'file',
+        'destination_file': f'covid_19_cases_by_place.csv',
         'package': covid_19_package_id,
         'resource_name': f'Allegheny County COVID-19 Counts by Municipality and Pittsburgh Neighborhood',
         'custom_post_processing': express_load_then_delete_file
@@ -176,8 +176,8 @@ job_dicts = [
         #'primary_key_fields': [],
         'always_wipe_data': True,
         'upload_method': 'insert',
-        'destinations': ['file'], # These lines are just for testing
-        'destination_file': f'covid_19_tests.csv', # purposes.
+        'destination': 'file',
+        'destination_file': f'covid_19_tests.csv',
         'package': covid_19_package_id,
         'resource_name': f'Allegheny County COVID-19 Tests and Cases',
         'custom_post_processing': express_load_then_delete_file

@@ -147,8 +147,8 @@ job_dicts = [
         'schema': ViolationsSchema,
         'always_wipe_data': True,
         'upload_method': 'insert',
-        'destinations': ['file'], # These lines are just for testing
-        'destination_file': f'alco-restuarant-violations.csv', # purposes.
+        'destination': 'file',
+        'destination_file': f'alco-restuarant-violations.csv',
         'package': package_id,
         'resource_name': "Food Facility/Restaurant Inspection Violations",
         'custom_post_processing': express_load_then_delete_file

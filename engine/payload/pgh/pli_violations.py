@@ -100,7 +100,7 @@ job_dicts = [
         #'primary_key_fields': ['CASE_NUMBER', 'VIOLATION', 'LOCATION', 'CORRECTIVE_ACTION'] # This is from an old job: tools:jobs/pli/pli_violations.py
         'upload_method': 'upsert',
         'custom_processing': ftp_and_prime_geocoder,
-        'destinations': ['ckan'],
+        'destination': 'ckan',
         'destination_file': 'PLI-output.csv',
         'package': pli_violations_package_id,
         'resource_name': 'Pittsburgh PLI Violations Report',

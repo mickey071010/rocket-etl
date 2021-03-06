@@ -98,8 +98,6 @@ job_dicts = [
         'primary_key_fields': ['datetime', 'measurement_name'],
         'always_wipe_data': False,
         'upload_method': 'upsert',
-        #'destinations': ['file'], # These lines are just for testing
-        #'destination_file': f'foreseer.csv', # purposes.
         'package': foreseer_package_id,
         'resource_name': f'Frick Environmental Center Sensor Readings'
     },

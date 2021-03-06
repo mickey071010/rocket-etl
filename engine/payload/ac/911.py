@@ -55,8 +55,6 @@ job_dicts = [
         'primary_key_fields': ['call_id_hash', 'call_year', 'call_quarter'],
         'always_wipe_data': False,
         'upload_method': 'upsert',
-        #'destinations': ['file'], # These lines are just for testing
-        #'destination_file': f'{current_year}_dog_licenses.csv', # purposes.
         'package': nine_one_one_package_id,
         'resource_name': '911 EMS Dispatches'
     },
@@ -71,8 +69,6 @@ job_dicts = [
         'primary_key_fields': ['call_id_hash', 'call_year', 'call_quarter'],
         'always_wipe_data': False,
         'upload_method': 'upsert',
-        #'destinations': ['file'], # These lines are just for testing
-        #'destination_file': f'{current_year}_dog_licenses.csv', # purposes.
         'package': nine_one_one_package_id,
         'resource_name': '911 Fire Dispatches'
     },

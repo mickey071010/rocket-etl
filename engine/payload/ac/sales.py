@@ -80,7 +80,6 @@ job_dicts = [
         'upload_method': 'upsert', # This job must be done by upsert
         # because the source file contains a small percentage of duplicate rows.
 
-        #'destinations': ['file'], # These lines are just for testing
         #'destination_file': f'sales.csv', # purposes.
         'package': sales_package_id,
         'resource_name': 'Property Sales Transactions',

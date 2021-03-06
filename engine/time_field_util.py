@@ -51,15 +51,24 @@ def find_extreme_dates(resource_id, time_field_lookup):
 #def synthesize_pseudo_time_field_lookup(job):
 
 def get_extant_time_range(job, **kwparameters):
-    if 'ckan' in job.destinations: # This is a strong argument for making each job_dict
+#    if 'ckan' in job.destinations: # This is a strong argument for making each job_dict
         # have exactly one source and one destination and using job molecules or
         # chains to support multiple destinations (somehow).
-        ## JOB CHAINS: 1) Support building up more complicated processes (often 
+        ## JOB CHAINS: 1) Support building up more complicated processes (often
         ## represented by "directed acyclic graphs") by chaining job atoms.
         ## 2) More coherently support multiple destinations at this level by
         ## calling the same job atom twice, with different destinations.
+            ## I can imagine that a job atom could be the basis for a superjob
+            ## which could replace multiple fields with lists, and some
+            ## launchpad logic would iterate over these lists
+            ## like
+            ##      destination = ['file', 'ckan_filestore']
+            ##      destination_filename = ['local_filename.csv', 'Official-Looking CKAN Filename']
+            ## and apply the elements in sequence to make len(xs) jobs.
+
         ## 3) But try to make every parameter into a potential list this way
         ## (at least by allowing one parameter at a time to be changed).
+    if job.destination == 'ckan':
 
         package = get_package_by_id(job.package)
         if 'extras' in package:
@@ -90,9 +99,9 @@ def get_extant_time_range(job, **kwparameters):
                 return None, None
         else:
             return None, None
-    else: # Find the time range of a non-datastore CSV file at one of the actual destinations.
+    else: # Find the time range of a non-datastore CSV file at the local destination
             # OR wipe the existing file and rewrite it from scratch.
-        if 'file' in job.destinations:
+        if job.destination == 'file':
             try:
                 f = open(job.destination_file_path, 'r')
             except FileNotFoundError:
@@ -115,4 +124,4 @@ def get_extant_time_range(job, **kwparameters):
                 else:
                     return None, None
         else:
-            raise ValueError(f"Unable to determine the extant time range for the following destinations: {job.destinations}")
+            raise ValueError(f"Unable to determine the extant time range for the following destination: {job.destination}")

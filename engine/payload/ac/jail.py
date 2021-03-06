@@ -61,10 +61,7 @@ job_dicts = [
         'upload_method': 'upsert',
         'primary_key_fields': ['record_id', 'census_date'],
         'schema': JailCensusSchema,
-        #'destinations': ['file'], # These lines are just for testing
-        #'destination_file': f'acj-output.csv', # purposes.
         'package': package_id,
-        'pipeline_name': 'ac_jail_census_pipeline', # Not yet used.
         'resource_name': 'ACJ Daily Census Data (Combined)'
     },
 

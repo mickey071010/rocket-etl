@@ -154,11 +154,11 @@ assessments_package_id = "812527ad-befc-4214-a4d3-e621d8230563" # Test package o
 
 def custom_processing(job, **kwparameters):
     ## BEGIN CUSTOMIZABLE SECTION ##
-    # Use local files on the second of the two jobs to avoid redownloading that giant file.
-    #if 'destinations' in job and len(job['destinations']) == 1 and job['destinations'][0] == 'ckan_filestore':
-    #    use_local_files = True
-    ## Actually, this will be handled by combining all three of the original jobs (each with a different destination)
-    ## into one with one source and a list of destinations.
+    # Think about finding a way to avoid redownloading that CSV file multiple times.
+    # Like:
+    #   [ ] Step 1 should be to download the source file to a local file and the
+    #   other steps should use 'source': 'local'.
+
 
     # The original assessments.py script has capitalize = True, like this:
     #      fields=AssessmentSchema().serialize_to_ckan_fields(capitalize=True),
@@ -204,7 +204,19 @@ job_dicts = [
         'connector_config_string': 'sftp.county_sftp', # This is just used to look up parameters in the settings.json file.
         'schema': None,
         'always_wipe_data': True,
-        'destinations': ['ckan_filestore'],
+        'destination': 'file',
+        'destination_file': 'ALLEGHENY_COUNTY_MASTER_FILE.csv',
+    },
+    {
+        'job_code': 'assessments_filestore'
+        'source_type': 'local', #'sftp',
+        #'source_dir': 'property_assessments',
+        'source_file': 'ALLEGHENY_COUNTY_MASTER_FILE.csv',
+        'encoding': 'latin-1', # Taken from assessments.py and used instead of the default, 'utf-8'.
+        'connector_config_string': 'sftp.county_sftp', # This is just used to look up parameters in the settings.json file.
+        'schema': None,
+        'always_wipe_data': True,
+        'destination': 'ckan_filestore',
         'destination_file': 'assessments.csv',
         'package': assessments_archive_package_id,
         'resource_name': name_file_resource()
@@ -212,22 +224,22 @@ job_dicts = [
     # Instead of all the LMAZ stuff, just save the file to a secret archive package.
     {
         'job_code': 'assessments_archive'
-        'source_type': 'sftp',
-        'source_dir': 'property_assessments',
+        'source_type': 'local', 'sftp',
+        #'source_dir': 'property_assessments',
         'source_file': 'ALLEGHENY_COUNTY_MASTER_FILE.csv',
         'encoding': 'latin-1', # Taken from assessments.py and used instead of the default, 'utf-8'.
         'connector_config_string': 'sftp.county_sftp', # This is just used to look up parameters in the settings.json file.
         'schema': None,
         'always_wipe_data': True,
-        'destinations': ['ckan_filestore'],
+        'destination': 'ckan_filestore',
         'destination_file': 'assessments.csv',
         'package': assessments_package_id,
         'resource_name': name_file_resource()
     },
     {
         'job_code': 'assessments_datastore'
-        'source_type': 'sftp',
-        'source_dir': 'property_assessments',
+        'source_type': 'local', #'sftp',
+        #'source_dir': 'property_assessments',
         'source_file': 'ALLEGHENY_COUNTY_MASTER_FILE.csv',
         'encoding': 'latin-1', # Taken from assessments.py and used instead of the default, 'utf-8'.
         'connector_config_string': 'sftp.county_sftp',

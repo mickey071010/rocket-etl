@@ -681,7 +681,7 @@ job_dicts = [
         'primary_key_fields': ['Year+month'],
         'always_wipe_data': False,
         'upload_method': 'upsert',
-        'destinations': ['file'], # These lines are just for testing
+        'destination': 'file', # These lines are just for testing
         'destination_file': f'web_stats.csv', # purposes.
         'package': analytics_package_id,
         'resource_name': f'WPRDC Site Statistics by Month'
@@ -697,8 +697,7 @@ job_dicts = [
         'primary_key_fields': ['Year+month', 'Resource ID'],
         'always_wipe_data': False,
         'upload_method': 'upsert',
-        'destinations': ['file'], # These lines are just for testing
-        'destination_file': f'dataset_pageviews_by_month.csv', # purposes.
+        'destination': 'file', # These lines are just for testing
         'package': analytics_package_id,
         'resource_name': f'WPRDC Resource Pageviews by Month'
     },
@@ -713,8 +712,7 @@ job_dicts = [
         'primary_key_fields': ['Year+month', 'Resource ID'], # Why isn't this by Resource ID?
         'always_wipe_data': False,
         'upload_method': 'upsert',
-        'destinations': ['file'], # These lines are just for testing
-        'destination_file': f'resource_downloads_by_month.csv', # purposes.
+        'destination': 'file', # These lines are just for testing
         'package': analytics_package_id, # What is the correct package ID for dataset downloads (instead of resource downloads)?
         'resource_name': f'WPRDC Resource Downloads by Month' # Where does this actually come from?
     },
@@ -728,8 +726,7 @@ job_dicts = [
         'primary_key_fields': ['Year+month', 'Package ID'], # Why isn't this by Resource ID?
         'always_wipe_data': False,
         'upload_method': 'upsert',
-        'destinations': ['file'], # These lines are just for testing
-        'destination_file': f'package_downloads_by_month.csv', # purposes.
+        'destination': 'file', # These lines are just for testing
         'package': '2bdef6b1-bf31-4d20-93e7-1aa3920d2c52',
         'resource_name': f'WPRDC Package Downloads by Month'
     },

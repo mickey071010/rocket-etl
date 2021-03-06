@@ -52,7 +52,7 @@ job_dicts = [
         #'primary_key_fields': [], # firm_name seems unique but probably not guaranteed to be so.
         'always_wipe_data': True,
         'upload_method': 'insert',
-        #'destinations': ['ckan_filestore'],
+        #'destination': 'ckan_filestore',
         'package': mwdbe_package_id,
         'resource_name': 'Allegheny County Certified MWDBE Businesses'
     },

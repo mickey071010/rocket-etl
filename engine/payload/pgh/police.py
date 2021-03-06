@@ -95,8 +95,6 @@ job_dicts = [
         'custom_processing': conditionally_get_city_files,
         'schema': PreBlotterSchema,
         'always_wipe_data': True,
-        #'destinations': ['file'], # These lines are just for testing
-        #'destination_file': f'blotter.csv', # purposes.
         'primary_key_fields': ['PK'],
         'upload_method': 'upsert',
         'package': blotter_package_id,
