@@ -695,86 +695,85 @@ class Job:
         # of correction.
 
 
-        if True: # This can be eliminated by unindenting the block of code below.
-            package_id = get_package_id(self, test_mode) # This is the effective package ID,
-            # taking into account whether test mode is active.
+        package_id = get_package_id(self, test_mode) # This is the effective package ID,
+        # taking into account whether test mode is active.
 
-            # [ ] Maybe the use_local_files and test_mode and any other parameters should be applied in a discrete stage between initialization and running.
-            # This would allow the source and destination parameters to be prepared, leaving the pipeline running to just run the pipeline.
-            self.select_extractor() # This could be done in default_setup.
+        # [ ] Maybe the use_local_files and test_mode and any other parameters should be applied in a discrete stage between initialization and running.
+        # This would allow the source and destination parameters to be prepared, leaving the pipeline running to just run the pipeline.
+        self.select_extractor() # This could be done in default_setup.
 
-            # BEGIN Destination-specific configuration
-            if self.destination == 'ckan':
-                loader = pl.CKANDatastoreLoader
-            elif self.destination == 'file':
-                # The tabularity of the data (that is, whether the loader is going
-                # to be handed a record (list of dicts) or a file or file-like object
-                # should determine which kind of file loader will be used.
-                if destination_file_format is None:
-                    raise ValueError("Destination == 'file' but destination_file_format is None!")
-                elif destination_file_format.lower() in ['csv'] and self.compressed_file_to_extract is None:
-                    loader = pl.TabularFileLoader # Isn't this actually very CSV-specific, given the write_or_append_to_csv_file function it uses?
-                    self.upload_method = 'insert' # Note that this will always append records to an existing file
-                    # unless 'always_clear_first' (or 'always_wipe_data') is set to True.
-                else:
-                    loader = pl.NontabularFileLoader
-            elif self.destination == 'ckan_filestore':
-                loader = pl.CKANFilestoreLoader
+        # BEGIN Destination-specific configuration
+        if self.destination == 'ckan':
+            loader = pl.CKANDatastoreLoader
+        elif self.destination == 'file':
+            # The tabularity of the data (that is, whether the loader is going
+            # to be handed a record (list of dicts) or a file or file-like object
+            # should determine which kind of file loader will be used.
+            if destination_file_format is None:
+                raise ValueError("Destination == 'file' but destination_file_format is None!")
+            elif destination_file_format.lower() in ['csv'] and self.compressed_file_to_extract is None:
+                loader = pl.TabularFileLoader # Isn't this actually very CSV-specific, given the write_or_append_to_csv_file function it uses?
+                self.upload_method = 'insert' # Note that this will always append records to an existing file
+                # unless 'always_clear_first' (or 'always_wipe_data') is set to True.
             else:
-                raise ValueError(f"run_pipeline does not know how to handle destination = {self.destination}")
+                loader = pl.NontabularFileLoader
+        elif self.destination == 'ckan_filestore':
+            loader = pl.CKANFilestoreLoader
+        else:
+            raise ValueError(f"run_pipeline does not know how to handle destination = {self.destination}")
 
-            clear_first = clear_first or self.always_clear_first or migrate_schema # If migrate_schema == True, 1) backup the data dictionary,
-            # 2) delete the Data Table view, 3) clear the datastore, 4) run the job, and 5) try to restore the data dictionary.
-            # It just seems cleaner to do most of that in launchpad.py (probably because there's so little in the main() function.
+        clear_first = clear_first or self.always_clear_first or migrate_schema # If migrate_schema == True, 1) backup the data dictionary,
+        # 2) delete the Data Table view, 3) clear the datastore, 4) run the job, and 5) try to restore the data dictionary.
+        # It just seems cleaner to do most of that in launchpad.py (probably because there's so little in the main() function.
 
-            wipe_data = wipe_data or self.always_wipe_data
-            if clear_first and wipe_data:
-                raise ValueError("clear_first and wipe_data should not both be True simultaneously. To clear a datastore for a job that has always_wipe_data = True, add the command-line argument 'override_wipe_data'.")
-            elif clear_first:
-                if self.destination in ['ckan']:
-                    if datastore_exists(package_id, self.resource_name):
-                        # It should be noted that this will wipe out any integrated data_dictionary (but it's being preserved at the launchpad.py level).
-                        print("Clearing the datastore for {}".format(self.resource_name)) # Actually done by the pipeline.
-                    else:
-                        print("Since it makes no sense to try to clear a datastore that does not exist, clear_first is being toggled to False.")
-                        clear_first = False
-            elif wipe_data:
-                if self.destination in ['ckan']:
-                    if datastore_exists(package_id, self.resource_name):
-                        print("Wiping records from the datastore for {}".format(self.resource_name))
-                    else:
-                        print("Since it makes no sense to try to wipe the records from a datastore that does not exist, wipe_data is being toggled to False.")
-                        wipe_data = False
-
-            print(f'Uploading {"tabular data" if loader.has_tabular_output else "file"}...')
-            # END Destination-specific configuration
-
-            try:
-                curr_pipeline = pl.Pipeline(self.job_code + ' pipeline', self.job_code + ' Pipeline', log_status=False, chunk_size=1000, settings_file=SETTINGS_FILE, retry_without_last_line = retry_without_last_line, ignore_empty_rows = ignore_empty_rows, filters = self.filters) \
-                    .connect(self.source_connector, self.target, config_string=self.connector_config_string, encoding=self.encoding, local_cache_filepath=self.local_cache_filepath) \
-                    .extract(self.extractor, firstline_headers=True, rows_to_skip=self.rows_to_skip, compressed_file_to_extract=self.compressed_file_to_extract) \
-                    .schema(self.schema) \
-                    .load(loader, self.loader_config_string,
-                          filepath = self.destination_file_path,
-                          file_format = destination_file_format,
-                          fields = self.schema().serialize_to_ckan_fields(),
-                          key_fields = self.primary_key_fields,
-                          package_id = package_id,
-                          resource_name = self.resource_name,
-                          clear_first = clear_first,
-                          wipe_data = wipe_data,
-                          method = self.upload_method).run()
-            except FileNotFoundError:
-                if self.ignore_if_source_is_missing:
-                    print("The source file for this job wasn't found, but that's not surprising.")
+        wipe_data = wipe_data or self.always_wipe_data
+        if clear_first and wipe_data:
+            raise ValueError("clear_first and wipe_data should not both be True simultaneously. To clear a datastore for a job that has always_wipe_data = True, add the command-line argument 'override_wipe_data'.")
+        elif clear_first:
+            if self.destination in ['ckan']:
+                if datastore_exists(package_id, self.resource_name):
+                    # It should be noted that this will wipe out any integrated data_dictionary (but it's being preserved at the launchpad.py level).
+                    print("Clearing the datastore for {}".format(self.resource_name)) # Actually done by the pipeline.
                 else:
-                    raise
+                    print("Since it makes no sense to try to clear a datastore that does not exist, clear_first is being toggled to False.")
+                    clear_first = False
+        elif wipe_data:
+            if self.destination in ['ckan']:
+                if datastore_exists(package_id, self.resource_name):
+                    print("Wiping records from the datastore for {}".format(self.resource_name))
+                else:
+                    print("Since it makes no sense to try to wipe the records from a datastore that does not exist, wipe_data is being toggled to False.")
+                    wipe_data = False
 
-            if self.destination in ['ckan', 'ckan_filestore']:
-                resource_id = find_resource_id(package_id, self.resource_name) # This IS determined in the pipeline, so it would be nice if the pipeline would return it.
-                locators_by_destination[self.destination] = resource_id
-            elif self.destination in ['file']:
-                locators_by_destination[self.destination] = self.destination_file_path
+        print(f'Uploading {"tabular data" if loader.has_tabular_output else "file"}...')
+        # END Destination-specific configuration
+
+        try:
+            curr_pipeline = pl.Pipeline(self.job_code + ' pipeline', self.job_code + ' Pipeline', log_status=False, chunk_size=1000, settings_file=SETTINGS_FILE, retry_without_last_line = retry_without_last_line, ignore_empty_rows = ignore_empty_rows, filters = self.filters) \
+                .connect(self.source_connector, self.target, config_string=self.connector_config_string, encoding=self.encoding, local_cache_filepath=self.local_cache_filepath) \
+                .extract(self.extractor, firstline_headers=True, rows_to_skip=self.rows_to_skip, compressed_file_to_extract=self.compressed_file_to_extract) \
+                .schema(self.schema) \
+                .load(loader, self.loader_config_string,
+                      filepath = self.destination_file_path,
+                      file_format = destination_file_format,
+                      fields = self.schema().serialize_to_ckan_fields(),
+                      key_fields = self.primary_key_fields,
+                      package_id = package_id,
+                      resource_name = self.resource_name,
+                      clear_first = clear_first,
+                      wipe_data = wipe_data,
+                      method = self.upload_method).run()
+        except FileNotFoundError:
+            if self.ignore_if_source_is_missing:
+                print("The source file for this job wasn't found, but that's not surprising.")
+            else:
+                raise
+
+        if self.destination in ['ckan', 'ckan_filestore']:
+            resource_id = find_resource_id(package_id, self.resource_name) # This IS determined in the pipeline, so it would be nice if the pipeline would return it.
+            locators_by_destination[self.destination] = resource_id
+        elif self.destination in ['file']:
+            locators_by_destination[self.destination] = self.destination_file_path
         return locators_by_destination
 
     def process_job(self, **kwparameters):
