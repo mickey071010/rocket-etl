@@ -534,6 +534,19 @@ class LIHTCSchema(pl.BaseSchema):
             if data[f] is not None:
                 data[f] = str(data[f])
 
+class LIHTCBuildingSchema(pl.BaseSchema):
+    job_code = 'lihtc_building'
+    hud_id = fields.String(load_from='\ufeffhud_id'.lower(), dump_to='hud_id')
+    project = fields.String(load_from='project'.lower(), dump_to='hud_property_name')
+    proj_add = fields.String(load_from='proj_add'.lower(), dump_to='property_street_address', allow_none=True)
+    proj_cty = fields.String(load_from='proj_cty'.lower(), dump_to='city', allow_none=True)
+    proj_st = fields.String(load_from='proj_st'.lower(), dump_to='state')
+    proj_zip = fields.String(load_from='proj_zip'.lower(), dump_to='zip_code', allow_none=True)
+    state_id = fields.String(load_from='state_id'.lower(), dump_to='state_id', allow_none=True)
+
+    class Meta:
+        ordered = True
+
 class BaseMultifamilyInspectionsSchema(pl.BaseSchema):
     job_code = 'mf_inspections'
     rems_property_id = fields.String(load_from='REMS Property Id'.lower(), dump_to='property_id')
@@ -672,6 +685,29 @@ job_dicts = [
         'always_wipe_data': True,
         'destination': 'file',
         'destination_file': f'lihtcpub.csv',
+    },
+    {   # This job is a two-step job. Step 1: Get the buildings from the file that
+        # either has to be manually pulled from lihtc.huduser.gov or extracted from
+        # the Access database.
+        'job_code': LIHTCBuildingSchema().job_code, # 'lihtc_building'
+        'source_type': 'local',
+        'source_file': 'lihtc.huduser.gov.extract.buildings.csv',
+        'schema': LIHTCBuildingSchema,
+        'filters': [['proj_st', '==', 'PA']], # use 'county_fips_code == 42003' to limit to Allegheny County
+        'always_wipe_data': True,
+        'destination': 'file',
+        'destination_file': f'lihtc_building.csv',
+    },
+    {   # Step 2: Get the buildings which are in the original project-level file
+        # and (probably) not in the multi-address building-level extraction.
+        'job_code': LIHTCBuildingSchema().job_code + '2', # 'lihtc_building' + '2'
+        'source_type': 'local',
+        'source_file': 'LIHTCPUB.csv',
+        'schema': LIHTCBuildingSchema,
+        'filters': [['proj_st', '==', 'PA']], # Can't be limited, except by city name.
+        'always_wipe_data': False,
+        'destination': 'file',
+        'destination_file': f'lihtc_building.csv',
     },
     {
         'update': 0,
