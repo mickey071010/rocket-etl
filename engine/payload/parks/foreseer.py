@@ -58,7 +58,7 @@ def select_point(devices, params, timestamp):
             }
 
 def pull_measurements_from_foreseer(jobject, **kwparameters):
-    if not kwparameters['use_local_files']:
+    if not kwparameters['use_local_input_file']:
         point_parameters = [{'device_name': 'PowerMeter-Sub09', 'point_number': 832, 'measurement_name': 'Total Energy Production of the Environmental Center'},
                 {'device_name': 'PowerMeter-MainSub', 'point_number': 985, 'measurement_name': 'Total Energy Usage of the Environmental Center'},
                 {'device_name': 'PowerMeter-Sub02', 'point_number': 619, 'measurement_name': 'Barn Energy Usage'},

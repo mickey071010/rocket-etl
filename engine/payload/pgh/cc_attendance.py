@@ -27,7 +27,7 @@ class RecCenterAttendanceSchema(pl.BaseSchema):
 
 
 def conditionally_get_city_files(job, **kwparameters):
-    if not kwparameters['use_local_files']:
+    if not kwparameters['use_local_input_file']:
         fetch_city_file(job)
 
 cc_attendance_package_id = "5b0b8acc-d8fc-4278-bc57-684e2e4faab5" # Production version of Community Center Attendance package

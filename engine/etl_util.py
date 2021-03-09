@@ -598,6 +598,22 @@ class Job:
         self.target, self.local_directory = local_file_and_dir(self, base_dir = SOURCE_DIR)
         self.local_cache_filepath = self.local_directory + self.source_file
 
+        self.loader_config_string = 'production' # Note that loader_config_string's use
+        # can be seen in the load() function of Pipeline from wprdc-etl.
+
+    def select_extractor(self):
+        extension = (self.source_file.split('.')[-1]).lower()
+        if extension == 'csv':
+            self.extractor = pl.CSVExtractor
+        elif extension in ['xls']:
+            self.extractor = pl.OldExcelExtractor
+        elif extension in ['xlsx']:
+            self.extractor = pl.ExcelExtractor
+        elif extension in ['zip']:
+            self.extractor = pl.CompressedFileExtractor
+        else:
+            self.extractor = pl.FileExtractor
+
     def configure_pipeline_with_options(self, **kwargs): # Rename this to reflect how it modifies parameters based on command-line-arguments.
         """This function handles the application of the command-line arguments
         to the configuration of the pipeline (things that cannot be done
@@ -607,13 +623,15 @@ class Job:
         # being carted around and (in principle) allowing those parameters to be even
         # used in Job.init().
 
-        use_local_files = kwargs['use_local_files']
+        use_local_input_file = kwargs['use_local_input_file']
+        use_local_output_file = kwargs['use_local_output_file']
+        test_mode = kwargs['test_mode']
 
         print("==============\n" + self.job_code)
         if self.package == TEST_PACKAGE_ID:
             print(" *** Note that this job currently only writes to the test package. ***")
 
-        if use_local_files:
+        if use_local_input_file:
             self.source_type = 'local'
 
         if self.source_type is not None:
@@ -623,7 +641,7 @@ class Job:
                 # but I'm experimenting with this as it seems like it might be a better way of separating
                 # such things.
                 self.source_connector = pl.RemoteFileConnector # This is the connector to use for files available via HTTP.
-                if not use_local_files:
+                if not use_local_input_file:
                     if self.source_full_url is not None:
                         self.target = self.source_full_url
                     else:
@@ -639,6 +657,11 @@ class Job:
             raise ValueError("The source_type is not specified.")
             # [ ] What should we do if no source_type (or no source) is specified?
 
+        ## BEGIN SET EXTRACTOR PROPERTIES ##
+        self.select_extractor()
+        ## END SET EXTRACTOR PROPERTIES ##
+
+        ## BEGIN SET DESTINATION PROPERTIES ##
         # It seems like self.destination_file_path and self.destination_directory should be
         # only defined if the destination is a local one. (So destination == 'file'.)
         # HOWEVER, self.destination_file_path is currently being used to specify the
@@ -646,46 +669,17 @@ class Job:
         # a workaround to avoid specifying yet another parameter.
 
         self.destination_file_path, self.destination_directory = local_file_and_dir(self, base_dir = DESTINATION_DIR, file_key = 'destination_file')
-        if use_local_files or self.source_type == 'local':
+        if use_local_input_file or self.source_type == 'local':
             if self.target == self.destination_file_path and self.target not in [None, '']:
                 raise ValueError("It seems like a bad idea to have the source file be the same as the destination file! Aborting pipeline execution.")
 
+        self.package_id = get_package_id(self, test_mode) # This is the effective package ID,
+        # taking into account whether test mode is active.
+
         ic(self.__dict__)
-        self.loader_config_string = 'production' # Would it be useful to set the
-        # loader_config_string from the command line? It was useful enough
-        # in park-shark to design a way to do this, checking command-line
-        # arguments aganinst a static list of known keys in the CKAN
-        # settings.json file. Doing that more generally would require
-        # some modification to the current command-line parsing.
-        # It's doable, but with the emergence of the test_mode idea of having
-        # one testing package ID, it does not seem that necessary to ALSO be
-        # able to specify other destinations unless we return to using a staging
-        # server. (I'm not using this now, particularly as we're drifting away
-        # from even using the setting.json file, preferring to keep most stuff
-        # in flat credentials.py files.)
+        ## END SET DESTINATION PROPERTIES ##
 
-        # Note that loader_config_string's use can be seen in the load()
-        # function of Pipeline from wprdc-etl.
-
-        # [ ] Move this to Job.__init__
-
-    def select_extractor(self):
-        extension = (self.source_file.split('.')[-1]).lower()
-        if extension == 'csv':
-            self.extractor = pl.CSVExtractor
-        elif extension in ['xls']:
-            self.extractor = pl.OldExcelExtractor
-        elif extension in ['xlsx']:
-            self.extractor = pl.ExcelExtractor
-        elif extension in ['zip']:
-            self.extractor = pl.CompressedFileExtractor
-        else:
-            self.extractor = pl.FileExtractor
-
-    def run_pipeline(self, test_mode, clear_first, wipe_data, migrate_schema, use_local_files, retry_without_last_line=False, ignore_empty_rows=False):
-        # This is a generalization of push_to_datastore() to optionally use
-        # the new FileLoader (exporting data to a file rather than just CKAN).
-
+    def run_pipeline(self, clear_first, wipe_data, migrate_schema, retry_without_last_line=False, ignore_empty_rows=False):
         # target is a filepath which is actually the source filepath.
 
         # The retry_without_last_line option is a way of dealing with CSV files
@@ -705,13 +699,8 @@ class Job:
         # response lists format as 'GeoJSON', so CKAN is doing some kind
         # of correction.
 
-
-        self.package_id = get_package_id(self, test_mode) # This is the effective package ID,
-        # taking into account whether test mode is active.
-
-        # [ ] Maybe the use_local_files and test_mode and any other parameters should be applied in a discrete stage between initialization and running.
+        # [ ] Maybe test_mode and any other parameters should be applied in a discrete stage between initialization and running.
         # This would allow the source and destination parameters to be prepared, leaving the pipeline running to just run the pipeline.
-        self.select_extractor() # This could be done in default_setup.
 
         # BEGIN Destination-specific configuration
         if self.destination == 'ckan':
@@ -789,15 +778,14 @@ class Job:
 
     def process_job(self, **kwparameters):
         #job = kwparameters['job'] # Here job is the class instance, so maybe it shouldn't be passed this way...
-        use_local_files = kwparameters['use_local_files']
         clear_first = kwparameters['clear_first']
         wipe_data = kwparameters['wipe_data']
         migrate_schema = kwparameters['migrate_schema']
-        test_mode = kwparameters['test_mode']
         ignore_empty_rows = kwparameters['ignore_empty_rows']
-        self.default_setup(use_local_files)
+        self.configure_pipeline_with_options(**kwparameters)
+
         self.custom_processing(self, **kwparameters) # In principle, filtering could be done here, but this might be kind of a hack.
-        locators_by_destination = self.run_pipeline(test_mode, clear_first, wipe_data, migrate_schema, use_local_files, retry_without_last_line=False, ignore_empty_rows=ignore_empty_rows)
+        locators_by_destination = self.run_pipeline(clear_first, wipe_data, migrate_schema, retry_without_last_line=False, ignore_empty_rows=ignore_empty_rows)
         self.custom_post_processing(self, **kwparameters)
         return locators_by_destination # Return a dict allowing look up of final destinations of data (filepaths for local files and resource IDs for data sent to a CKAN instance).
 

@@ -69,10 +69,10 @@ pli_violations_package_id = "d660edf8-9157-45ad-a282-50822badfaae" # Production 
 #pli_violations_package_id = "812527ad-befc-4214-a4d3-e621d8230563" # Test package
 
 def ftp_and_prime_geocoder(job, **kwparameters):
-    use_local_files = kwparameters['use_local_files'] # Deserializing the command-line parameters
+    use_local_input_file = kwparameters['use_local_input_file'] # Deserializing the command-line parameters
     # feels kludgy, but it also doesn't seem worth folding them into the Job object just for
     # the custom processing function and the run_pipeline function.
-    if not use_local_files:
+    if not use_local_input_file:
         fetch_city_file(job)
     # Geocoding Stuff
     areas = ['NEIGHBORHOOD', 'TRACT', 'COUNCIL_DISTRICT', 'PLI_DIVISION',

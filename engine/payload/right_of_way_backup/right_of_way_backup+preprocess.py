@@ -165,7 +165,7 @@ if package_id == "812527ad-befc-4214-a4d3-e621d8230563":
 #          method='upsert').run()
 
 def conditionally_get_city_files(job, **kwparameters):
-    if not kwparameters['use_local_files']:
+    if not kwparameters['use_local_input_file']:
         fetch_city_file(job)
 
 def preprocess(job, **kwparameters):

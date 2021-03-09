@@ -23,14 +23,11 @@ def ftp_and_upload_maybe(job, **kwparameters):
     allowing the job to run.
     
     A better ETL framework would make this script smaller or non-existent."""
-    use_local_files = kwparameters['use_local_files'] # Deserializing the command-line parameters
-    # feels kludgy, but it also doesn't seem worth folding them into the Job object just for
-    # the custom processing function and the run_pipeline function.
     _, local_target_directory = local_file_and_dir(job, SOURCE_DIR)
     local_target_directory += 'snow_plow_data'
     if not os.path.isdir(local_target_directory):
         os.makedirs(local_target_directory)
-    if not use_local_files:
+    if not kwparameters['use_local_input_file']:
         download_city_directory(job, local_target_directory)
         # Downloading all of these files just to get a list of the 
         # FTP directory is not great, particularly given that these files

@@ -53,7 +53,7 @@ class RevenueAndExpensesSchema(pl.BaseSchema):
 budget_package_id = "846f028b-bcc3-45e0-b939-255cffca5f5e" # Production version of Budget package
 
 def conditionally_get_city_files(job, **kwparameters):
-    if not kwparameters['use_local_files']:
+    if not kwparameters['use_local_input_file']:
         fetch_city_file(job)
 
 def express_load_then_delete_file(job, **kwparameters):

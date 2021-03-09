@@ -72,7 +72,8 @@ def select_jobs_by_code(selected_job_codes, job_dicts):
 
 def main(**kwargs):
     selected_job_codes = kwargs.get('selected_job_codes', [])
-    use_local_files = kwargs.get('use_local_files', False)
+    use_local_input_file = kwargs.get('use_local_input_file', False)
+    use_local_output_file = kwargs.get('use_local_output_file', False)
     clear_first = kwargs.get('clear_first', False)
     wipe_data = kwargs.get('wipe_data', False)
     migrate_schema = kwargs.get('migrate_schema', False)
@@ -155,7 +156,8 @@ if __name__ == '__main__':
                     for job_dict in job_dicts:
                         job_dict['job_directory'] = jobs_directory # Add 'job_directory' field to each job.
                     kwargs = {'selected_job_codes': [],
-                        'use_local_files': False,
+                        'use_local_input_file': False,
+                        'use_local_output_file': False,
                         'clear_first': False,
                         'wipe_data': False,
                         'test_mode': True,
@@ -172,7 +174,8 @@ if __name__ == '__main__':
             args = sys.argv[2:]
             copy_of_args = list(args)
             mute_alerts = False
-            use_local_files = False
+            use_local_input_file = False
+            use_local_output_file = False
             clear_first = False
             wipe_data = False
             migrate_schema = False
@@ -227,8 +230,11 @@ if __name__ == '__main__':
                 if arg in ['mute']:
                     mute_alerts = True
                     args.remove(arg)
-                elif arg in ['local']:
-                    use_local_files = True
+                elif arg in ['local', 'from_file', 'local_input']:
+                    use_local_input_file = True
+                    args.remove(arg)
+                elif arg in ['to_local', 'to_file', 'local_output']:
+                    use_local_output_file = True
                     args.remove(arg)
                 elif arg in ['clear_first']:
                     clear_first = True
@@ -281,7 +287,8 @@ if __name__ == '__main__':
                 print("Unused command-line arguments: {}".format(args))
 
             kwargs = {'selected_job_codes': selected_job_codes,
-                'use_local_files': use_local_files,
+                'use_local_input_file': use_local_input_file,
+                'use_local_output_file': use_local_output_file,
                 'clear_first': clear_first,
                 'wipe_data': wipe_data,
                 'migrate_schema': migrate_schema,

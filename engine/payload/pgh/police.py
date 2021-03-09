@@ -80,7 +80,7 @@ class PreBlotterSchema(pl.BaseSchema):
         data['public_works_division'], data['council_district'] = rev_geocode(data['x'], data['y'])
 
 def conditionally_get_city_files(job, **kwparameters):
-    if not kwparameters['use_local_files']:
+    if not kwparameters['use_local_input_file']:
         fetch_city_file(job)
 
 blotter_package_id = "046e5b6a-0f90-4f8e-8c16-14057fd8872e"
