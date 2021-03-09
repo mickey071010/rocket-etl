@@ -319,7 +319,7 @@ class MultifamilyProjectsSubsidySection8Schema(pl.BaseSchema):
                 data[f] = data[f].date().isoformat()
 
     @pre_load
-    def transform_int_to_strings(self, data):
+    def transform_ints_to_strings(self, data):
         fields = ['property_id', 'county_code', 'congressional_district_code', 'mgmt_agent_main_phone_number',
                 'owner_main_phone_number_text', 'placed_base_city_name_text']
         for f in fields:
@@ -367,7 +367,7 @@ class MultifamilyProjectsSection8ContractsSchema(pl.BaseSchema):
                 data[f] = data[f].date().isoformat()
 
     @pre_load
-    def transform_int_to_strings(self, data):
+    def transform_ints_to_strings(self, data):
         fields = ['property_id', 'assisted_units_count', '0br_count', '1br_count',
                 '2br_count', '3br_count', '4br_count', '5plusbr_count',
                 'contract_term_months_qty'
@@ -524,7 +524,7 @@ class LIHTCSchema(pl.BaseSchema):
                 data[f] = lookup[data[f]]
 
     @pre_load
-    def transform_int_to_strings(self, data):
+    def transform_ints_to_strings(self, data):
         fields = ['place2010', 'n_units', 'li_units',
                 'n_0br', 'n_1br', 'n_2br', 'n_3br',
                 'n_4br', 'credit', 'type',
@@ -559,7 +559,7 @@ class BaseMultifamilyInspectionsSchema(pl.BaseSchema):
         ordered = True
 
     @pre_load
-    def transform_float_to_strings(self, data):
+    def transform_floats_to_strings(self, data):
         fields = ['rems_property_id', 'inspection_id_1',
                 'inspection_id_2', 'inspection_id_3',
                 ]
