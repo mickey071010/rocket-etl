@@ -431,8 +431,8 @@ class MultifamilyGuaranteedLoansSchema(pl.BaseSchema):
 class LIHTCSchema(pl.BaseSchema):
     job_code = 'lihtc'
     hud_id = fields.String(load_from='\ufeffhud_id'.lower(), dump_to='hud_id')
-    latitude = fields.String(load_from='latitude'.lower(), dump_to='latitude', allow_none=True)
-    longitude = fields.String(load_from='longitude'.lower(), dump_to='longitude', allow_none=True)
+    latitude = fields.Float(load_from='latitude'.lower(), dump_to='latitude', allow_none=True)
+    longitude = fields.Float(load_from='longitude'.lower(), dump_to='longitude', allow_none=True)
 
     fips2010 = fields.String(load_from='fips2010'.lower(), dump_to='census_tract')
     place2010 = fields.Integer(load_from='place2010'.lower(), dump_to='municipality_fips', allow_none=True)
