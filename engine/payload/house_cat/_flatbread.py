@@ -598,6 +598,28 @@ class MultifamilyInspectionsSchema3(BaseMultifamilyInspectionsSchema):
     inspection_score = fields.String(load_from='inspection_score3'.lower(), dump_to='inspection_score', allow_none=True)
     inspection_date = fields.Date(load_from='release_date_3'.lower(), dump_to='inspection_date', allow_none=True)
 
+class USDAProgramExitSchema(pl.BaseSchema):
+    job_code = 'usda_exit'
+    property_name = fields.String(load_from='Property_Name'.lower(), dump_to='hud_property_name')
+    main_address_1 = fields.String(load_from='Main_Address_1'.lower(), dump_to='property_street_address', allow_none=True)
+
+    state_county_fips_code = fields.String(load_from='State_County_FIPS_Code'.lower(), dump_to='county_fips_code', allow_none=True)
+    city = fields.String(load_from='City'.lower(), dump_to='city', allow_none=True)
+    state = fields.String(load_from='State'.lower(), dump_to='state')
+    zip_code = fields.String(load_from='Zip_Code'.lower(), dump_to='zip_code', allow_none=True)
+    latitude = fields.Float(load_from='latitude'.lower(), dump_to='latitude', allow_none=True)
+    longitude = fields.Float(load_from='longitude'.lower(), dump_to='longitude', allow_none=True)
+
+    class Meta:
+        ordered = True
+
+    @pre_load
+    def transform_ints_to_string(self, data):
+        fields = ['main_address_1', 'state_county_fips_code',
+                'zip_code']
+        for f in fields:
+            if data[f] is not None:
+                data[f] = str(data[f])
 # dfg
 
 job_dicts = [
@@ -842,6 +864,25 @@ job_dicts = [
         'primary_key_fields': ['rems_property_id'],
         'destination': 'file',
         'destination_file': 'mf_inspections.csv',
+    },
+    {
+        'update': 0,
+        'job_code': USDAProgramExitSchema().job_code, # 'usda_exit'
+        'source_type': 'http',
+        #'source_file': 'USDA_RD_MHF_Program_Exit-2020-12-31.xlsx',
+        'source_full_url': scrape_nth_link('https://www.sc.egov.usda.gov/data/MFH.html', 'xlsx', 0, 5, regex='xit', verify=False),
+        # This web page has incorrectly configured certificates, so we'll need to route around that with requests.get(url, verify=False).
+        'ignore_certificate_errors': True,
+        'encoding': 'binary',
+        'rows_to_skip': 0,
+        'schema': USDAProgramExitSchema,
+        'filters': [['state_county_fips_code', '==', 42003], ['state', '==', 'PA']],
+        'always_wipe_data': True,
+        #'primary_key_fields': "Individual properties can be identified across databases
+        # by Borrower ID, followed by Project (Property?) ID, followed by Project Check Digit."
+        'destination': 'file',
+        'destination_file': 'usda_exit.csv',
+        'description': 'USDA Rural Program Exit (Allegheny County)',
     },
 
 ]
