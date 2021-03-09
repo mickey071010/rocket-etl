@@ -695,7 +695,7 @@ job_dicts = [
         'destination': 'file',
         'destination_file': f'{SOURCE_DIR}house_cat/LIHTCPUB.csv', # Needing to specify the
         # job directory makes this more of a hack than I would like.
-        # Alternatives: Set the destination file in the Extractor or in default_setup.
+        # Alternatives: Set the destination file in the Extractor or in configure_pipeline_with_options.
     },
     {
         'update': 0,

@@ -169,7 +169,7 @@ def process_job(**kwparameters):
     use_local_files = kwparameters['use_local_files']
     clear_first = kwparameters['clear_first']
     test_mode = kwparameters['test_mode']
-    job.default_setup(use_local_files)
+    job.configure_pipeline_with_options(**kwparameters)
 
     # [ ] Check whether this process_job function can be put into standard form.
     job.loader_config_string = 'production'

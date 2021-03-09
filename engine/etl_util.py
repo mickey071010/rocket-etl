@@ -598,7 +598,17 @@ class Job:
         self.target, self.local_directory = local_file_and_dir(self, base_dir = SOURCE_DIR)
         self.local_cache_filepath = self.local_directory + self.source_file
 
-    def default_setup(self, use_local_files): # Rename this to reflect how it modifies parameters based on command-line-arguments.
+    def configure_pipeline_with_options(self, **kwargs): # Rename this to reflect how it modifies parameters based on command-line-arguments.
+        """This function handles the application of the command-line arguments
+        to the configuration of the pipeline (things that cannot be done
+        in the Job.__init__ phase.
+        """
+        # launchpad could just ingest the command-line parameters, preventing them from
+        # being carted around and (in principle) allowing those parameters to be even
+        # used in Job.init().
+
+        use_local_files = kwargs['use_local_files']
+
         print("==============\n" + self.job_code)
         if self.package == TEST_PACKAGE_ID:
             print(" *** Note that this job currently only writes to the test package. ***")
