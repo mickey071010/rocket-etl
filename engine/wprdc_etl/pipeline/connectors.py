@@ -22,6 +22,7 @@ class Connector(object):
         self.encoding = kwargs.get('encoding', 'utf-8')
         self.local_cache_filepath = kwargs.get('local_cache_filepath', None) # This
         # tells non-local connectors where to cache retrieved files.
+        self.verify_requests = kwargs.get('verify_requests', True)
         self.checksum = None
 
     def connect(self, target):
@@ -111,7 +112,7 @@ class RemoteFileConnector(FileConnector):
             a `io.BufferedReader` instance.
         '''
         if self.encoding == 'binary':
-            self._file = io.BytesIO(urllib.request.urlopen(target).read())
+            self._file = io.BytesIO(requests.get(target, verify=self.verify_requests).content)
         else:
             self._file = TextIOWrapper(urllib.request.urlopen(target), encoding=self.encoding)
         return self._file
