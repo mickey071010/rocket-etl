@@ -57,7 +57,7 @@ def select_point(devices, params, timestamp):
             'archive_type': point['pointArchiveType']
             }
 
-def pull_measuremets_from_foreseer(jobject, **kwparameters):
+def pull_measurements_from_foreseer(jobject, **kwparameters):
     if not kwparameters['use_local_files']:
         point_parameters = [{'device_name': 'PowerMeter-Sub09', 'point_number': 832, 'measurement_name': 'Total Energy Production of the Environmental Center'},
                 {'device_name': 'PowerMeter-MainSub', 'point_number': 985, 'measurement_name': 'Total Energy Usage of the Environmental Center'},
@@ -92,7 +92,7 @@ job_dicts = [
         'source_type': 'local',
         'source_dir': '',
         'source_file': f'foreseer.csv',
-        'custom_processing': pull_measuremets_from_foreseer,
+        'custom_processing': pull_measurements_from_foreseer,
         'encoding': 'utf-8-sig',
         'schema': ForeseerSchema,
         'primary_key_fields': ['datetime', 'measurement_name'],
