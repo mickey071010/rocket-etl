@@ -7,8 +7,10 @@ except ImportError:  # Graceful fallback if IceCream isn't installed.
     ic = lambda *a: None if not a else (a[0] if len(a) == 1 else a)  # noqa
 
 def make_relative_url_absolute(nth_url, web_page_url):
-    if re.match('/', nth_url) is None:
+    if re.match('http', nth_url) is not None:
         return nth_url
+    if re.match('/', nth_url) is None:
+        return '/'.join(web_page_url.split('/')[:-1]) + '/' + nth_url
     return '/'.join(web_page_url.split('/')[:3]) + nth_url
 
 def scrape_nth_link(web_page_url, extension, n, expected_matches, regex=None, verify=True):
