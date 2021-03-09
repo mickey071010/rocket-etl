@@ -575,18 +575,6 @@ class Job:
 
         self.destination = job_dict['destination'] if 'destination' in job_dict else 'ckan'
         self.destination_file = job_dict.get('destination_file', None)
-        if self.destination == 'file' and self.destination_file is None:
-            # Situations where it would be a good idea to just copy the source_file value over to destination_file
-
-            # Situations where the destination_file value(s) should be determined by something else:
-            if job.files_to_extract not in [None, []]:
-                # When ~extracting~ files from a .zip file, the filenames can come from compressed_file_to_extract.
-                self.destination_file = f'{SOURCE_DIR}{self.job_directory}/{self.compressed_file_to_extract}'
-            elif self.source_file is not None:
-                self.destination_file = self.source_file
-            else:
-                raise ValueError("No destination_file specified but self.destination == 'file'.")
-
         self.package = job_dict['package'] if 'package' in job_dict else None
         self.resource_name = job_dict['resource_name'] if 'resource_name' in job_dict else None # resource_name is expecting to have a string value
         # for use in naming pipelines. For non-CKAN destinations, this field could be eliminated, but then a different field (like job_code)
@@ -662,11 +650,27 @@ class Job:
         ## END SET EXTRACTOR PROPERTIES ##
 
         ## BEGIN SET DESTINATION PROPERTIES ##
+
         # It seems like self.destination_file_path and self.destination_directory should be
         # only defined if the destination is a local one. (So destination == 'file'.)
         # HOWEVER, self.destination_file_path is currently being used to specify the
         # filepath parameter in the load() part of the pipeline, below. This is
         # a workaround to avoid specifying yet another parameter.
+
+        if use_local_output_file:
+            self.destination = 'file'
+
+        if self.destination == 'file' and self.destination_file is None:
+            # Situations where it would be a good idea to just copy the source_file value over to destination_file
+
+            # Situations where the destination_file value(s) should be determined by something else:
+            if job.files_to_extract not in [None, []]:
+                # When ~extracting~ files from a .zip file, the filenames can come from compressed_file_to_extract.
+                self.destination_file = f'{SOURCE_DIR}{self.job_directory}/{self.compressed_file_to_extract}'
+            elif self.source_file is not None:
+                self.destination_file = self.source_file
+            else:
+                raise ValueError("No destination_file specified but self.destination == 'file'.")
 
         self.destination_file_path, self.destination_directory = local_file_and_dir(self, base_dir = DESTINATION_DIR, file_key = 'destination_file')
         if use_local_input_file or self.source_type == 'local':
