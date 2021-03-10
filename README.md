@@ -26,8 +26,14 @@ A number of options can be set using command-line parameters:
 
 * Force the use of local files (rather than fetching them via FTP) housed in the appropriate `source_files` subdirectory:
 ```bash
-> python launchpad.py pgh/smart_trash.py local
+> python launchpad.py pgh/smart_trash.py from_file
 ```
+
+* Force output to be saved to local files (rather than uploading/upserting the data to CKAN) housed in the appropriate `output_files` subdirectory:
+```bash
+> python launchpad.py pgh/smart_trash.py to_file
+```
+
 
 * Run the script in test mode, which means that rather than writing the results to the production version of the CKAN package described in the `jobs` list in the script, the data will be written to a default private CKAN package:
 ```bash
@@ -69,11 +75,11 @@ would run only the `oscar` and `grouch` jobs.
 
 The command-line parameters can be specified in any order, so a typical test-run of an ETL job could be 
 ```bash
-> python launchpad.py pgh/smart_trash.py local mute test
+> python launchpad.py pgh/smart_trash.py from_file mute test
 ```
 or 
 ```bash
-> python launchpad.py pgh/smart_trash.py test mute local
+> python launchpad.py pgh/smart_trash.py test mute from_file
 ```
 
 
