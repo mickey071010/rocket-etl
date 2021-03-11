@@ -2530,10 +2530,6 @@ class IRSGeocodedSchema(GeocodedAssetSchema):
         assert hasattr(self, 'job_code')
         data['primary_key_from_rocket'] = form_key(self.job_code, data['primary_key_from_rocket'])
 
-#def conditionally_get_city_files(job, **kwparameters):
-#    if not kwparameters['use_local_files']:
-#        fetch_city_file(job)
-
 class LiquorLicensesSchema(GeocodedAssetSchema):
     #asset_type = fields.String(dump_only=True, default='community_nonprofit_orgs')
     name = fields.String(load_from='premises', allow_none=False)

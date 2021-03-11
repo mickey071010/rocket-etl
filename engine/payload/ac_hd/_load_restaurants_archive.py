@@ -142,7 +142,7 @@ def custom_processing(job, **kwparameters):
         job.source_type = 'local'
         job.connector_config_string = ''
         print("Using local archive file: {}".format(job.target))
-    elif kwparameters['use_local_files']:
+    elif kwparameters['use_local_input_file']:
         job.target = SOURCE_DIR + job.source_file
     else:
         job.target = job.source_dir + "/" + job.source_file
@@ -166,10 +166,10 @@ job_dicts = [
 
 def process_job(**kwparameters):
     job = kwparameters['job']
-    use_local_files = kwparameters['use_local_files']
+    use_local_input_file = kwparameters['use_local_input_file']
     clear_first = kwparameters['clear_first']
     test_mode = kwparameters['test_mode']
-    job.default_setup(use_local_files)
+    job.configure_pipeline_with_options(**kwparameters)
 
     # [ ] Check whether this process_job function can be put into standard form.
     job.loader_config_string = 'production'
@@ -179,7 +179,7 @@ def process_job(**kwparameters):
         job.source_type = 'local'
         job.connector_config_string = ''
         print("Using local archive file: {}".format(target))
-    elif use_local_files:
+    elif use_local_input_file:
         job.target = SOURCE_DIR + job.source_file
     else:
         job.target = job.source_dir + "/" + job.source_file
@@ -208,16 +208,16 @@ def process_job(**kwparameters):
     locators_by_destination = {destinations[0]: resource_id}
     return locators_by_destination
 
-def main(use_local_files=False,clear_first=False,test_mode=False):
+def main(use_local_input_file=False,clear_first=False,test_mode=False):
     for job in jobs:
-        locators_by_destination = process_job(job,use_local_files,clear_first,test_mode)
+        locators_by_destination = process_job(job, use_local_input_file, clear_first, test_mode)
         for destination, resource_id in locators_by_destination.items():
             if destination == 'ckan':
                 post_process(resource_id, job)
 
 if __name__ == '__main__':
     mute_alerts = False
-    use_local_files = False
+    use_local_input_file = False
     clear_first = False
     test_mode = False
     try:
@@ -225,12 +225,12 @@ if __name__ == '__main__':
             if 'mute' in sys.argv[1:]:
                 mute_alerts = True
             if 'local' in sys.argv[1:]:
-                use_local_files = True
+                use_local_input_file = True
             if 'test' in sys.argv[1:]:
                 test_mode = True
             if 'clear_first' in sys.argv[1:]:
                 clear_first = True
-        main(use_local_files,clear_first,test_mode)
+        main(use_local_input_file, clear_first, test_mode)
     except:
         e = sys.exc_info()[0]
         msg = "Error: {} : \n".format(e)

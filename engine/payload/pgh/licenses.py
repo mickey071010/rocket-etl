@@ -97,7 +97,7 @@ class BusinessLicensesSchema(BaseLicensesSchema):
                 data[field] = strip_time_zone_from_datetime(data[field])
 
 def conditionally_get_city_files(job, **kwparameters):
-    if not kwparameters['use_local_files']:
+    if not kwparameters['use_local_input_file']:
         fetch_city_file(job)
 
 city_business_licenses_package_id = "2b5324d4-c57f-42f7-bac8-2aec26e199cf"

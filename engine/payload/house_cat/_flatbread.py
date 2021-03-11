@@ -133,6 +133,7 @@ class HousingInspectionScoresSchema(pl.BaseSchema):
     state = fields.String(load_from='STATE_NAME'.lower(), dump_to='state')
     latitude = fields.Float(load_from='LATITUDE'.lower(), allow_none=True)
     longitude = fields.Float(load_from='LONGITUDE'.lower(), allow_none=True)
+    county = fields.String(load_from='COUNTY_NAME'.lower(), dump_to='county', allow_none=True)
     county_fips_code = fields.String(load_from='COUNTY_CODE'.lower(), dump_to='county_fips_code', allow_none=True)
     hud_property_name = fields.String(load_from='development_name', dump_to='hud_property_name')
     property_street_address = fields.String(load_from='ADDRESS'.lower(), dump_to='property_street_address')
@@ -622,9 +623,10 @@ class USDAProgramExitSchema(pl.BaseSchema):
                 data[f] = str(data[f])
 # dfg
 
+housecat_package_id = 'bb77b955-b7c3-4a05-ac10-448e4857ade4'
+
 job_dicts = [
     {
-        'update': 0,
         'job_code': MultifamilyInsuredMortgagesSchema().job_code, #'mf_mortgages'
         #This Excel 2018 file includes all active HUD Multifamily insured mortgages. The data is as of  January 4, 2021 and is updated monthly. It is extracted from MFIS and includes the following data elements:
         #   FHA Project Number
@@ -663,9 +665,12 @@ job_dicts = [
         'schema': MultifamilyInsuredMortgagesSchema,
         'filters': [['property_state', '==', 'PA']], # Location information includes city, state, and ZIP code.
         'always_wipe_data': True,
-        'primary_key_fields': ['hud_project_number'], # "HUD PROJECT NUMBER" seems pretty unique.
-        'destination': 'file',
+        #'primary_key_fields': ['hud_project_number'], # "HUD PROJECT NUMBER" seems pretty unique.
+        'destination': 'ckan',
         'destination_file': 'mf_mortgages.csv',
+        'package': housecat_package_id,
+        'resource_name': MultifamilyInsuredMortgagesSchema().job_code, #'mf_mortgages'
+        'upload_method': 'insert',
     },
     {
         'update': 0,
@@ -679,9 +684,12 @@ job_dicts = [
         'schema': MultifamilyProductionInitialCommitmentSchema,
         'filters': [['project_state', '==', 'PA']], # No county field. Just city and state. (And Pittsburgh is misspelled as "Pittsburg".)
         'always_wipe_data': True,
-        'primary_key_fields': ['fha_number'], # "HUD PROJECT NUMBER" seems pretty unique.
-        'destination': 'file',
+        #'primary_key_fields': ['fha_number'], # "HUD PROJECT NUMBER" seems pretty unique.
+        'destination': 'ckan',
         'destination_file': 'mf_init_commit.csv',
+        'package': housecat_package_id,
+        'resource_name': MultifamilyProductionInitialCommitmentSchema().job_code, # 'mf_init_commit'
+        'upload_method': 'insert',
     },
     {
         'update': 0,
@@ -695,7 +703,7 @@ job_dicts = [
         'destination': 'file',
         'destination_file': f'{SOURCE_DIR}house_cat/LIHTCPUB.csv', # Needing to specify the
         # job directory makes this more of a hack than I would like.
-        # Alternatives: Set the destination file in the Extractor or in default_setup.
+        # Alternatives: Set the destination file in the Extractor or in configure_pipeline_with_options.
     },
     {
         'update': 0,
@@ -705,8 +713,11 @@ job_dicts = [
         'schema': LIHTCSchema,
         'filters': [['proj_st', '==', 'PA']], # use 'county_fips_code == 42003' to limit to Allegheny County
         'always_wipe_data': True,
-        'destination': 'file',
+        'destination': 'ckan',
         'destination_file': f'lihtcpub.csv',
+        'package': housecat_package_id,
+        'resource_name': LIHTCSchema().job_code, # 'lihtc'
+        'upload_method': 'insert',
     },
     {   # This job is a two-step job. Step 1: Get the buildings from the file that
         # either has to be manually pulled from lihtc.huduser.gov or extracted from
@@ -717,8 +728,11 @@ job_dicts = [
         'schema': LIHTCBuildingSchema,
         'filters': [['proj_st', '==', 'PA']], # use 'county_fips_code == 42003' to limit to Allegheny County
         'always_wipe_data': True,
-        'destination': 'file',
+        'destination': 'ckan',
         'destination_file': f'lihtc_building.csv',
+        'package': housecat_package_id,
+        'resource_name': LIHTCBuildingSchema().job_code, # 'lihtc_building'
+        'upload_method': 'insert',
     },
     {   # Step 2: Get the buildings which are in the original project-level file
         # and (probably) not in the multi-address building-level extraction.
@@ -728,8 +742,11 @@ job_dicts = [
         'schema': LIHTCBuildingSchema,
         'filters': [['proj_st', '==', 'PA']], # Can't be limited, except by city name.
         'always_wipe_data': False,
-        'destination': 'file',
+        'destination': 'ckan',
         'destination_file': f'lihtc_building.csv',
+        'package': housecat_package_id,
+        'resource_name': LIHTCBuildingSchema().job_code, # 'lihtc_building'
+        'upload_method': 'insert',
     },
     {
         'update': 0,
@@ -741,11 +758,15 @@ job_dicts = [
         'encoding': 'binary',
         'rows_to_skip': 0,
         'schema': HousingInspectionScoresSchema,
-        'filters': [['state_name', '==', 'PA']], # use 'county_fips_code == 42003' to limit to Allegheny County
+        'filters': [['county_name', '==', 'Allegheny'], ['state_name', '==', 'PA']],
         'always_wipe_data': True,
-        'primary_key_fields': ['fha_number'], # "HUD PROJECT NUMBER" seems pretty unique.
-        'destination': 'file',
+        #'primary_key_fields': ['fha_number'], # "HUD PROJECT NUMBER" seems pretty unique.
+        'destination': 'ckan',
         'destination_file': 'housing_inspections.csv',
+        'package': housecat_package_id,
+        'resource_name': 'HUD Inspection Scores (Allegheny County)',
+        'upload_method': 'insert',
+        'resource_description': f'Derived from https://www.huduser.gov/portal/datasets/pis.html. job code: {HousingInspectionScoresSchema().job_code}', # 'housing_inspections'
     },
     {
         'update': 0,
@@ -757,8 +778,11 @@ job_dicts = [
         'filters': [['std_st', '==', 'PA']], # Coordinates could be used to filter to Allegheny County.
         'always_wipe_data': True,
         #'primary_key_fields': # DEVELOPMENT_CODE seems like a possible unique key.
-        'destination': 'file',
+        'destination': 'ckan',
         'destination_file': 'public_housing_projects.csv',
+        'package': housecat_package_id,
+        'resource_name': HUDPublicHousingProjectsSchema().job_code, # 'hud_public_housing_projects'
+        'upload_method': 'insert',
     },
     {
         'update': 0,
@@ -784,9 +808,12 @@ job_dicts = [
         'schema': MultifamilyProjectsSubsidySection8Schema,
         'filters': [['state_code', '==', 'PA']], # use 'county_code == 3' to limit to Allegheny County
         'always_wipe_data': True,
-        'primary_key_fields': ['property_id'],
-        'destination': 'file',
+        #'primary_key_fields': ['property_id'],
+        'destination': 'ckan',
         'destination_file': 'mf_subsidy_8.csv',
+        'package': housecat_package_id,
+        'resource_name': MultifamilyProjectsSubsidySection8Schema().job_code, # 'mf_subsidy_8'
+        'upload_method': 'insert',
     },
     {
         'update': 0,
@@ -799,9 +826,12 @@ job_dicts = [
         'schema': MultifamilyProjectsSection8ContractsSchema,
         #'filters': # Nothing to directly filter on here. The property_id needs to be joined to mf_subsidy_8 to determine the property locations.
         'always_wipe_data': True,
-        'primary_key_fields': ['property_id'],
-        'destination': 'file',
+        #'primary_key_fields': ['property_id'],
+        'destination': 'ckan',
         'destination_file': 'mf_8_contracts.csv',
+        'package': housecat_package_id,
+        'resource_name': MultifamilyProjectsSection8ContractsSchema().job_code, # 'mf_contracts_8'
+        'upload_method': 'insert',
     },
     {
         'update': 0,
@@ -812,11 +842,15 @@ job_dicts = [
         # for testing purposes, but this could be remedied.
         'encoding': 'utf-8',
         'schema': MultifamilyGuaranteedLoansSchema,
-        'filters': [['std_st', '==', 'PA']], # cnty2kx could be used to filter to Allegheny County.
+        'filters': [['std_st', '==', 'PA'], ['cnty_nm2kx', '==', 'Allegheny']], # cnty2kx could be used to filter to Allegheny County.
         'always_wipe_data': True,
         #'primary_key_fields': # POTENTIAL PRIMARY KEY FIELDS: ['PROPERTY_ID', 'PRIMARY_FHA_NUMBER', 'ASSOCIATED_FHA_NUMBER', 'FHA_NUM1']
-        'destination': 'file',
+        'destination': 'ckan',
         'destination_file': 'mf_loans.csv',
+        'package': housecat_package_id,
+        'resource_name': 'HUD Insured Multifamily Properties (Allegheny County)',
+        'upload_method': 'insert',
+        'resource_description': f'Derived from https://hudgis-hud.opendata.arcgis.com/datasets/hud-insured-multifamily-properties \n job code: {MultifamilyGuaranteedLoansSchema().job_code}', # 'mf_loans'
     },
     { # The source file is in a weird wide format, listing three different columns
       # for each of the three last inspections.
@@ -833,9 +867,13 @@ job_dicts = [
         'schema': MultifamilyInspectionsSchema1,
         'filters': [['state_code', '==', 'PA']], # city and REMS_Property_ID are the only fields that could be used to geographically narrow this filter.
         'always_wipe_data': True,
-        'primary_key_fields': ['rems_property_id'],
-        'destination': 'file',
+        #'primary_key_fields': ['rems_property_id'],
+        'destination': 'ckan',
         'destination_file': 'mf_inspections.csv',
+        'package': housecat_package_id,
+        'resource_name': 'mf_inspections',
+        'upload_method': 'insert',
+        'description': 'HUD Multifamily Inspection Scores (Pennsylvania)',
     },
     {
         'update': 0,
@@ -847,9 +885,13 @@ job_dicts = [
         'rows_to_skip': 0,
         'schema': MultifamilyInspectionsSchema2,
         'filters': [['state_code', '==', 'PA'], ['inspection_id_2', '!=', None]], # city and REMS_Property_ID are the only fields that could be used to geographically narrow this filter.
-        'primary_key_fields': ['rems_property_id'],
-        'destination': 'file',
+        #'primary_key_fields': ['rems_property_id'],
+        'destination': 'ckan',
         'destination_file': 'mf_inspections.csv',
+        'package': housecat_package_id,
+        'resource_name': 'mf_inspections',
+        'upload_method': 'insert',
+        'description': 'HUD Multifamily Inspection Scores (Pennsylvania)',
     },
     {
         'update': 0,
@@ -861,9 +903,13 @@ job_dicts = [
         'rows_to_skip': 0,
         'schema': MultifamilyInspectionsSchema3,
         'filters': [['state_code', '==', 'PA'], ['inspection_id_3', '!=', None]], # city and REMS_Property_ID are the only fields that could be used to geographically narrow this filter.
-        'primary_key_fields': ['rems_property_id'],
-        'destination': 'file',
+        #'primary_key_fields': ['rems_property_id'],
+        'destination': 'ckan',
         'destination_file': 'mf_inspections.csv',
+        'package': housecat_package_id,
+        'resource_name': 'mf_inspections',
+        'upload_method': 'insert',
+        'description': 'HUD Multifamily Inspection Scores (Pennsylvania)',
     },
     {
         'update': 0,
@@ -880,9 +926,12 @@ job_dicts = [
         'always_wipe_data': True,
         #'primary_key_fields': "Individual properties can be identified across databases
         # by Borrower ID, followed by Project (Property?) ID, followed by Project Check Digit."
-        'destination': 'file',
+        'destination': 'ckan',
         'destination_file': 'usda_exit.csv',
         'description': 'USDA Rural Program Exit (Allegheny County)',
+        'package': housecat_package_id,
+        'resource_name': USDAProgramExitSchema().job_code, # 'usda_exit'
+        'upload_method': 'insert',
     },
 
 ]

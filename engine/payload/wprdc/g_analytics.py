@@ -577,7 +577,7 @@ def write_to_csv(filename, list_of_dicts, keys):
         dict_writer.writerows(list_of_dicts)
 
 def pull_web_stats_from_ga(jobject, **kwparameters):
-    if not kwparameters['use_local_files']:
+    if not kwparameters['use_local_input_file']:
         service = initialize_ga_api()
 
         metrics_name = OrderedDict([("ga:users",'Users'),

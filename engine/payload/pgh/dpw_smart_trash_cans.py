@@ -55,7 +55,7 @@ class smartTrashCansSchema(pl.BaseSchema):
 smart_trash_cans_package_id = "b1282e47-6a70-4f18-98df-f081e7406e34" # Production version of Smart Trash Cans package
 
 def conditionally_get_city_files(job, **kwparameters):
-    if not kwparameters['use_local_files']:
+    if not kwparameters['use_local_input_file']:
         fetch_city_file(job)
 
 job_dicts = [

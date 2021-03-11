@@ -225,7 +225,7 @@ def decode_calls(calls):
 def pull_211_requests_and_save_to_file(job, **kwparameters):
     """Examine the extant resource to find the last date included in the
     published data."""
-    if not kwparameters['use_local_files']:
+    if not kwparameters['use_local_input_file']:
         last_datetime = (datetime.now() - timedelta(days=1))
         _, datetime_of_latest_record = get_extant_time_range(job, **kwparameters)
         if datetime_of_latest_record is None:
