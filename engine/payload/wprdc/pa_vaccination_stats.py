@@ -37,6 +37,51 @@ class ByResidenceSchema(pl.BaseSchema):
     class Meta:
         ordered = True
 
+class ByAgeGroupSchema(pl.BaseSchema):
+    job_code = 'by_age_group'
+    date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/odata/v4/niuh-2xe3")
+    date_updated = fields.Date(dump_only=True, dump_to='date_updated', default=date_updated_from_site)
+
+    county = fields.String(load_from='County_Name'.lower(), dump_to='county')
+    age_group = fields.String(load_from='Age_Group'.lower(), dump_to='age_group')
+    coverage = fields.String(load_from='Coverage'.lower(), dump_to='coverage')
+    total_count = fields.Integer(load_from='Total_Count'.lower(), dump_to='total_count', allow_none=True)
+
+    class Meta:
+        ordered = True
+
+class ByRaceSchema(pl.BaseSchema):
+    job_code = 'by_race'
+    date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/odata/v4/x5z9-57ub")
+    date_updated = fields.Date(dump_only=True, dump_to='date_updated', default=date_updated_from_site)
+
+    county = fields.String(load_from='County_Name'.lower(), dump_to='county')
+    race = fields.String(load_from='Race'.lower(), dump_to='race')
+    coverage = fields.String(load_from='Coverage'.lower(), dump_to='coverage')
+    total_count = fields.Integer(load_from='Total_Count'.lower(), dump_to='total_count', allow_none=True)
+
+    class Meta:
+        ordered = True
+
+class ByDayAndCountySchema(pl.BaseSchema):
+    job_code = 'by_day_and_county'
+    date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/odata/v4/bicw-3gwi")
+    date_updated = fields.Date(dump_only=True, dump_to='date_updated', default=date_updated_from_site)
+
+    date = fields.String(load_from='Date'.lower(), dump_to='date')
+    county = fields.String(load_from='County_Name'.lower(), dump_to='county')
+    partially_covered = fields.Integer(load_from='Partially Covered'.lower(), dump_to='partially_covered', allow_none=True)
+    fully_covered = fields.Integer(load_from='Fully_Covered'.lower(), dump_to='fully_covered', allow_none=True)
+
+    class Meta:
+        ordered = True
+
+    @pre_load
+    def remove_commas_from_numbers(self, data):
+        f = 'fully_covered'
+        if f in data and data[f] is not None:
+            data[f] = re.sub(',', '', data[f])
+
 # dfg
 
 vaccinations_stats_archive_package_id = '5a3230bb-5a51-4eec-90bd-ec8796325216'
@@ -54,6 +99,49 @@ job_dicts = [
         'package': vaccinations_stats_archive_package_id,
         'resource_name': 'COVID-19 Vaccinations by Residence Current County Health (archive)',
         'upload_method': 'upsert',
+        'resource_description': 'Archive of data from https://data.pa.gov/Health/COVID-19-Vaccinations-by-Residence-Current-County-/gcnb-epac',
+    },
+    {
+        'job_code': ByAgeGroupSchema().job_code, # 'by_age_group'
+        'source_type': 'http',
+        'source_file': 'COVID-19_Vaccinations_by_Age_Group_Current_County_Health.csv',
+        'source_full_url': 'https://data.pa.gov/api/views/niuh-2xe3/rows.csv?accessType=DOWNLOAD&api_foundry=true',
+        'schema': ByAgeGroupSchema,
+        'primary_key_fields': ['date_updated', 'age_group'],
+        'destination': 'ckan',
+        'destination_file': 'vaccinations_by_age_group.csv',
+        'package': vaccinations_stats_archive_package_id,
+        'resource_name': 'COVID-19 Vaccinations by Age Group Current County Health (archive)',
+        'upload_method': 'upsert',
+        'resource_description': 'Archive of data from https://data.pa.gov/Health/COVID-19-Vaccinations-by-Age-Group-Current-County-/niuh-2xe3',
+    },
+    {
+        'job_code': ByRaceSchema().job_code, # 'by_race'
+        'source_type': 'http',
+        'source_file': 'COVID-19_Vaccinations_by_Race_Current_County_Health.csv',
+        'source_full_url': 'https://data.pa.gov/api/views/x5z9-57ub/rows.csv?accessType=DOWNLOAD&api_foundry=true',
+        'schema': ByRaceSchema,
+        'primary_key_fields': ['date_updated', 'county', 'race'],
+        'destination': 'ckan',
+        'destination_file': 'vaccinations_by_race.csv',
+        'package': vaccinations_stats_archive_package_id,
+        'resource_name': 'COVID-19 Vaccinations by Race Current County Health (archive)',
+        'upload_method': 'upsert',
+        'resource_description': 'Archive of data from https://data.pa.gov/Health/COVID-19-Vaccinations-by-Race-Current-County-Healt/x5z9-57ub',
+    },
+    {
+        'job_code': ByDayAndCountySchema().job_code, # 'by_day_and_county'
+        'source_type': 'http',
+        'source_file': 'COVID-19_Vaccinations_by_Day_by_County_of_Residence_Current_Health.csv',
+        'source_full_url': 'https://data.pa.gov/api/views/bicw-3gwi/rows.csv?accessType=DOWNLOAD&api_foundry=true',
+        'schema': ByDayAndCountySchema,
+        'primary_key_fields': ['date_updated', 'date', 'county'],
+        'destination': 'ckan',
+        'destination_file': 'vaccinations_by_day_and_county.csv',
+        'package': vaccinations_stats_archive_package_id,
+        'resource_name': 'COVID-19 Vaccinations by Day by County of Residence Current Health (archive)',
+        'upload_method': 'upsert',
+        'resource_description': 'Archive of data from https://data.pa.gov/Health/COVID-19-Vaccinations-by-Day-by-County-of-Residenc/bicw-3gwi',
     },
 ]
 
