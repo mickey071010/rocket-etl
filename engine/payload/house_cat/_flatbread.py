@@ -133,6 +133,7 @@ class HousingInspectionScoresSchema(pl.BaseSchema):
     state = fields.String(load_from='STATE_NAME'.lower(), dump_to='state')
     latitude = fields.Float(load_from='LATITUDE'.lower(), allow_none=True)
     longitude = fields.Float(load_from='LONGITUDE'.lower(), allow_none=True)
+    county = fields.String(load_from='COUNTY_NAME'.lower(), dump_to='county', allow_none=True)
     county_fips_code = fields.String(load_from='COUNTY_CODE'.lower(), dump_to='county_fips_code', allow_none=True)
     hud_property_name = fields.String(load_from='development_name', dump_to='hud_property_name')
     property_street_address = fields.String(load_from='ADDRESS'.lower(), dump_to='property_street_address')
@@ -626,7 +627,6 @@ housecat_package_id = 'bb77b955-b7c3-4a05-ac10-448e4857ade4'
 
 job_dicts = [
     {
-        'update': 0,
         'job_code': MultifamilyInsuredMortgagesSchema().job_code, #'mf_mortgages'
         #This Excel 2018 file includes all active HUD Multifamily insured mortgages. The data is as of  January 4, 2021 and is updated monthly. It is extracted from MFIS and includes the following data elements:
         #   FHA Project Number
@@ -758,14 +758,15 @@ job_dicts = [
         'encoding': 'binary',
         'rows_to_skip': 0,
         'schema': HousingInspectionScoresSchema,
-        'filters': [['state_name', '==', 'PA']], # use 'county_fips_code == 42003' to limit to Allegheny County
+        'filters': [['county_name', '==', 'Allegheny'], ['state_name', '==', 'PA']],
         'always_wipe_data': True,
         #'primary_key_fields': ['fha_number'], # "HUD PROJECT NUMBER" seems pretty unique.
         'destination': 'ckan',
         'destination_file': 'housing_inspections.csv',
         'package': housecat_package_id,
-        'resource_name': HousingInspectionScoresSchema().job_code, # 'housing_inspections'
+        'resource_name': 'HUD Inspection Scores (Allegheny County)',
         'upload_method': 'insert',
+        'resource_description': f'Derived from https://www.huduser.gov/portal/datasets/pis.html. job code: {HousingInspectionScoresSchema().job_code}', # 'housing_inspections'
     },
     {
         'update': 0,
@@ -841,15 +842,15 @@ job_dicts = [
         # for testing purposes, but this could be remedied.
         'encoding': 'utf-8',
         'schema': MultifamilyGuaranteedLoansSchema,
-        'filters': [['std_st', '==', 'PA']], # cnty2kx could be used to filter to Allegheny County.
+        'filters': [['std_st', '==', 'PA'], ['cnty_nm2kx', '==', 'Allegheny']], # cnty2kx could be used to filter to Allegheny County.
         'always_wipe_data': True,
         #'primary_key_fields': # POTENTIAL PRIMARY KEY FIELDS: ['PROPERTY_ID', 'PRIMARY_FHA_NUMBER', 'ASSOCIATED_FHA_NUMBER', 'FHA_NUM1']
         'destination': 'ckan',
         'destination_file': 'mf_loans.csv',
         'package': housecat_package_id,
-        'resource_name': MultifamilyGuaranteedLoansSchema().job_code, # 'mf_loans'
+        'resource_name': 'HUD Insured Multifamily Properties (Allegheny County)',
         'upload_method': 'insert',
-        'description': 'HUD Insured Multifamily Properties (Allegheny County)',
+        'resource_description': f'Derived from https://hudgis-hud.opendata.arcgis.com/datasets/hud-insured-multifamily-properties \n job code: {MultifamilyGuaranteedLoansSchema().job_code}', # 'mf_loans'
     },
     { # The source file is in a weird wide format, listing three different columns
       # for each of the three last inspections.
