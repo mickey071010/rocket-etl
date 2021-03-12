@@ -15,16 +15,15 @@ except ImportError:  # Graceful fallback if IceCream isn't installed.
     ic = lambda *a: None if not a else (a[0] if len(a) == 1 else a)  # noqa
 
 def get_socrata_updated_date(url):
-    import xmltodict
-    headers = {"Accept": "application/atom+xml,application/atomsvc+xml,application/xml"} 
-    # Without these headers, the returned JSON lacks the desired metadata.
-    d = xmltodict.parse(requests.get(url, headers=headers).content)
-    timestamp = d['a:feed']['a:entry'][0]['a:updated']
-    return parser.parse(timestamp).date().isoformat()
+    r = requests.get(url)
+    updated_at_string = r.json()['updatedAt'] # There is a dataUpdatedAt field, but
+    # I'm not convinced that it actually reflects when data updates happen.
+    updated_at_dt = parser.parse(updated_at_string)
+    return updated_at_dt.date().isoformat()
 
 class ByResidenceSchema(pl.BaseSchema):
     job_code = 'by_residence'
-    date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/odata/v4/gcnb-epac")
+    date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/views/metadata/v1/gcnb-epac")
     date_updated = fields.Date(dump_only=True, dump_to='date_updated', default=date_updated_from_site)
 
     county = fields.String(load_from='County_Name'.lower(), dump_to='county')
@@ -39,7 +38,7 @@ class ByResidenceSchema(pl.BaseSchema):
 
 class ByAgeGroupSchema(pl.BaseSchema):
     job_code = 'by_age_group'
-    date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/odata/v4/niuh-2xe3")
+    date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/views/metadata/v1/niuh-2xe3")
     date_updated = fields.Date(dump_only=True, dump_to='date_updated', default=date_updated_from_site)
 
     county = fields.String(load_from='County_Name'.lower(), dump_to='county')
@@ -52,7 +51,7 @@ class ByAgeGroupSchema(pl.BaseSchema):
 
 class ByAgeGroupStatewideSchema(pl.BaseSchema):
     job_code = 'by_age_group_pa'
-    date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/odata/v4/xy2e-dqvt")
+    date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/views/metadata/v1/xy2e-dqvt")
     date_updated = fields.Date(dump_only=True, dump_to='date_updated', default=date_updated_from_site)
 
     age_group = fields.String(load_from='Age_Group'.lower(), dump_to='age_group')
@@ -64,7 +63,7 @@ class ByAgeGroupStatewideSchema(pl.BaseSchema):
 
 class ByRaceSchema(pl.BaseSchema):
     job_code = 'by_race'
-    date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/odata/v4/x5z9-57ub")
+    date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/views/metadata/v1/x5z9-57ub")
     date_updated = fields.Date(dump_only=True, dump_to='date_updated', default=date_updated_from_site)
 
     county = fields.String(load_from='County_Name'.lower(), dump_to='county')
@@ -77,7 +76,7 @@ class ByRaceSchema(pl.BaseSchema):
 
 class ByRaceStatewideSchema(pl.BaseSchema):
     job_code = 'by_race_pa'
-    date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/odata/v4/e384-bs7r")
+    date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/views/metadata/v1/e384-bs7r")
     date_updated = fields.Date(dump_only=True, dump_to='date_updated', default=date_updated_from_site)
 
     race = fields.String(load_from='Race'.lower(), dump_to='race')
@@ -89,9 +88,6 @@ class ByRaceStatewideSchema(pl.BaseSchema):
 
 class ByDayAndCountySchema(pl.BaseSchema):
     job_code = 'by_day_and_county'
-    #date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/odata/v4/bicw-3gwi")
-    #date_updated = fields.Date(dump_only=True, dump_to='date_updated', default=date_updated_from_site) # Not needed
-    # for this job.
     date = fields.Date(load_from='Date'.lower(), dump_to='date')
     county = fields.String(load_from='County_Name'.lower(), dump_to='county')
     partially_covered = fields.Integer(load_from='Partially Covered'.lower(), dump_to='partially_covered', allow_none=True)
@@ -108,7 +104,7 @@ class ByDayAndCountySchema(pl.BaseSchema):
 
 class ByGenderSchema(pl.BaseSchema):
     job_code = 'by_gender'
-    date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/odata/v4/bicw-3gwi")
+    date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/views/metadata/v1/bicw-3gwi")
     date_updated = fields.Date(dump_only=True, dump_to='date_updated', default=date_updated_from_site)
     gender = fields.String(load_from='Gender'.lower(), dump_to='gender')
     coverage = fields.String(load_from='Coverage'.lower(), dump_to='coverage')
@@ -119,7 +115,7 @@ class ByGenderSchema(pl.BaseSchema):
 
 class ByGenderStatewideSchema(pl.BaseSchema):
     job_code = 'by_gender_pa'
-    date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/odata/v4/jweg-3ezy")
+    date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/views/metadata/v1/jweg-3ezy")
     date_updated = fields.Date(dump_only=True, dump_to='date_updated', default=date_updated_from_site)
     gender = fields.String(load_from='Gender'.lower(), dump_to='gender')
     partially_covered = fields.Integer(load_from='Partially Covered'.lower(), dump_to='partially_covered', allow_none=True)
@@ -130,7 +126,7 @@ class ByGenderStatewideSchema(pl.BaseSchema):
 
 class ByEthnicitySchema(pl.BaseSchema):
     job_code = 'by_ethnicity'
-    date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/odata/v4/7ruj-m7k6")
+    date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/views/metadata/v1/7ruj-m7k6")
     date_updated = fields.Date(dump_only=True, dump_to='date_updated', default=date_updated_from_site)
     ethnicity = fields.String(load_from='Ethnicity'.lower(), dump_to='ethnicity')
     coverage = fields.String(load_from='Coverage'.lower(), dump_to='coverage')
@@ -141,7 +137,7 @@ class ByEthnicitySchema(pl.BaseSchema):
 
 class ByEthnicityStatewideSchema(pl.BaseSchema):
     job_code = 'by_ethnicity_pa'
-    date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/odata/v4/u8hy-smfm")
+    date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/views/metadata/v1/u8hy-smfm")
     date_updated = fields.Date(dump_only=True, dump_to='date_updated', default=date_updated_from_site)
     ethnicity = fields.String(load_from='Ethnicity'.lower(), dump_to='ethnicity')
     partially_covered = fields.Integer(load_from='Partially Covered'.lower(), dump_to='partially_covered', allow_none=True)
