@@ -152,6 +152,21 @@ vaccinations_stats_archive_package_id = '5a3230bb-5a51-4eec-90bd-ec8796325216'
 
 job_dicts = [
     {
+        'job_code': ByDayAndCountySchema().job_code, # 'by_day_and_county'
+        'source_type': 'http',
+        'source_file': 'COVID-19_Vaccinations_by_Day_by_County_of_Residence_Current_Health.csv',
+        'source_full_url': 'https://data.pa.gov/api/views/bicw-3gwi/rows.csv?accessType=DOWNLOAD&api_foundry=true',
+        'schema': ByDayAndCountySchema,
+        'primary_key_fields': ['date', 'county'], # 'date_updated' is not needed here since 'date' is present.
+        'destination': 'ckan',
+        'destination_file': 'vaccinations_by_day_and_county.csv',
+        'package': vaccinations_stats_archive_package_id,
+        'resource_name': 'COVID-19 Vaccinations by Day by County of Residence Current Health (archive)',
+        'upload_method': 'upsert',
+        'resource_description': 'Archive of data from https://data.pa.gov/Health/COVID-19-Vaccinations-by-Day-by-County-of-Residenc/bicw-3gwi',
+        'custom_post_processing': set_resource_description,
+    },
+    {
         'job_code': ByResidenceSchema().job_code, # 'by_residence'
         'source_type': 'http',
         'source_file': 'COVID-19_Vaccinations_by_Residence_Current_County_Health.csv',
@@ -220,20 +235,6 @@ job_dicts = [
         'resource_name': 'COVID-19 Vaccinations by Race Current Statewide Health (archive)',
         'upload_method': 'upsert',
         'resource_description': 'Archive of data from https://data.pa.gov/Health/COVID-19-Vaccinations-by-Race-Current-Statewide-He/e384-bs7r',
-    },
-    {
-        'job_code': ByDayAndCountySchema().job_code, # 'by_day_and_county'
-        'source_type': 'http',
-        'source_file': 'COVID-19_Vaccinations_by_Day_by_County_of_Residence_Current_Health.csv',
-        'source_full_url': 'https://data.pa.gov/api/views/bicw-3gwi/rows.csv?accessType=DOWNLOAD&api_foundry=true',
-        'schema': ByDayAndCountySchema,
-        'primary_key_fields': ['date', 'county'], # 'date_updated' is not needed here since 'date' is present.
-        'destination': 'ckan',
-        'destination_file': 'vaccinations_by_day_and_county.csv',
-        'package': vaccinations_stats_archive_package_id,
-        'resource_name': 'COVID-19 Vaccinations by Day by County of Residence Current Health (archive)',
-        'upload_method': 'upsert',
-        'resource_description': 'Archive of data from https://data.pa.gov/Health/COVID-19-Vaccinations-by-Day-by-County-of-Residenc/bicw-3gwi',
     },
     {
         'job_code': ByGenderSchema().job_code, # 'by_gender'
