@@ -926,7 +926,7 @@ job_dicts = [
         'job_code': USDAProgramExitSchema().job_code, # 'usda_exit'
         'source_type': 'http',
         #'source_file': 'USDA_RD_MHF_Program_Exit-2020-12-31.xlsx',
-        'source_full_url': scrape_nth_link('https://www.sc.egov.usda.gov/data/MFH.html', 'xlsx', 0, 5, regex='xit', verify=False),
+        'source_full_url': scrape_nth_link('https://www.sc.egov.usda.gov/data/MFH.html', 'xlsx', 0, 2, regex='xit', verify=False),
         # This web page has incorrectly configured certificates, so we'll need to route around that with requests.get(url, verify=False).
         'ignore_certificate_errors': True,
         'encoding': 'binary',
