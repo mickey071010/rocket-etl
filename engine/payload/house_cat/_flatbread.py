@@ -681,11 +681,11 @@ job_dicts = [
         'destination': 'ckan',
         'destination_file': 'mf_mortgages.csv',
         'package': housecat_package_id,
-        'resource_name': MultifamilyInsuredMortgagesSchema().job_code, #'mf_mortgages'
+        'resource_name': 'Active HUD Multifamily Insured Mortgages (Pennsylvania)',
         'upload_method': 'insert',
+        'resource_description': f'Derived from https://www.hud.gov/program_offices/housing/comp/rpts/mfh/mf_f47 \njob code: {MultifamilyInsuredMortgagesSchema().job_code}', #'mf_mortgages'
     },
     {
-        'update': 0,
         'job_code': MultifamilyProductionInitialCommitmentSchema().job_code, # 'mf_init_commit'
         'source_type': 'http',
         'source_file': 'Initi_Endores_Firm%20Comm_DB_FY21_Q1.xlsx',
@@ -700,11 +700,11 @@ job_dicts = [
         'destination': 'ckan',
         'destination_file': 'mf_init_commit.csv',
         'package': housecat_package_id,
-        'resource_name': MultifamilyProductionInitialCommitmentSchema().job_code, # 'mf_init_commit'
+        'resource_name': 'HUD Multifamily Fiscal Year Production (Pennsylvania)',
         'upload_method': 'insert',
+        'resource_description': 'Derived from https://www.hud.gov/program_offices/housing/mfh/mfdata/mfproduction \njob code: {MultifamilyProductionInitialCommitmentSchema().job_code},' # 'mf_init_commit'
     },
     {
-        'update': 0,
         'job_code': f'unzip_{LIHTCSchema().job_code}', # 'unzip_lihtc'
         'source_type': 'http',
         'source_full_url': 'https://lihtc.huduser.gov/lihtcpub.zip',
@@ -741,7 +741,7 @@ job_dicts = [
         'source_type': 'local',
         'source_file': 'lihtc.huduser.gov.extract.buildings.csv',
         'schema': LIHTCBuildingSchema,
-        'filters': [['proj_st', '==', 'PA']], # use 'county_fips_code == 42003' to limit to Allegheny County
+        'filters': [['proj_st', '==', 'PA']], # Can't be limited, except by city name.
         'always_wipe_data': True,
         'destination': 'ckan',
         'destination_file': f'lihtc_building.csv',
@@ -755,16 +755,17 @@ job_dicts = [
         'source_type': 'local',
         'source_file': 'LIHTCPUB.csv',
         'schema': LIHTCBuildingSchema,
-        'filters': [['proj_st', '==', 'PA']], # Can't be limited, except by city name.
+        'filters': [['proj_st', '==', 'PA']], # Hard to geographically limit
+        # because of issues with the LIHTC data discussed above.
         'always_wipe_data': False,
         'destination': 'ckan',
         'destination_file': f'lihtc_building.csv',
         'package': housecat_package_id,
         'resource_name': LIHTCBuildingSchema().job_code, # 'lihtc_building'
         'upload_method': 'insert',
+        'resource_description': 'LIHTC Buildings (Pennsylvania)',
     },
     {
-        'update': 0,
         'job_code': HousingInspectionScoresSchema().job_code, # 'housing_inspections'
         'source_type': 'http',
         'source_file': 'public_housing_physical_inspection_scores_0620.xlsx',
@@ -784,7 +785,6 @@ job_dicts = [
         'resource_description': f'Derived from https://www.huduser.gov/portal/datasets/pis.html. job code: {HousingInspectionScoresSchema().job_code}', # 'housing_inspections'
     },
     {
-        'update': 0,
         'job_code': HUDPublicHousingProjectsSchema().job_code, # 'hud_public_housing_projects'
         'source_type': 'http',
         'source_full_url': get_arcgis_data_url('https://hudgis-hud.opendata.arcgis.com/data.json', 'Public Housing Developments', 'CSV')[0],
@@ -800,7 +800,6 @@ job_dicts = [
         'upload_method': 'insert',
     },
     {
-        'update': 0,
         'job_code': HUDPublicHousingBuildingsSchema().job_code, # 'hud_public_housing_buildings'
         'source_type': 'http',
         'source_full_url': get_arcgis_data_url('https://hudgis-hud.opendata.arcgis.com/data.json', 'Public Housing Buildings', 'CSV')[0],
@@ -809,11 +808,13 @@ job_dicts = [
         'filters': [['std_st', '==', 'PA']], # Coordinates could be used to filter to Allegheny County.
         'always_wipe_data': True,
         #'primary_key_fields': # DEVELOPMENT_CODE seems like a possible unique key.
-        'destination': 'file',
+        'destination': 'ckan',
         'destination_file': 'public_housing_buildings.csv',
+        'package': housecat_package_id,
+        'resource_name': HUDPublicHousingBuildingsSchema().job_code, # 'hud_public_housing_buildings'
+        'upload_method': 'insert',
     },
     {
-        'update': 0,
         'job_code': MultifamilyProjectsSubsidySection8Schema().job_code, # 'mf_subsidy_8'
         'source_type': 'http',
         'source_file': 'MF_Properties_with_Assistance_\&_Sec8_Contracts.xlsx',
@@ -831,7 +832,6 @@ job_dicts = [
         'upload_method': 'insert',
     },
     {
-        'update': 0,
         'job_code': MultifamilyProjectsSection8ContractsSchema().job_code, # 'mf_contracts_8'
         'source_type': 'http',
         'source_file': 'MF_Assistance_&_Sec8_Contracts.xlsx',
@@ -849,7 +849,6 @@ job_dicts = [
         'upload_method': 'insert',
     },
     {
-        'update': 0,
         'job_code': MultifamilyGuaranteedLoansSchema().job_code, # 'mf_loans'
         'source_type': 'http',
         'source_full_url': get_arcgis_data_url('https://hudgis-hud.opendata.arcgis.com/data.json', 'HUD Insured Multifamily Properties', 'CSV')[0], # HUD_Insured_Multifamily_Properties.csv
@@ -872,7 +871,6 @@ job_dicts = [
       # To convert this into a narrow format (with properties possibly appearing on
       # multiple rows), we run slight variants of the job three times, plucking
       # the correct inspection columns and filtering out the empty ones.
-        'update': 0,
         'job_code': MultifamilyInspectionsSchema1().job_code, # 'mf_inspections_1'
         'source_type': 'http',
         'source_file': 'MF_Inspection_Report02252021.xls',
@@ -888,10 +886,9 @@ job_dicts = [
         'package': housecat_package_id,
         'resource_name': 'mf_inspections',
         'upload_method': 'insert',
-        'description': 'HUD Multifamily Inspection Scores (Pennsylvania)',
+        'resource_description': 'HUD Multifamily Inspection Scores (Pennsylvania)',
     },
     {
-        'update': 0,
         'job_code': MultifamilyInspectionsSchema2().job_code, # 'mf_inspections_2'
         'source_type': 'http',
         'source_file': 'MF_Inspection_Report02252021.xls',
@@ -906,10 +903,9 @@ job_dicts = [
         'package': housecat_package_id,
         'resource_name': 'mf_inspections',
         'upload_method': 'insert',
-        'description': 'HUD Multifamily Inspection Scores (Pennsylvania)',
+        'resource_description': 'HUD Multifamily Inspection Scores (Pennsylvania)',
     },
     {
-        'update': 0,
         'job_code': MultifamilyInspectionsSchema3().job_code, # 'mf_inspections_3'
         'source_type': 'http',
         'source_file': 'MF_Inspection_Report02252021.xls',
@@ -924,10 +920,9 @@ job_dicts = [
         'package': housecat_package_id,
         'resource_name': 'mf_inspections',
         'upload_method': 'insert',
-        'description': 'HUD Multifamily Inspection Scores (Pennsylvania)',
+        'resource_description': 'HUD Multifamily Inspection Scores (Pennsylvania)',
     },
     {
-        'update': 0,
         'job_code': USDAProgramExitSchema().job_code, # 'usda_exit'
         'source_type': 'http',
         #'source_file': 'USDA_RD_MHF_Program_Exit-2020-12-31.xlsx',
@@ -943,7 +938,7 @@ job_dicts = [
         # by Borrower ID, followed by Project (Property?) ID, followed by Project Check Digit."
         'destination': 'ckan',
         'destination_file': 'usda_exit.csv',
-        'description': 'USDA Rural Program Exit (Allegheny County)',
+        'resource_description': 'USDA Rural Program Exit (Allegheny County)',
         'package': housecat_package_id,
         'resource_name': USDAProgramExitSchema().job_code, # 'usda_exit'
         'upload_method': 'insert',
