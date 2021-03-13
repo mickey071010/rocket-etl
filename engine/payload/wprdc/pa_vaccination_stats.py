@@ -164,7 +164,6 @@ job_dicts = [
         'resource_name': 'COVID-19 Vaccinations by Day by County of Residence Current Health (archive)',
         'upload_method': 'upsert',
         'resource_description': 'Archive of data from https://data.pa.gov/Health/COVID-19-Vaccinations-by-Day-by-County-of-Residenc/bicw-3gwi',
-        'custom_post_processing': set_resource_description,
     },
     {
         'job_code': ByResidenceSchema().job_code, # 'by_residence'
@@ -206,7 +205,7 @@ job_dicts = [
         'package': vaccinations_stats_archive_package_id,
         'resource_name': 'COVID-19 Vaccinations by Age Group Current Statewide Health (archive)',
         'upload_method': 'upsert',
-        'resource_description': 'Archive of data from https://data.pa.gov/Health/COVID-19-Vaccinations-by-Age-Group-Current-Statewi/xy2e-dqvt'
+        'resource_description': 'Archive of data from https://data.pa.gov/Health/COVID-19-Vaccinations-by-Age-Group-Current-Statewi/xy2e-dqvt',
     },
     {
         'job_code': ByRaceSchema().job_code, # 'by_race'

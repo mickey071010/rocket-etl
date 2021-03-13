@@ -378,12 +378,13 @@ def create_data_table_view_if_needed(resource_id):
             return package, resource
     return None, None
 
-def post_process(resource_id, job):
+def post_process(resource_id, job, **kwparameters):
     package, resource = create_data_table_view_if_needed(resource_id)
     if resource is not None and package is not None:
         add_tag(package, '_etl')
         update_etl_timestamp(package, resource)
         add_time_field(package, resource, job)
+        set_resource_description(job, **kwparameters)
 
 def lookup_parcel(parcel_id):
     """Accept parcel ID for Allegheny County parcel and return geocoordinates."""
@@ -490,6 +491,7 @@ class Job:
         self.resource_name = job_dict['resource_name'] if 'resource_name' in job_dict else None # resource_name is expecting to have a string value
         # for use in naming pipelines. For non-CKAN destinations, this field could be eliminated, but then a different field (like job_code)
         # should be used instead.
+        self.resource_description = job_dict['resource_description'] if 'resource_description' in job_dict else None
         self.job_code = job_dict.get('job_code', job_dict.get('resource_name', None)) # If there's no job_code, use the resource_name.
 
         ic(self.job_code, self.resource_name)
