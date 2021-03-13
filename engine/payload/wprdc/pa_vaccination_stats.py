@@ -106,6 +106,7 @@ class ByGenderSchema(pl.BaseSchema):
     job_code = 'by_gender'
     date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/views/metadata/v1/bicw-3gwi")
     date_updated = fields.Date(dump_only=True, dump_to='date_updated', default=date_updated_from_site)
+    county = fields.String(load_from='County_Name'.lower(), dump_to='county')
     gender = fields.String(load_from='Gender'.lower(), dump_to='gender')
     coverage = fields.String(load_from='Coverage'.lower(), dump_to='coverage')
     total_count = fields.Integer(load_from='Total_Count'.lower(), dump_to='total_count', allow_none=True)
@@ -128,6 +129,7 @@ class ByEthnicitySchema(pl.BaseSchema):
     job_code = 'by_ethnicity'
     date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/views/metadata/v1/7ruj-m7k6")
     date_updated = fields.Date(dump_only=True, dump_to='date_updated', default=date_updated_from_site)
+    county = fields.String(load_from='County_Name'.lower(), dump_to='county')
     ethnicity = fields.String(load_from='Ethnicity'.lower(), dump_to='ethnicity')
     coverage = fields.String(load_from='Coverage'.lower(), dump_to='coverage')
     total_count = fields.Integer(load_from='Total_Count'.lower(), dump_to='total_count', allow_none=True)
@@ -185,7 +187,7 @@ job_dicts = [
         'source_file': 'COVID-19_Vaccinations_by_Age_Group_Current_County_Health.csv',
         'source_full_url': 'https://data.pa.gov/api/views/niuh-2xe3/rows.csv?accessType=DOWNLOAD&api_foundry=true',
         'schema': ByAgeGroupSchema,
-        'primary_key_fields': ['date_updated', 'age_group', 'coverage'],
+        'primary_key_fields': ['date_updated', 'county', 'age_group', 'coverage'],
         'destination': 'ckan',
         'destination_file': 'vaccinations_by_age_group.csv',
         'package': vaccinations_stats_archive_package_id,
@@ -241,7 +243,7 @@ job_dicts = [
         'source_file': 'COVID-19_Vaccinations_by_Gender_Current_County_Health.csv',
         'source_full_url': 'https://data.pa.gov/api/views/jweg-3ezy/rows.csv?accessType=DOWNLOAD&api_foundry=true',
         'schema': ByGenderSchema,
-        'primary_key_fields': ['date_updated', 'gender', 'coverage'],
+        'primary_key_fields': ['date_updated', 'county', 'gender', 'coverage'],
         'destination': 'ckan',
         'destination_file': 'vaccinations_by_gender.csv',
         'package': vaccinations_stats_archive_package_id,
@@ -269,7 +271,7 @@ job_dicts = [
         'source_file': 'COVID-19_Vaccinations_by_Ethnicity_Current_County_Health.csv',
         'source_full_url': 'https://data.pa.gov/api/views/7ruj-m7k6/rows.csv?accessType=DOWNLOAD&api_foundry=true',
         'schema': ByEthnicitySchema,
-        'primary_key_fields': ['date_updated', 'ethnicity', 'coverage'],
+        'primary_key_fields': ['date_updated', 'county', 'ethnicity', 'coverage'],
         'destination': 'ckan',
         'destination_file': 'vaccinations_by_ethnicity.csv',
         'package': vaccinations_stats_archive_package_id,
