@@ -436,6 +436,9 @@ class LIHTCSchema(pl.BaseSchema):
     longitude = fields.Float(load_from='longitude'.lower(), dump_to='longitude', allow_none=True)
 
     fips2010 = fields.String(load_from='fips2010'.lower(), dump_to='census_tract')
+    fips2000 = fields.String(load_from='fips2000'.lower(), dump_to='fips2000') # Included because it can often
+    # have the correct code when the 2010 version includes a long XXXXXXX string.
+    county_fips_code = fields.String(load_from='fips2010'.lower(), dump_to='county_fips_code')
     place2010 = fields.Integer(load_from='place2010'.lower(), dump_to='municipality_fips', allow_none=True)
     project = fields.String(load_from='project'.lower(), dump_to='hud_property_name')
     proj_add = fields.String(load_from='proj_add'.lower(), dump_to='property_street_address', allow_none=True)
@@ -534,6 +537,15 @@ class LIHTCSchema(pl.BaseSchema):
         for f in fields:
             if data[f] is not None:
                 data[f] = str(data[f])
+
+    @post_load
+    def truncate_to_county_fips_code(self, data):
+        # In many cases where the county_fips_code is 42XXX, if the fips2000
+        # code is used instead of the fips2010 code, a better determination
+        # of the county can be made.
+        f = 'county_fips_code'
+        if data[f] is not None:
+            data[f] = str(data[f])[:5]
 
 class LIHTCBuildingSchema(pl.BaseSchema):
     job_code = 'lihtc_building'
@@ -706,18 +718,21 @@ job_dicts = [
         # Alternatives: Set the destination file in the Extractor or in configure_pipeline_with_options.
     },
     {
-        'update': 0,
         'job_code': LIHTCSchema().job_code, # 'lihtc'
         'source_type': 'local',
         'source_file': 'LIHTCPUB.csv',
         'schema': LIHTCSchema,
-        'filters': [['proj_st', '==', 'PA']], # use 'county_fips_code == 42003' to limit to Allegheny County
+        'filters': [['proj_st', '==', 'PA']], # It would seem that the county FIPS
+        # code could be used to narrow this table to just Allegheny County, but
+        # the presence of 42XXX codes and also the truncation required to get
+        # the 5-digit code make this complicated.
         'always_wipe_data': True,
         'destination': 'ckan',
         'destination_file': f'lihtcpub.csv',
         'package': housecat_package_id,
         'resource_name': LIHTCSchema().job_code, # 'lihtc'
         'upload_method': 'insert',
+        'resource_description': 'LIHTC (Pennsylvania)',
     },
     {   # This job is a two-step job. Step 1: Get the buildings from the file that
         # either has to be manually pulled from lihtc.huduser.gov or extracted from
