@@ -582,7 +582,7 @@ class Job:
             # Situations where it would be a good idea to just copy the source_file value over to destination_file
 
             # Situations where the destination_file value(s) should be determined by something else:
-            if job.files_to_extract not in [None, []]:
+            if self.files_to_extract not in [None, []]:
                 # When ~extracting~ files from a .zip file, the filenames can come from compressed_file_to_extract.
                 self.destination_file = f'{SOURCE_DIR}{self.job_directory}/{self.compressed_file_to_extract}'
             elif self.source_file is not None:
