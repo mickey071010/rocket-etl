@@ -178,7 +178,7 @@ def query_resource(site,query,API_key=None):
     return data
 
 def get_package_id(job, test_mode):
-    return job.package if not test_mode else TEST_PACKAGE_ID
+    return job.production_package_id if not test_mode else TEST_PACKAGE_ID
 
 def delete_datatable_views(resource_id):
     from engine.credentials import site, API_key
@@ -487,7 +487,7 @@ class Job:
 
         self.destination = job_dict['destination'] if 'destination' in job_dict else 'ckan'
         self.destination_file = job_dict.get('destination_file', None)
-        self.package = job_dict['package'] if 'package' in job_dict else None
+        self.production_package_id = job_dict['package'] if 'package' in job_dict else None
         self.resource_name = job_dict['resource_name'] if 'resource_name' in job_dict else None # resource_name is expecting to have a string value
         # for use in naming pipelines. For non-CKAN destinations, this field could be eliminated, but then a different field (like job_code)
         # should be used instead.
@@ -529,7 +529,7 @@ class Job:
         test_mode = kwargs['test_mode']
 
         print("==============\n" + self.job_code)
-        if self.package == TEST_PACKAGE_ID:
+        if self.production_package_id == TEST_PACKAGE_ID:
             print(" *** Note that this job currently only writes to the test package. ***")
 
         if use_local_input_file:

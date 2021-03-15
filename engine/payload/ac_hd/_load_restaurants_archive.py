@@ -184,8 +184,8 @@ def process_job(**kwparameters):
     else:
         job.target = job.source_dir + "/" + job.source_file
 
-    package_id = job.package if not test_mode else TEST_PACKAGE_ID
-    print("==============\n {} in package {}".format(job.resource_name,package_id))
+    package_id = job.package_id if not test_mode else TEST_PACKAGE_ID
+    print("==============\n {} in package {}".format(job.resource_name, package_id))
 
     if clear_first:
         print("Clearing the datastore for {}".format(job.resource_name))

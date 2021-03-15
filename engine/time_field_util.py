@@ -70,7 +70,7 @@ def get_extant_time_range(job, **kwparameters):
         ## (at least by allowing one parameter at a time to be changed).
     if job.destination == 'ckan':
 
-        package = get_package_by_id(job.package)
+        package = get_package_by_id(job.package_id)
         if 'extras' in package:
             extras_list = package['extras']
             # Keep definitions and uses of extras metadata updated here:
@@ -79,7 +79,7 @@ def get_extant_time_range(job, **kwparameters):
             #       u'extras': [{u'key': u'dcat_issued', u'value': u'2014-01-07T15:27:45.000Z'}, ...
             # not a dict, but a list of dicts.
             extras = {d['key']: d['value'] for d in extras_list}
-            resource_id = find_resource_id(job.package, job.resource_name) # This adds a second call to get the
+            resource_id = find_resource_id(job.package_id, job.resource_name) # This adds a second call to get the
                 # package when it's already been obtained a few lines above.
             if resource_id is None: # The resource does not yet exist.
                 return None, None

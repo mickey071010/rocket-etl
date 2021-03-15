@@ -19,9 +19,9 @@ except ImportError:  # Graceful fallback if IceCream isn't installed.
 def ftp_and_upload_maybe(job, **kwparameters):
     """This script optionally obtains all files from an FTP directory,
     scans for files that have not been uploaded to CKAN, and takes the
-    first such file and recodes the job to upload just it before 
+    first such file and recodes the job to upload just it before
     allowing the job to run.
-    
+
     A better ETL framework would make this script smaller or non-existent."""
     _, local_target_directory = local_file_and_dir(job, SOURCE_DIR)
     local_target_directory += 'snow_plow_data'
@@ -29,11 +29,11 @@ def ftp_and_upload_maybe(job, **kwparameters):
         os.makedirs(local_target_directory)
     if not kwparameters['use_local_input_file']:
         download_city_directory(job, local_target_directory)
-        # Downloading all of these files just to get a list of the 
+        # Downloading all of these files just to get a list of the
         # FTP directory is not great, particularly given that these files
         # can each be hundreds of megabytes in size.
         # Better solutions would be to intercept the list of names
-        # (possibly using lftp or some other program) and then 
+        # (possibly using lftp or some other program) and then
         # using that to decide which file to obtain from the FTP server.
 
     # Get list of files in local_target_directory.
@@ -42,9 +42,9 @@ def ftp_and_upload_maybe(job, **kwparameters):
     datafiles = [df for df in datafiles if df[-4:].lower() == 'json']
 
     # Compare list of obtained files to list of resources for the package
-    effective_package_id = TEST_PACKAGE_ID if kwparameters['test_mode'] else job.package # It's 
-    # necessary to work out the effective package ID here since this 
-    # preprocessing is done before the package ID is switched to the 
+    effective_package_id = TEST_PACKAGE_ID if kwparameters['test_mode'] else job.production_package_id # It's
+    # necessary to work out the effective package ID here since this
+    # preprocessing is done before the package ID is switched to the
     # package ID when in test mode.
     ic(effective_package_id)
     for datafile in datafiles:
@@ -52,9 +52,9 @@ def ftp_and_upload_maybe(job, **kwparameters):
         if not resource_exists(effective_package_id, resource_name):
             # Modify the job to upload just this file.
             # This is kind of a kludge until the ETL framework becomes
-            # generalized to support multiple simultaneous tables 
+            # generalized to support multiple simultaneous tables
             # (though I suppose one could also add to the jobs list,
-            # assuming it can be extended), but then so is this 
+            # assuming it can be extended), but then so is this
             # particular ETL job.
             job.source_file = datafile
             job.resource_name = resource_name
@@ -63,7 +63,7 @@ def ftp_and_upload_maybe(job, **kwparameters):
             print(f"OK, let's upload {datafile} with resource name {resource_name}.")
             return
         else:
-            print(f"Found resource with name {resource_name} in package {job.package}.")
+            print(f"Found resource with name {resource_name} in package {effective_package_id}.")
 
     print("No new files to upload.")
     job.destination = '' #job.destinations.remove('ckan_filestore')

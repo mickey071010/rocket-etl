@@ -108,19 +108,19 @@ def express_load_then_delete_file(job, **kwparameters):
     # can be formalized, either as a destination or upload method and
     # possibly implemented as a loader (CKANExpressLoader).
     if kwparameters['test_mode']:
-        job.package = TEST_PACKAGE_ID
+        job.package_id = TEST_PACKAGE_ID
     ckan = ckanapi.RemoteCKAN(site, apikey=API_key)
     csv_file_path = job.destination_file_path
-    resource_id = find_resource_id(job.package, job.resource_name)
+    resource_id = find_resource_id(job.package_id, job.resource_name)
     if resource_id is None:
         # If the resource does not already exist, create it.
-        print(f"Unable to find a resource with name '{job.resource_name}' in package with ID {job.package}.")
-        print(f"Creating new resource, and uploading CSV file {csv_file_path} to resource with name '{job.resource_name}' in package with ID {job.package}.")
-        resource_as_dict = ckan.action.resource_create(package_id=job.package,
+        print(f"Unable to find a resource with name '{job.resource_name}' in package with ID {job.package_id}.")
+        print(f"Creating new resource, and uploading CSV file {csv_file_path} to resource with name '{job.resource_name}' in package with ID {job.package_id}.")
+        resource_as_dict = ckan.action.resource_create(package_id=job.package_id,
             name = job.resource_name,
             upload=open(csv_file_path, 'r'))
     else:
-        print(f"Uploading CSV file {csv_file_path} to resource with name '{job.resource_name}' in package with ID {job.package}.")
+        print(f"Uploading CSV file {csv_file_path} to resource with name '{job.resource_name}' in package with ID {job.package_id}.")
         resource_as_dict = ckan.action.resource_patch(id = resource_id,
             upload=open(csv_file_path, 'r'))
         # Running resource_update once sets the file to the correct file and triggers some datastore action and

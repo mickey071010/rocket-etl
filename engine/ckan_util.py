@@ -109,11 +109,9 @@ def set_resource_description(job, **kwparameters):
     if hasattr(job, 'resource_description') and job.resource_description is not None:
         if not kwparameters['use_local_output_file'] and job.destination in ['ckan', 'ckan_filestore']:
             if kwparameters['test_mode']:
-                job.package = TEST_PACKAGE_ID # This should be taken care of in etl_util.py
-                ic(job.package)
-                ic(job.package_id)
+                assert job.package_id == TEST_PACKAGE_ID # This should be taken care of in etl_util.py
             ckan = ckanapi.RemoteCKAN(site, apikey=API_key)
-            resource_id = find_resource_id(job.package, job.resource_name)
+            resource_id = find_resource_id(job.package_id, job.resource_name)
             if resource_id is not None:
                 existing_resource_description = get_resource_parameter(site, resource_id, 'description', API_key)
                 if existing_resource_description == '':
