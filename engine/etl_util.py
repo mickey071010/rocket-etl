@@ -520,11 +520,12 @@ class Job:
     def configure_pipeline_with_options(self, **kwargs): # Rename this to reflect how it modifies parameters based on command-line-arguments.
         """This function handles the application of the command-line arguments
         to the configuration of the pipeline (things that cannot be done
-        in the Job.__init__ phase.
+        in the Job.__init__ phase without passing the command-line arguments
+        in some fashion).
         """
         # launchpad could just ingest the command-line parameters, preventing them from
         # being carted around and (in principle) allowing those parameters to be even
-        # used in Job.init().
+        # used in Job.__init__().
 
         use_local_input_file = kwargs['use_local_input_file']
         use_local_output_file = kwargs['use_local_output_file']
@@ -534,6 +535,8 @@ class Job:
         if self.production_package_id == TEST_PACKAGE_ID:
             print(" *** Note that this job currently only writes to the test package. ***")
 
+
+        # BEGIN SET CONNECTOR PROPERTIES ##
         if use_local_input_file:
             self.source_type = 'local'
 
@@ -559,10 +562,10 @@ class Job:
         else:
             raise ValueError("The source_type is not specified.")
             # [ ] What should we do if no source_type (or no source) is specified?
+        # END SET CONNECTOR PROPERTIES ##
 
-        ## BEGIN SET EXTRACTOR PROPERTIES ##
+        ## SET EXTRACTOR PROPERTIES ##
         self.select_extractor()
-        ## END SET EXTRACTOR PROPERTIES ##
 
         ## BEGIN SET DESTINATION PROPERTIES ##
 
@@ -622,6 +625,7 @@ class Job:
         # This would allow the source and destination parameters to be prepared, leaving the pipeline running to just run the pipeline.
 
         # BEGIN Destination-specific configuration
+            # A) First configure the loader. It might make more sense to move this to configure_pipeline_with_options().
         if self.destination == 'ckan':
             self.loader = pl.CKANDatastoreLoader
         elif self.destination == 'file':
@@ -641,6 +645,7 @@ class Job:
         else:
             raise ValueError(f"run_pipeline does not know how to handle destination = {self.destination}")
 
+            # B) Then do some boolean operations on clear_first, self.always_clear_first, migrate_schema, and wipe_first.
         clear_first = clear_first or self.always_clear_first or migrate_schema # If migrate_schema == True, 1) backup the data dictionary,
         # 2) delete the Data Table view, 3) clear the datastore, 4) run the job, and 5) try to restore the data dictionary.
         # It just seems cleaner to do most of that in launchpad.py (probably because there's so little in the main() function.
