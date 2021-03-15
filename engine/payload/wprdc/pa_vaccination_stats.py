@@ -104,7 +104,7 @@ class ByDayAndCountySchema(pl.BaseSchema):
 
 class ByGenderSchema(pl.BaseSchema):
     job_code = 'by_gender'
-    date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/views/metadata/v1/bicw-3gwi")
+    date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/views/metadata/v1/jweg-3ezy")
     date_updated = fields.Date(dump_only=True, dump_to='date_updated', default=date_updated_from_site)
     county = fields.String(load_from='County_Name'.lower(), dump_to='county')
     gender = fields.String(load_from='Gender'.lower(), dump_to='gender')
@@ -116,7 +116,7 @@ class ByGenderSchema(pl.BaseSchema):
 
 class ByGenderStatewideSchema(pl.BaseSchema):
     job_code = 'by_gender_pa'
-    date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/views/metadata/v1/jweg-3ezy")
+    date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/views/metadata/v1/id8t-dnk6")
     date_updated = fields.Date(dump_only=True, dump_to='date_updated', default=date_updated_from_site)
     gender = fields.String(load_from='Gender'.lower(), dump_to='gender')
     partially_covered = fields.Integer(load_from='Partially Covered'.lower(), dump_to='partially_covered', allow_none=True)
