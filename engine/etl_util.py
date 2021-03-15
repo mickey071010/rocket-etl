@@ -506,6 +506,8 @@ class Job:
         extension = (self.source_file.split('.')[-1]).lower()
         if extension == 'csv':
             self.extractor = pl.CSVExtractor
+        elif extension == 'json':
+            self.extractor = pl.JSONExtractor
         elif extension in ['xls']:
             self.extractor = pl.OldExcelExtractor
         elif extension in ['xlsx']:
@@ -628,7 +630,7 @@ class Job:
             # should determine which kind of file loader will be used.
             if self.destination_file_format is None:
                 raise ValueError("Destination == 'file' but self.destination_file_format is None!")
-            elif self.destination_file_format.lower() in ['csv'] and self.compressed_file_to_extract is None:
+            elif self.destination_file_format.lower() in ['csv', 'json'] and self.compressed_file_to_extract is None:
                 self.loader = pl.TabularFileLoader # Isn't this actually very CSV-specific, given the write_or_append_to_csv_file function it uses?
                 self.upload_method = 'insert' # Note that this will always append records to an existing file
                 # unless 'always_clear_first' (or 'always_wipe_data') is set to True.

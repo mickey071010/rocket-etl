@@ -8,6 +8,7 @@ from engine.wprdc_etl.pipeline.exceptions import (
 )
 from engine.wprdc_etl.pipeline.status import Status
 from engine.wprdc_etl.pipeline.exceptions import InvalidConfigException
+from engine.wprdc_etl.pipeline.extractors import JSONExtractor
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 PARENT = os.path.join(HERE, '..')
@@ -189,7 +190,7 @@ class Pipeline(object):
             data: A parsed line from an extractor's handle_line
                 method
         '''
-        if not self._loader.has_tabular_output:
+        if not self._loader.has_tabular_output or self._extractor == JSONExtractor:
             self.data.append(data)
         else:
             loaded = self.__schema.load(data)

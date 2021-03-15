@@ -1,6 +1,7 @@
 import csv
 import datetime
 import io
+import json
 from collections import OrderedDict
 from engine.wprdc_etl.pipeline.exceptions import IsHeaderException
 from xlrd import open_workbook, xldate_as_tuple, XL_CELL_DATE
@@ -155,6 +156,63 @@ class TableExtractor(Extractor):
             raise IsHeaderException
         return OrderedDict(zip(self.schema_headers, [i if i != '' else None for i in line]))
 
+class JSONExtractor(TableExtractor):
+    """This extractor assumes that the JSON file is just a reformatted
+    table and doesn't have any nested data structures within it. (To
+    handle a more complex JSON file, we could cast any nested lists
+    or dictionaries to either strings or JSON (both of which I believe
+    are supported by CKAN).)
+    """
+    def __init__(self, connection, *args, **kwargs):
+        '''Extractor subclass for JSON files.
+        '''
+        super(JSONExtractor, self).__init__(connection, *args, **kwargs)
+        self.set_headers()
+
+    def set_headers(self, headers=None):
+        '''Sets headers from file or passed headers
+
+        This method sets two attributes on the class: the headers
+        attribute and the schema_headers attribute. schema_headers
+        must align with the schema attributes for the pipeline.
+
+        If no headers are passed, then we check the first line of the file.
+        The headers attribute is set from the first line, and schema
+        headers are by default created by lowercasing and replacing
+        spaces with underscores. Custom header -> schema header mappings can
+        be created by subclassing the CSVExtractor and overwriting the
+        create_schema_headers method.
+
+        Keyword Arguments:
+            headers: Optional headers that can be passed to be used
+                as the headers and schema headers
+
+        Raises:
+            RuntimeError: if self.headers is not passed and the
+            firstline_headers kwarg is not set.
+        '''
+        if headers:
+            self.headers = headers
+            self.schema_headers = self.headers
+            return
+        else:
+            reader = self.process_connection()
+            self.headers = next(reader).keys()
+            self.schema_headers = self.create_schema_headers(self.headers)
+            return
+
+    def process_connection(self):
+        self.connection.seek(0)
+        reader = iter(json.load(self.connection))
+        return reader
+
+    def handle_line(self, line):
+        '''Replace empty strings with None types.
+        '''
+        #if line == self.headers:
+        #    raise IsHeaderException
+        #return OrderedDict(zip(self.schema_headers, [i if i != '' else None for i in line]))
+        return line
 
 class CSVExtractor(TableExtractor):
     def __init__(self, connection, *args, **kwargs):
