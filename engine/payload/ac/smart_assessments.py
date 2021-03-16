@@ -195,20 +195,20 @@ def custom_processing(job, **kwparameters):
 
 
 job_dicts = [
+#    {
+#        'job_code': 'assessments_filestore',
+#        'source_type': 'sftp',
+#        'source_dir': 'property_assessments',
+#        'source_file': 'ALLEGHENY_COUNTY_MASTER_FILE.csv',
+#        'encoding': 'latin-1', # Taken from assessments.py and used instead of the default, 'utf-8'.
+#        'connector_config_string': 'sftp.county_sftp', # This is just used to look up parameters in the settings.json file.
+#        'schema': None,
+#        'always_wipe_data': True,
+#        'destination': 'file',
+#        'destination_file': 'ALLEGHENY_COUNTY_MASTER_FILE.csv',
+#    },
     {
-        'job_code': 'assessments_filestore'
-        'source_type': 'sftp',
-        'source_dir': 'property_assessments',
-        'source_file': 'ALLEGHENY_COUNTY_MASTER_FILE.csv',
-        'encoding': 'latin-1', # Taken from assessments.py and used instead of the default, 'utf-8'.
-        'connector_config_string': 'sftp.county_sftp', # This is just used to look up parameters in the settings.json file.
-        'schema': None,
-        'always_wipe_data': True,
-        'destination': 'file',
-        'destination_file': 'ALLEGHENY_COUNTY_MASTER_FILE.csv',
-    },
-    {
-        'job_code': 'assessments_filestore'
+        'job_code': 'assessments_filestore',
         'source_type': 'local', #'sftp',
         #'source_dir': 'property_assessments',
         'source_file': 'ALLEGHENY_COUNTY_MASTER_FILE.csv',
@@ -223,7 +223,7 @@ job_dicts = [
     },
     # Instead of all the LMAZ stuff, just save the file to a secret archive package.
     {
-        'job_code': 'assessments_archive'
+        'job_code': 'assessments_archive',
         'source_type': 'local', 'sftp',
         #'source_dir': 'property_assessments',
         'source_file': 'ALLEGHENY_COUNTY_MASTER_FILE.csv',
@@ -237,7 +237,7 @@ job_dicts = [
         'resource_name': name_file_resource()
     },
     {
-        'job_code': 'assessments_datastore'
+        'job_code': 'assessments_datastore',
         'source_type': 'local', #'sftp',
         #'source_dir': 'property_assessments',
         'source_file': 'ALLEGHENY_COUNTY_MASTER_FILE.csv',
