@@ -439,7 +439,28 @@ class CKANDatastoreLoader(CKANLoader):
             response = ckan.action.datastore_delete(id=self.resource_id, filters={}, force=True)
             # Deleting the records in the datastore also has the side effect of deactivating the
             # datastore, so we need to reactivate it.
+
+            ### Maybe it would be better to just delete the records in batches or else
+            ### just save and restore the data dictionary, since that's really the
+            ### point of this maneuver. HOWEVER, the CKAN API does not make it simple
+            ### to delete records in batches.
+
+            # If this script gets interrupted between these two calls, the datastore will
+            # stay inactive, so there must be a way to restore it.
+
+            # Calling datastore_exists() in engine.ckan_util will now try to restore
+            # a deactivated datastore, and this seems to work to eventually rectify
+            # errors.
             response2 = ckan.action.resource_patch(id=self.resource_id, datastore_active=True)
+            if not response2['datastore_active']: # Retry datastore reactivation if necessary.
+                print(f"(datastore_active == {response2['datastore_active']}. Trying again to reactivate the datastore.)")
+                import time
+                time.sleep(10)
+                response3 = ckan.action.resource_patch(id=self.resource_id, datastore_active=True)
+                print(f"(Now, datastore_active == {response3['datastore_active']})")
+                if not response3['datastore_active']:
+                    raise ValueError(f"The datastore for resource_id == {self.resource_id} could not be reactivated.")
+
         elif clear and first:
             delete_status = self.delete_datastore(self.resource_id)
             if str(delete_status)[0] in ['4', '5']:
