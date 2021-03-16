@@ -807,6 +807,9 @@ class PollingPlacesSchema(GeocodedAssetSchema):
         data['synthesized_key'] = synthesize_key(data, ['mwd'])
 
 class ACHACommunitySitesSchema(GeocodedAssetSchema):
+    # This is for Allegheny County Housing Authority sites. These
+    # are community centers with programming for kids (like Head
+    # Start), parents, and families.
     asset_type = fields.String(dump_only=True, default='acha_community_sites')
     name = fields.String(load_from='name')
     asset_name = fields.String(load_from='name')
