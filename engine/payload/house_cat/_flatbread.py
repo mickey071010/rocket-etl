@@ -377,6 +377,74 @@ class MultifamilyProjectsSection8ContractsSchema(pl.BaseSchema):
             if data[f] is not None:
                 data[f] = str(data[f])
 
+class MultifamilyProjectsSubsidyLoansSchema(pl.BaseSchema):
+    job_code = 'mf_subsidy_loans'
+    property_id = fields.String(load_from='property_id'.lower(), dump_to='property_id')
+    latitude = fields.Float(load_from='\ufeffX'.lower(), dump_to='latitude', allow_none=True)
+    longitude = fields.Float(load_from='Y'.lower(), dump_to='longitude', allow_none=True)
+    lvl2kx = fields.String(load_from='LVL2KX', dump_to='geocoding_accuracy')
+        # 'R' - Interpolated rooftop (high degree of accuracy, symbolized as green)
+        # '4' - ZIP+4 centroid (high degree of accuracy, symbolized as green)
+        # 'B' - Block group centroid (medium degree of accuracy, symbolized as yellow)
+        # 'T' - Census tract centroid (low degree of accuracy, symbolized as red)
+        # '2' - ZIP+2 centroid (low degree of accuracy, symbolized as red)
+        # 'Z' - ZIP5 centroid (low degree of accuracy, symbolized as red)
+        # '5' - ZIP5 centroid (same as above, low degree of accuracy, symbolized as red)
+        # Null - Could not be geocoded (does not appear on the map)
+        # "For the purposes of displaying the location of an address on a map only use
+        # addresses and their associated lat/long coordinates where the LVL2KX field is
+        # coded 'R' or '4'. These codes ensure that the address is displayed on the
+        # correct street segment and in the correct census block."
+    cnty_nm2kx = fields.String(load_from='CNTY_NM2KX'.lower(), dump_to='county', allow_none=True)
+    cnty2kx = fields.String(load_from='CNTY2KX'.lower(), dump_to='county_fips_code', allow_none=True)
+    congressional_district_code = fields.String(load_from='congressional_district_code'.lower(), dump_to='congressional_district_code', allow_none=True)
+    tract2kx = fields.String(load_from='TRACT2KX'.lower(),dump_to='census_tract', allow_none=True)
+    curcosub = fields.String(load_from='CURCOSUB'.lower(),dump_to='municipality_fips', allow_none=True)
+    placed_base_city_name_text = fields.String(load_from='placed_base_city_name_text'.lower(), dump_to='municipality_name', allow_none=True)
+    property_name_text = fields.String(load_from='property_name_text'.lower(), dump_to='hud_property_name')
+    address_line1_text = fields.String(load_from='address_line1_text'.lower(), dump_to='property_street_address')
+    std_city = fields.String(load_from='std_city'.lower(), dump_to='city', allow_none=True)
+    std_st = fields.String(load_from='std_st'.lower(), dump_to='state')
+    std_zip5 = fields.String(load_from='std_zip5'.lower(), dump_to='zip_code')
+    # Should ZIP+4 be added for easy of matching with other datasets?
+
+    total_unit_count = fields.Integer(load_from='total_unit_count'.lower(), dump_to='units')
+    total_assisted_unit_count = fields.Integer(load_from='total_assisted_unit_count'.lower(), dump_to='assisted_units')
+
+    occupancy_date = fields.Date(load_from='OCCUPANCY_DATE'.lower(), dump_to='occupancy_date', allow_none=True)
+
+    property_category_name = fields.String(load_from='property_category_name'.lower(), dump_to='property_category_name')
+    project_manager_name_text = fields.String(load_from='MGMT_CONTACT_FULL_NAME'.lower(), dump_to='property_manager_name', allow_none=True) # uses different field from mf_loans
+    mgmt_agent_org_name = fields.String(load_from='MGMT_AGENT_ORG_NAME'.lower(), dump_to='property_manager_company', allow_none=True)
+    mgmt_contact_address_line1 = fields.String(load_from='MGMT_CONTACT_ADDRESS_LINE1'.lower(), dump_to='property_manager_address', allow_none=True)
+    property_on_site_phone_number = fields.String(load_from='MGMT_CONTACT_MAIN_PHN_NBR'.lower(), dump_to='property_manager_phone', allow_none=True) # uses different field from mf_loans
+    mgmt_contact_email_text = fields.String(load_from='mgmt_contact_email_text'.lower(), dump_to='property_manager_email', allow_none=True)
+
+    # Subsidy Information (HUD)
+    contract1 = fields.String(load_from='CONTRACT1'.lower(), dump_to='contract_id', allow_none=True)
+    program_type1 = fields.String(load_from='PROGRAM_TYPE1'.lower(), dump_to='program_type', allow_none=True)
+    units1 = fields.Integer(load_from='UNITS1'.lower(), dump_to='subsidy_units')
+    expiration_date1 = fields.Date(load_from='EXPIRATION_DATE1'.lower(), dump_to='subsidy_expiration_date', allow_none=True)
+
+    count_0br = fields.Integer(load_from='BD0_CNT1'.lower(), dump_to='count_0br', allow_none=True)
+    count_1br = fields.Integer(load_from='BD1_CNT1'.lower(), dump_to='count_1br', allow_none=True)
+    count_2br = fields.Integer(load_from='BD2_CNT1'.lower(), dump_to='count_2br', allow_none=True)
+    count_3br = fields.Integer(load_from='BD3_CNT1'.lower(), dump_to='count_3br', allow_none=True)
+    count_4br = fields.Integer(load_from='BD4_CNT1'.lower(), dump_to='count_4br', allow_none=True)
+    count_5plusbr = fields.Integer(load_from='BD5_CNT1'.lower(), dump_to='count_5plusbr', allow_none=True)
+    servicing_site_name_text = fields.String(load_from='servicing_site_name_text'.lower(), dump_to='servicing_site_name_loan', allow_none=True)
+
+    reac_last_inspection_id = fields.Integer(load_from='REAC_LAST_INSPECTION_ID'.lower(), dump_to='inspection_id')
+    reac_last_inspection_score = fields.String(load_from='REAC_LAST_INSPECTION_SCORE'.lower(), dump_to='inspection_score', allow_none=True)
+    client_group_name = fields.String(load_from='CLIENT_GROUP_NAME'.lower(), dump_to='client_group_name', allow_none=True)
+    client_group_type = fields.String(load_from='CLIENT_GROUP_TYPE'.lower(), dump_to='client_group_type', allow_none=True)
+
+    #primary_fha_number = fields.String(load_from='PRIMARY_FHA_NUMBER'.lower(), dump_to='fha_loan_id') # Aren't these useful for linking?
+    #associated_fha_number = fields.String(load_from='ASSOCIATED_FHA_NUMBER'.lower(), dump_to='associated_fha_loan_id') # Aren't these useful for linking?
+
+    class Meta:
+        ordered = True
+
 class MultifamilyGuaranteedLoansSchema(pl.BaseSchema):
     job_code = 'mf_loans'
     property_id = fields.String(load_from='property_id'.lower(), dump_to='property_id')
@@ -813,6 +881,24 @@ job_dicts = [
         'package': housecat_package_id,
         'resource_name': HUDPublicHousingBuildingsSchema().job_code, # 'hud_public_housing_buildings'
         'upload_method': 'insert',
+    },
+    {
+        'job_code': MultifamilyProjectsSubsidyLoansSchema().job_code, # 'mf_subsidy_loans'
+        'source_type': 'http',
+        'source_full_url': get_arcgis_data_url('https://hudgis-hud.opendata.arcgis.com/data.json', 'HUD Insured Multifamily Properties', 'CSV')[0], # HUD_Insured_Multifamily_Properties.csv
+        # The downside to pulling the filename from the data.json file is that there is currently no support for offline caching
+        # for testing purposes, but this could be remedied.
+        'encoding': 'utf-8',
+        'schema': MultifamilyProjectsSubsidyLoansSchema,
+        'filters': [['std_st', '==', 'PA'], ['cnty_nm2kx', '==', 'Allegheny']], # cnty2kx could be used to filter to Allegheny County.
+        'always_wipe_data': True,
+        #'primary_key_fields': # POTENTIAL PRIMARY KEY FIELDS: ['PROPERTY_ID', 'PRIMARY_FHA_NUMBER', 'ASSOCIATED_FHA_NUMBER', 'FHA_NUM1']
+        'destination': 'ckan',
+        'destination_file': 'mf_subsidy_loans.csv',
+        'package': housecat_package_id,
+        'resource_name': 'Subsidy extract from HUD Insured Multifamily Properties (Allegheny County)',
+        'upload_method': 'insert',
+        'resource_description': f'Derived from https://hudgis-hud.opendata.arcgis.com/datasets/hud-insured-multifamily-properties \n job code: {MultifamilyGuaranteedLoansSchema().job_code}', # 'mf_subsidy_loans'
     },
     {
         'job_code': MultifamilyProjectsSubsidySection8Schema().job_code, # 'mf_subsidy_8'
