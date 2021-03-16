@@ -28,7 +28,7 @@ def ftp_and_upload_maybe(job, **kwparameters):
     if not os.path.isdir(local_target_directory):
         os.makedirs(local_target_directory)
     if not kwparameters['use_local_input_file']:
-        download_city_directory(job, local_target_directory)
+        download_city_directory(job, local_target_directory, file_prefix=str(datetime.now().year))
         # Downloading all of these files just to get a list of the
         # FTP directory is not great, particularly given that these files
         # can each be hundreds of megabytes in size.

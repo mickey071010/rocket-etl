@@ -432,11 +432,12 @@ def ftp_target(jobject):
         target_path = re.sub('/$','',jobject.source_dir) + '/' + target_path
     return target_path
 
-def download_city_directory(jobject, local_target_directory):
+def download_city_directory(jobject, local_target_directory, file_prefix=''):
     """For this function to be able to access the City's FTP server,
     it needs to be able to access the appropriate key file."""
+    from icecream import ic
     from engine.parameters.local_parameters import CITY_KEYFILEPATH
-    cmd = "sftp -i {} pitt@ftp.pittsburghpa.gov:/pitt/{}/* {}".format(CITY_KEYFILEPATH, jobject.source_dir, local_target_directory)
+    cmd = f"sftp -i {CITY_KEYFILEPATH} pitt@ftp.pittsburghpa.gov:/pitt/{jobject.source_dir}/{file_prefix}* {local_target_directory}"
     results = os.popen(cmd).readlines()
     for result in results:
         print(" > {}".format(result))
@@ -642,6 +643,10 @@ class Job:
                 self.loader = pl.NontabularFileLoader
         elif self.destination == 'ckan_filestore':
             self.loader = pl.CKANFilestoreLoader
+        elif self.destination is None:
+            return {} # locators_by_destination should be empty and the pipeline should be skipped
+            # for these cases where there is no destination (like in snow_plow_geojson.py when
+            # no new files to upload are found.
         else:
             raise ValueError(f"run_pipeline does not know how to handle destination = {self.destination}")
 
