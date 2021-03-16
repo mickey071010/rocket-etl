@@ -23,11 +23,34 @@ def resource_exists(package_id, resource_name):
     return find_resource_id(package_id, resource_name) is not None
 
 def datastore_exists(package_id, resource_name):
+    """Check whether a datastore exists for the given package ID and resource name.
+
+    If there should be a datastore but it's inactive, try to restore it. If
+    restoration fails, send a notification.
+    """
     from engine.credentials import site, API_key
     resource_id = find_resource_id(package_id, resource_name)
     if resource_id is None:
         return False
-    return get_resource_parameter(site, resource_id, 'datastore_active', API_key)
+    datastore_is_active = get_resource_parameter(site, resource_id, 'datastore_active', API_key)
+    if datastore_is_active:
+        return True
+    else:
+        url = get_resource_parameter(site, resource_id, 'url', API_key)
+        if re.search('datastore/dump', url) is not None:
+            # This looks like a resource that has a datastore that is inactive.
+            # Try restoring it.
+            ckan = ckanapi.RemoteCKAN(site, apikey=API_key)
+            response = ckan.action.resource_patch(id=resource_id, datastore_active=True)
+            if response['datastore_active']:
+                print("Restored inactive datastore.")
+            else:
+                msg = f"Unable to restore inactive datastore for resource ID {resource_id}, resource name {resource_name} and package_id {package_id}!"
+                channel = "@david" #if (test_mode or not PRODUCTION) else "#etl-hell" # test_mode is not available to this function.
+                if channel != "@david":
+                    msg = f"@david {msg}"
+                send_to_slack(msg, username='datastore_exists()', channel=channel, icon=':illuminati:')
+            return response['datastore_active']
 
 def get_package_parameter(site, package_id, parameter=None, API_key=None):
     """Gets a CKAN package parameter. If no parameter is specified, all metadata
