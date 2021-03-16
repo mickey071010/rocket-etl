@@ -66,7 +66,7 @@ def ftp_and_upload_maybe(job, **kwparameters):
             print(f"Found resource with name {resource_name} in package {effective_package_id}.")
 
     print("No new files to upload.")
-    job.destination = '' #job.destinations.remove('ckan_filestore')
+    job.destination = None #job.destinations.remove('ckan_filestore')
 
 snow_plow_geojson_package_id = "d0b56030-3391-49db-87bd-4f1c16490fbc" # Production version of Snow Plow Activity (2018-2020)
 
