@@ -521,7 +521,11 @@ class LIHTCSchema(pl.BaseSchema):
     n_3br = fields.Integer(load_from='n_3br'.lower(), dump_to='count_3br', allow_none=True)
     n_4br = fields.Integer(load_from='n_4br'.lower(), dump_to='count_4br', allow_none=True)
     contact = fields.String(load_from='contact'.lower(), dump_to='owner_organization_name', allow_none=True)
-    owner_address = fields.String(load_from='co_add', dump_to='property_manager_address', allow_none=True)
+    property_manager_address = fields.String(dump_only=True, dump_to='property_manager_address', allow_none=True)
+    co_add = fields.String(load_from='co_add', load_only=True, allow_none=True)
+    co_cty = fields.String(load_from='co_cty', load_only=True, allow_none=True)
+    co_st = fields.String(load_from='co_st', load_only=True, allow_none=True)
+    co_zip = fields.String(load_from='co_zip', load_only=True, allow_none=True)
     company = fields.String(load_from='company'.lower(), dump_to='property_manager_company', allow_none=True)
     co_tel = fields.String(load_from='co_tel'.lower(), dump_to='property_manager_phone', allow_none=True)
 
@@ -541,19 +545,19 @@ class LIHTCSchema(pl.BaseSchema):
     class Meta:
         ordered = True
 
-    @pre_load
+    @post_load
     def form_address(self, data): # [ ] Is there any chance we want to keep these parts as separate fields?
         address = ''
-        if data['co_add'] != '':
+        if data['co_add'] not in ['', None]:
             address += f"{data['co_add']}, "
-        if data['co_cty'] != '':
+        if data['co_cty'] not in ['', None]:
             address += f"{data['co_cty']}, "
-        if data['co_st'] != '':
+        if data['co_st'] not in ['', None]:
             address += f"{data['co_st']} "
-        if data['co_zip'] != '':
+        if data['co_zip'] not in ['', None]:
             address += f"{data['co_zip']}"
         address = address.strip()
-        if address == '':
+        if address in ['', 'PA']:
             address = None
         data['property_manager_address'] = address
 
