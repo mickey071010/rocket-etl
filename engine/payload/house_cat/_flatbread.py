@@ -701,6 +701,69 @@ class USDAProgramExitSchema(pl.BaseSchema):
         for f in fields:
             if data[f] is not None:
                 data[f] = str(data[f])
+
+class USDA514515Schema(pl.BaseSchema):
+    project_name = fields.String(load_from='Project_Name'.lower(), dump_to='hud_property_name')
+    main_address_line1 = fields.String(load_from='Main_Address_Line1'.lower(), dump_to='property_street_address', allow_none=True)
+
+    state_county_fips_code = fields.String(load_from='State_County_FIPS_Code'.lower(), dump_to='county_fips_code', allow_none=True)
+    city = fields.String(load_from='City'.lower(), dump_to='city', allow_none=True)
+    state_abbreviation = fields.String(load_from='State_Abbreviation'.lower(), dump_to='state', allow_none=True)
+    zip_code = fields.String(load_from='Zip_Code'.lower(), dump_to='zip_code', allow_none=True)
+
+    class Meta:
+        ordered = True
+
+    @pre_load
+    def transform_ints_to_string(self, data):
+        fields = ['main_address_line1', 'state_county_fips_code',
+                'zip_code']
+        for f in fields:
+            if data[f] is not None:
+                data[f] = str(data[f])
+
+class USDA514515ActiveSchema(USDA514515Schema):
+    job_code = 'usda_active'
+    latitude = fields.Float(load_from='latitude'.lower(), dump_to='latitude', allow_none=True)
+    longitude = fields.Float(load_from='longitude'.lower(), dump_to='longitude', allow_none=True)
+
+class USDA514515TenantSchema(USDA514515Schema):
+    job_code = 'usda_tenant'
+
+class USDA538Schema(pl.BaseSchema):
+    job_code = 'usda_538'
+    project_name = fields.String(load_from='Project_Name'.lower(), dump_to='hud_property_name')
+    main_address_line1 = fields.String(load_from='Main_Address_Line1'.lower(), dump_to='property_street_address', allow_none=True)
+
+    city = fields.String(load_from='City'.lower(), dump_to='city', allow_none=True)
+    state_abbreviation = fields.String(load_from='State_Abbreviation'.lower(), dump_to='state', allow_none=True)
+    zip_code = fields.String(load_from='Zip_Code'.lower(), dump_to='zip_code', allow_none=True) # This is a ZIP+4 code, which we will truncate.
+
+    latitude = fields.Float(load_from='latitude'.lower(), dump_to='latitude', allow_none=True)
+    ongitude = fields.Float(load_from='longitude'.lower(), dump_to='longitude', allow_none=True)
+
+    class Meta:
+        ordered = True
+
+    @pre_load
+    def transform_ints_to_string(self, data):
+        fields = ['main_address_line1', 'zip_code']
+        for f in fields:
+            if data[f] is not None:
+                data[f] = str(data[f])
+
+    @pre_load
+    def fix_zip_code(self, data):
+        f = 'zip_code'
+        if data[f] is not None:
+            data[f] = str(data[f])[:5]
+
+class HousingInventoryCountSchema(pl.BaseSchema):
+    job_code = 'hic'
+    coc_id = fields.Integer(load_from='Coc\\ID'.lower(), load_only=True, allow_none=True)
+    project_name = fields.String(load_from='Project_Name'.lower(), dump_to='hud_property_name') # There are also Project ID and HMIS Project ID values.
+    address1 = fields.String(load_from='address1'.lower(), dump_to='property_street_address', allow_none=True)
+
 # dfg
 
 housecat_package_id = 'bb77b955-b7c3-4a05-ac10-448e4857ade4'
@@ -1029,7 +1092,107 @@ job_dicts = [
         'resource_name': USDAProgramExitSchema().job_code, # 'usda_exit'
         'upload_method': 'insert',
     },
-
+    {
+        'job_code': USDA514515ActiveSchema().job_code, # 'usda_active'
+        'source_type': 'http',
+        #'source_file': 'USDA_RD_MFH_Active_Projects-2021-02-17.xlsx'
+        'source_full_url': scrape_nth_link('https://www.sc.egov.usda.gov/data/MFH_section_515.html', 'xlsx', 0, 3, regex='Active', verify=False),
+        # This web page has incorrectly configured certificates, so we'll need to route around that with requests.get(url, verify=False).
+        'ignore_certificate_errors': True,
+        'encoding': 'binary',
+        'rows_to_skip': 0,
+        'schema': USDA514515ActiveSchema,
+        'filters': [['state_county_fips_code', '==', 42003], ['state_abbreviation', '==', 'PA']],
+        'always_wipe_data': True,
+        #'primary_key_fields': "Individual properties can be identified across databases
+        # by Borrower ID, followed by Project (Property?) ID, followed by Project Check Digit."
+        'destination': 'ckan',
+        'destination_file': 'usda_active.csv',
+        'resource_description': 'Derived from https://www.sc.egov.usda.gov/data/MFH_section_515.html',
+        'package': housecat_package_id,
+        'resource_name': 'USDA Rural Development Multi-Family Section 514 and 515 Active (Allegheny County)',
+        'upload_method': 'insert',
+    },
+    {
+        'job_code': USDA514515TenantSchema().job_code, # 'usda_tenant'
+        'source_type': 'http',
+        #'source_file': 'USDA_RD_MFH_Tenant-2021-02-17.xlsx'
+        'source_full_url': scrape_nth_link('https://www.sc.egov.usda.gov/data/MFH_section_515.html', 'xlsx', 2, 3, regex='Tenant', verify=False),
+        # This web page has incorrectly configured certificates, so we'll need to route around that with requests.get(url, verify=False).
+        'ignore_certificate_errors': True,
+        'encoding': 'binary',
+        'rows_to_skip': 0,
+        'schema': USDA514515TenantSchema,
+        'filters': [['state_county_fips_code', '==', 42003], ['state_abbreviation', '==', 'PA']],
+        'always_wipe_data': True,
+        #'primary_key_fields': "Individual properties can be identified across databases
+        # by Borrower ID, followed by Project (Property?) ID, followed by Project Check Digit."
+        'destination': 'ckan',
+        'destination_file': 'usda_tenant.csv',
+        'resource_description': f'Derived from https://www.sc.egov.usda.gov/data/MFH_section_515.html \n job_code: {USDA514515TenantSchema().job_code}',
+        'package': housecat_package_id,
+        'resource_name': 'USDA Rural Development Multi-Family Section 514 and 515 Tenant (Allegheny County)',
+        'upload_method': 'insert',
+    },
+    {
+        'job_code': USDA538Schema().job_code, # 'usda_538'
+        'source_type': 'http',
+        #'source_file': 'USDA_RD_MHF_Program_Exit-2020-12-31.xlsx',
+        'source_full_url': scrape_nth_link('https://www.sc.egov.usda.gov/data/MFH.html', 'xls', 0, 1, regex='538', verify=False),
+        # This web page has incorrectly configured certificates, so we'll need to route around that with requests.get(url, verify=False).
+        'ignore_certificate_errors': True,
+        'encoding': 'binary',
+        'rows_to_skip': 0,
+        'schema': USDA538Schema,
+        'filters': [['state_abbreviation', '==', 'PA']], # Latitude, longitude, city, and ZIP code seem to be the available options for geographic filtering.
+        'always_wipe_data': True,
+        #'primary_key_fields': "Individual properties can be identified across databases
+        # by Borrower ID, followed by Project (Property?) ID, followed by Project Check Digit."
+        'destination': 'ckan',
+        'destination_file': 'usda_538.csv',
+        'resource_description': f'Derived from file at https://www.sc.egov.usda.gov/data/MFH.html \n job_code: {USDA538Schema().job_code}',
+        'package': housecat_package_id,
+        'resource_name': 'USDA Rural Program Multi-Family Housing 538 (Pennsylvania)',
+        'upload_method': 'insert',
+    },
+    {
+        'job_code': HousingInventoryCountSchema().job_code, # 'hic' (related to homelessness)
+        'source_type': 'http',
+        #'source_file': '2019-Housing-Inventory-County-RawFile.xlsx',
+        'source_full_url': scrape_nth_link('https://www.hudexchange.info/resource/3031/pit-and-hic-data-since-2007/', 'xlsx', 4, None, regex='RawFile'),
+        'encoding': 'binary',
+        'rows_to_skip': 0,
+        'schema': HousingInventoryCountSchema,
+        'filters': [['coc\\id', '==', 1080]], # The "Continuum of Care" ID limits records to Allegheny County.
+        'always_wipe_data': True,
+        #'primary_key_fields': "Individual properties can be identified across databases
+        # by Borrower ID, followed by Project (Property?) ID, followed by Project Check Digit."
+        'destination': 'ckan',
+        'destination_file': 'usda_538.csv',
+        'resource_description': f'Derived from file at https://www.hudexchange.info/resource/3031/pit-and-hic-data-since-2007/ \n job_code: {HousingInventoryCountSchema().job_code}',
+        'package': housecat_package_id,
+        'resource_name': 'HUD Exchange Housing Inventory Count (Allegheny County)',
+        'upload_method': 'insert',
+    },
+#    { # This one is incomplete because the desired fields have not been identified yet.
+#        'job_code': MultifamilyTerminatedMortgagesSchema().job_code, #'terminated_mortgages'
+#        # This Excel 2018 file includes all terminated HUD Multifamily insured mortgages. It includes the Holder and Servicer at the time the mortgage was terminated. The data is as of  March 1, 2021 and is updated monthly.
+#        'source_type': 'http',
+#        'source_file': 'CopyofFHA_BF90_RM_T_03012021.xlsx',
+#        'source_full_url': scrape_nth_link('https://www.hud.gov/program_offices/housing/comp/rpts/mfh/mf_f47t', 'xlsx', 1, 2, 'FHA'),
+#        'updates': 'Monthly',
+#        'encoding': 'binary',
+#        'schema': MultifamilyTerminatedMortgagesSchema,
+#        'filters': [['property_state', '==', 'PA']], # Location information includes city, state, and ZIP code.
+#        'always_wipe_data': True,
+#        #'primary_key_fields': ['hud_project_number'], # "HUD PROJECT NUMBER" seems pretty unique.
+#        'destination': 'ckan',
+#        'destination_file': 'terminated_mortgages.csv',
+#        'package': housecat_package_id,
+#        'resource_name': 'HUD Terminated Multifamily Mortgages (Pennsylvania)',
+#        'upload_method': 'insert',
+#        'resource_description': f'Derived from https://www.hud.gov/program_offices/housing/comp/rpts/mfh/mf_f47t \njob code: {MultifamilyTerminatedMortgagesSchema().job_code}', #'terminated_mortgages'
+#    },
 ]
 
 assert len(job_dicts) == len({d['job_code'] for d in job_dicts}) # Verify that all job codes are unique.
