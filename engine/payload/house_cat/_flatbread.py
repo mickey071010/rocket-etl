@@ -839,7 +839,7 @@ job_dicts = [
         'package': housecat_package_id,
         'resource_name': 'HUD Multifamily Fiscal Year Production (Pennsylvania)',
         'upload_method': 'insert',
-        'resource_description': 'Derived from https://www.hud.gov/program_offices/housing/mfh/mfdata/mfproduction \njob code: {MultifamilyProductionInitialCommitmentSchema().job_code},' # 'mf_init_commit'
+        'resource_description': f'Derived from https://www.hud.gov/program_offices/housing/mfh/mfdata/mfproduction \njob code: {MultifamilyProductionInitialCommitmentSchema().job_code},' # 'mf_init_commit'
     },
     {
         'job_code': f'unzip_{LIHTCSchema().job_code}', # 'unzip_lihtc'
@@ -865,26 +865,27 @@ job_dicts = [
         # the 5-digit code make this complicated.
         'always_wipe_data': True,
         'destination': 'ckan',
-        'destination_file': f'lihtcpub.csv',
+        'destination_file': f'lihtc_projects.csv',
         'package': housecat_package_id,
-        'resource_name': LIHTCSchema().job_code, # 'lihtc'
+        'resource_name': 'LIHTC (Pennsylvania)',
         'upload_method': 'insert',
-        'resource_description': 'LIHTC (Pennsylvania)',
+        'resource_description': f'Derived from https://lihtc.huduser.gov/lihtcpub.zip \njob_code: {LIHTCSchema().job_code}', # 'lihtc'
     },
     {   # This job is a two-step job. Step 1: Get the buildings from the file that
         # either has to be manually pulled from lihtc.huduser.gov or extracted from
         # the Access database.
         'job_code': LIHTCBuildingSchema().job_code, # 'lihtc_building'
         'source_type': 'local',
-        'source_file': 'lihtc.huduser.gov.extract.buildings.csv',
+        'source_file': 'lihtc-huduser-gov-extract-buildings.csv',
         'schema': LIHTCBuildingSchema,
         'filters': [['proj_st', '==', 'PA']], # Can't be limited, except by city name.
         'always_wipe_data': True,
         'destination': 'ckan',
         'destination_file': f'lihtc_building.csv',
         'package': housecat_package_id,
-        'resource_name': LIHTCBuildingSchema().job_code, # 'lihtc_building'
+        'resource_name': 'All Buildings from LIHTC Projects (Pennsylvania)',
         'upload_method': 'insert',
+        'resource_description': f'Derived from https://lihtc.huduser.gov/ \njob_code: {LIHTCBuildingSchema().job_code}',
     },
     {   # Step 2: Get the buildings which are in the original project-level file
         # and (probably) not in the multi-address building-level extraction.
@@ -898,9 +899,9 @@ job_dicts = [
         'destination': 'ckan',
         'destination_file': f'lihtc_building.csv',
         'package': housecat_package_id,
-        'resource_name': LIHTCBuildingSchema().job_code, # 'lihtc_building'
+        'resource_name': 'All Buildings from LIHTC Projects (Pennsylvania)',
         'upload_method': 'insert',
-        'resource_description': 'LIHTC Buildings (Pennsylvania)',
+        'resource_description': f'Derived from https://lihtc.huduser.gov/ \njob_code: {LIHTCBuildingSchema().job_code}',
     },
     {
         'job_code': HousingInspectionScoresSchema().job_code, # 'housing_inspections'
@@ -919,7 +920,7 @@ job_dicts = [
         'package': housecat_package_id,
         'resource_name': 'HUD Inspection Scores (Allegheny County)',
         'upload_method': 'insert',
-        'resource_description': f'Derived from https://www.huduser.gov/portal/datasets/pis.html. job code: {HousingInspectionScoresSchema().job_code}', # 'housing_inspections'
+        'resource_description': f'Derived from https://www.huduser.gov/portal/datasets/pis.html \njob code: {HousingInspectionScoresSchema().job_code}',
     },
     {
         'job_code': HUDPublicHousingProjectsSchema().job_code, # 'hud_public_housing_projects'
@@ -933,8 +934,9 @@ job_dicts = [
         'destination': 'ckan',
         'destination_file': 'public_housing_projects.csv',
         'package': housecat_package_id,
-        'resource_name': HUDPublicHousingProjectsSchema().job_code, # 'hud_public_housing_projects'
+        'resource_name': 'HUD Public Housing Developments (Allegheny County)',
         'upload_method': 'insert',
+        'resource_description': f'Derived from https://hudgis-hud.opendata.arcgis.com/datasets/public-housing-developments \njob code: {HUDPublicHousingProjectsSchema().job_code}',
     },
     {
         'job_code': HUDPublicHousingBuildingsSchema().job_code, # 'hud_public_housing_buildings'
@@ -948,8 +950,10 @@ job_dicts = [
         'destination': 'ckan',
         'destination_file': 'public_housing_buildings.csv',
         'package': housecat_package_id,
-        'resource_name': HUDPublicHousingBuildingsSchema().job_code, # 'hud_public_housing_buildings'
+        'resource_name': 'HUD Public Housing Buildings (Pennsylvania)',
         'upload_method': 'insert',
+        'resource_description': f'Derived from https://hudgis-hud.opendata.arcgis.com/datasets/public-housing-buildings\njob code: {HUDPublicHousingBuildingsSchema().job_code}',
+
     },
     {
         'job_code': MultifamilyProjectsSubsidyLoansSchema().job_code, # 'mf_subsidy_loans'
@@ -983,8 +987,9 @@ job_dicts = [
         'destination': 'ckan',
         'destination_file': 'mf_subsidy_8.csv',
         'package': housecat_package_id,
-        'resource_name': MultifamilyProjectsSubsidySection8Schema().job_code, # 'mf_subsidy_8'
+        'resource_name': 'Subsidy extract from Multifamily Assistance & Section 8 Contracts (Pennsylvania)',
         'upload_method': 'insert',
+        'resource_description': f'Derived from https://www.hud.gov/program_offices/housing/mfh/exp/mfhdiscl \n job code: {MultifamilyProjectsSubsidySection8Schema().job_code}',
     },
     {
         'job_code': MultifamilyProjectsSection8ContractsSchema().job_code, # 'mf_contracts_8'
@@ -1000,8 +1005,9 @@ job_dicts = [
         'destination': 'ckan',
         'destination_file': 'mf_8_contracts.csv',
         'package': housecat_package_id,
-        'resource_name': MultifamilyProjectsSection8ContractsSchema().job_code, # 'mf_contracts_8'
+        'resource_name': 'Multifamily Assistance & Section 8 Contracts (All)',
         'upload_method': 'insert',
+        'resource_description': f'Derived from https://www.hud.gov/program_offices/housing/mfh/exp/mfhdiscl \n job code: {MultifamilyProjectsSection8ContractsSchema().job_code}',
     },
     {
         'job_code': MultifamilyGuaranteedLoansSchema().job_code, # 'mf_loans'
@@ -1039,9 +1045,9 @@ job_dicts = [
         'destination': 'ckan',
         'destination_file': 'mf_inspections.csv',
         'package': housecat_package_id,
-        'resource_name': 'mf_inspections',
+        'resource_name': 'HUD Multifamily Inspection Scores (Pennsylvania)',
         'upload_method': 'insert',
-        'resource_description': 'HUD Multifamily Inspection Scores (Pennsylvania)',
+        'resource_description': f'Derived from https://www.hud.gov/program_offices/housing/mfh/rems/remsinspecscores/remsphysinspscores \n job_code: {MultifamilyInspectionsSchema1().job_code[:-2]}'
     },
     {
         'job_code': MultifamilyInspectionsSchema2().job_code, # 'mf_inspections_2'
@@ -1056,9 +1062,8 @@ job_dicts = [
         'destination': 'ckan',
         'destination_file': 'mf_inspections.csv',
         'package': housecat_package_id,
-        'resource_name': 'mf_inspections',
+        'resource_name': 'HUD Multifamily Inspection Scores (Pennsylvania)',
         'upload_method': 'insert',
-        'resource_description': 'HUD Multifamily Inspection Scores (Pennsylvania)',
     },
     {
         'job_code': MultifamilyInspectionsSchema3().job_code, # 'mf_inspections_3'
@@ -1073,9 +1078,8 @@ job_dicts = [
         'destination': 'ckan',
         'destination_file': 'mf_inspections.csv',
         'package': housecat_package_id,
-        'resource_name': 'mf_inspections',
+        'resource_name': 'HUD Multifamily Inspection Scores (Pennsylvania)',
         'upload_method': 'insert',
-        'resource_description': 'HUD Multifamily Inspection Scores (Pennsylvania)',
     },
 # All the jobs below are being commented out because the desired fields have not yet been identified.
 #    {
