@@ -16,8 +16,17 @@ except ImportError:  # Graceful fallback if IceCream isn't installed.
 
 def get_socrata_updated_date(url):
     r = requests.get(url)
-    updated_at_string = r.json()['updatedAt'] # There is a dataUpdatedAt field, but
+    update_field = 'updatedAt' # There is a dataUpdatedAt field, but
     # I'm not convinced that it actually reflects when data updates happen.
+
+    try:
+        updated_at_string = r.json()[update_field]
+    except JSONDecodeError: # Retry
+        import time
+        time.sleep(5)
+        r = requests.get(url)
+        updated_at_string = r.json()[update_field]
+
     updated_at_dt = parser.parse(updated_at_string)
     return updated_at_dt.date().isoformat()
 
