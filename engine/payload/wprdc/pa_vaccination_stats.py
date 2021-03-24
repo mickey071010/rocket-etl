@@ -45,8 +45,9 @@ class ByResidenceSchema(pl.BaseSchema):
     class Meta:
         ordered = True
 
-class ByAgeGroupSchema(pl.BaseSchema):
-    job_code = 'by_age_group'
+class OldByAgeGroupSchema(pl.BaseSchema):
+    # The State data portal totally changed the schema on ~2021-03-23. This schema no longer works.
+    job_code = 'old_by_age_group'
     date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/views/metadata/v1/niuh-2xe3")
     date_updated = fields.Date(dump_only=True, dump_to='date_updated', default=date_updated_from_site)
 
@@ -54,6 +55,55 @@ class ByAgeGroupSchema(pl.BaseSchema):
     age_group = fields.String(load_from='Age_Group'.lower(), dump_to='age_group')
     coverage = fields.String(load_from='Coverage'.lower(), dump_to='coverage')
     total_count = fields.Integer(load_from='Total_Count'.lower(), dump_to='total_count', allow_none=True)
+
+    class Meta:
+        ordered = True
+
+class ByAgeGroupSchema(pl.BaseSchema):
+    # The State data portal totally changed the schema on ~2021-03-23. This is the new schema.
+    job_code = 'by_age_group'
+    date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/views/metadata/v1/niuh-2xe3")
+    date_updated = fields.Date(dump_only=True, dump_to='date_updated', default=date_updated_from_site)
+
+    county_name = fields.String(load_from='County Name'.lower(), dump_to='county_name')
+    partially_covered_age_group_15_19 = fields.Integer(load_from='Partially Covered Age Group 15-19'.lower(), dump_to='partially_covered_age_group_15_19', allow_none=True)
+    partially_covered_age_group_20_24 = fields.Integer(load_from='Partially Covered Age Group 20-24'.lower(), dump_to='partially_covered_age_group_20_24', allow_none=True)
+    partially_covered_age_group_25_29 = fields.Integer(load_from='Partially Covered Age Group 25-29'.lower(), dump_to='partially_covered_age_group_25_29')
+    partially_covered_age_group_30_34 = fields.Integer(load_from='Partially Covered Age Group 30-34'.lower(), dump_to='partially_covered_age_group_30_34')
+    partially_covered_age_group_35_39 = fields.Integer(load_from='Partially Covered Age Group 35-39'.lower(), dump_to='partially_covered_age_group_35_39')
+    partially_covered_age_group_40_44 = fields.Integer(load_from='Partially Covered Age Group 40-44'.lower(), dump_to='partially_covered_age_group_40_44')
+    partially_covered_age_group_45_49 = fields.Integer(load_from='Partially Covered Age Group 45-49'.lower(), dump_to='partially_covered_age_group_45_49')
+    partially_covered_age_group_50_54 = fields.Integer(load_from='Partially Covered Age Group 50-54'.lower(), dump_to='partially_covered_age_group_50_54')
+    partially_covered_age_group_55_59 = fields.Integer(load_from='Partially Covered Age Group 55-59'.lower(), dump_to='partially_covered_age_group_55_59')
+    partially_covered_age_group_60_64 = fields.Integer(load_from='Partially Covered Age Group 60-64'.lower(), dump_to='partially_covered_age_group_60_64')
+    partially_covered_age_group_65_69 = fields.Integer(load_from='Partially Covered Age Group 65-69'.lower(), dump_to='partially_covered_age_group_65_69')
+    partially_covered_age_group_70_74 = fields.Integer(load_from='Partially Covered Age Group 70-74'.lower(), dump_to='partially_covered_age_group_70_74')
+    partially_covered_age_group_75_79 = fields.Integer(load_from='Partially Covered Age Group 75-79'.lower(), dump_to='partially_covered_age_group_75_79')
+    partially_covered_age_group_80_84 = fields.Integer(load_from='Partially Covered Age Group 80-84'.lower(), dump_to='partially_covered_age_group_80_84')
+    partially_covered_age_group_85_89 = fields.Integer(load_from='Partially Covered Age Group 85-89'.lower(), dump_to='partially_covered_age_group_85_89')
+    partially_covered_age_group_90_94 = fields.Integer(load_from='Partially Covered Age Group 90-94'.lower(), dump_to='partially_covered_age_group_90_94', allow_none=True)
+    partially_covered_age_group_95_99 = fields.Integer(load_from='Partially Covered Age Group 95-99'.lower(), dump_to='partially_covered_age_group_95_99', allow_none=True)
+    partially_covered_age_group_100_104 = fields.Integer(load_from='Partially Covered Age Group 100-104'.lower(), dump_to='partially_covered_age_group_100_104', allow_none=True)
+    partially_covered_age_group_105_plus = fields.Integer(load_from='Partially Covered Age Group 105-plus'.lower(), dump_to='partially_covered_age_group_105_plus', allow_none=True)
+    fully_covered_age_group_15_19 = fields.Integer(load_from='Fully Covered Age Group 15-19'.lower(), dump_to='fully_covered_age_group_15_19', allow_none=True)
+    fully_covered_age_group_20_24 = fields.Integer(load_from='Fully Covered Age Group 20-24'.lower(), dump_to='fully_covered_age_group_20_24')
+    fully_covered_age_group_25_29 = fields.Integer(load_from='Fully Covered Age Group 25-29'.lower(), dump_to='fully_covered_age_group_25_29')
+    fully_covered_age_group_30_34 = fields.Integer(load_from='Fully Covered Age Group 30-34'.lower(), dump_to='fully_covered_age_group_30_34')
+    fully_covered_age_group_35_39 = fields.Integer(load_from='Fully Covered Age Group 35-39'.lower(), dump_to='fully_covered_age_group_35_39')
+    fully_covered_age_group_40_44 = fields.Integer(load_from='Fully Covered Age Group 40-44'.lower(), dump_to='fully_covered_age_group_40_44')
+    fully_covered_age_group_45_49 = fields.Integer(load_from='Fully Covered Age Group 45-49'.lower(), dump_to='fully_covered_age_group_45_49')
+    fully_covered_age_group_50_54 = fields.Integer(load_from='Fully Covered Age Group 50-54'.lower(), dump_to='fully_covered_age_group_50_54')
+    fully_covered_age_group_55_59 = fields.Integer(load_from='Fully Covered Age Group 55-59'.lower(), dump_to='fully_covered_age_group_55_59')
+    fully_covered_age_group_60_64 = fields.Integer(load_from='Fully Covered Age Group 60-64'.lower(), dump_to='fully_covered_age_group_60_64')
+    fully_covered_age_group_65_69 = fields.Integer(load_from='Fully Covered Age Group 65-69'.lower(), dump_to='fully_covered_age_group_65_69')
+    fully_covered_age_group_70_74 = fields.Integer(load_from='Fully Covered Age Group 70-74'.lower(), dump_to='fully_covered_age_group_70_74')
+    fully_covered_age_group_75_79 = fields.Integer(load_from='Fully Covered Age Group 75-79'.lower(), dump_to='fully_covered_age_group_75_79')
+    fully_covered_age_group_80_84 = fields.Integer(load_from='Fully Covered Age Group 80-84'.lower(), dump_to='fully_covered_age_group_80_84')
+    fully_covered_age_group_85_89 = fields.Integer(load_from='Fully Covered Age Group 85-89'.lower(), dump_to='fully_covered_age_group_85_89')
+    fully_covered_age_group_94_94 = fields.Integer(load_from='Fully Covered Age Group 94-94'.lower(), dump_to='fully_covered_age_group_94_94')
+    fully_covered_age_group_95_99 = fields.Integer(load_from='Fully Covered Age Group 95-99'.lower(), dump_to='fully_covered_age_group_95_99', allow_none=True)
+    fully_covered_age_group_100_104 = fields.Integer(load_from='Fully Covered Age Group 100-104'.lower(), dump_to='fully_covered_age_group_100_104', allow_none=True)
+    fully_covered_age_group_105_plus = fields.Integer(load_from='Fully Covered Age Group 105-plus'.lower(), dump_to='fully_covered_age_group_105_plus', allow_none=True)
 
     class Meta:
         ordered = True
@@ -196,7 +246,7 @@ job_dicts = [
         'source_file': 'COVID-19_Vaccinations_by_Age_Group_Current_County_Health.csv',
         'source_full_url': 'https://data.pa.gov/api/views/niuh-2xe3/rows.csv?accessType=DOWNLOAD&api_foundry=true',
         'schema': ByAgeGroupSchema,
-        'primary_key_fields': ['date_updated', 'county', 'age_group', 'coverage'],
+        'primary_key_fields': ['date_updated', 'county_name'],
         'destination': 'ckan',
         'destination_file': 'vaccinations_by_age_group.csv',
         'package': vaccinations_stats_archive_package_id,
