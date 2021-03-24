@@ -219,6 +219,133 @@ class ByEthnicityStatewideSchema(pl.BaseSchema):
     class Meta:
         ordered = True
 
+class Dose1AllocationByClinicSchema(pl.BaseSchema):
+    job_code = 'dose_1_by_clinic'
+    date_saved = fields.Date(dump_only=True, dump_to='date_saved', default=datetime.now().date().isoformat())
+
+    covid_19_vaccine_clinic_name = fields.String(load_from='COVID_19_Vaccine_Clinic_Name'.lower(), dump_to='covid_19_vaccine_clinic_name')
+    street_address = fields.String(load_from='Street Address'.lower(), dump_to='street_address')
+    city = fields.String(load_from='City'.lower(), dump_to='city')
+    state = fields.String(load_from='State'.lower(), dump_to='state')
+    zip_code = fields.String(load_from='ZIP Code'.lower(), dump_to='zip_code')
+    county_name = fields.String(load_from='County Name'.lower(), dump_to='county_name')
+    data_as_of_date = fields.Date(load_from='Data as of Date'.lower(), dump_to='data_as_of_date')
+    clinic_website = fields.String(load_from='Clinic Website'.lower(), dump_to='clinic_web_site', allow_none=True)
+    phone_number = fields.String(load_from='Phone Number'.lower(), dump_to='phone_number', allow_none=True)
+    number_of_doses_allocated = fields.Integer(load_from='Number of Doses Allocated'.lower(), dump_to='number_of_doses_allocated', allow_none=True)
+    federal_allocation = fields.Boolean(load_from='Federal Allocation'.lower(), dump_to='federal_allocation')
+    georeferenced_latitude_longitude = fields.String(load_from='Georeferenced Latitude & Longitude'.lower(), load_only=True, allow_none=True)
+    latitude = fields.Float(load_from='Georeferenced Latitude & Longitude'.lower(), dump_to='latitude', allow_none=True)
+    longitude = fields.Float(dump_to='longitude', allow_none=True)
+
+    date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/views/metadata/v1/qsii-pka7")
+    date_updated = fields.Date(dump_only=True, dump_to='date_updated', default=date_updated_from_site)
+
+    class Meta:
+        ordered = True
+
+    @pre_load
+    def fix_geocoordinates(self, data):
+        if data['georeferenced_latitude_&_longitude'] is not None:
+            s = re.sub('POINT \(', '', data['georeferenced_latitude_&_longitude'])
+            coords = re.sub('\)', '', s).split(' ')
+            data['latitude'] = coords[1]
+            data['longitude'] = coords[0]
+
+    @pre_load
+    def fix_date(self, data):
+        f = 'data_as_of_date'
+        if data[f] is not None:
+            data[f] = parser.parse(data[f]).date().isoformat()
+
+    @post_load
+    def fix_state(self, data):
+        f = 'state'
+        if data[f] in ['Pa']:
+            data[f] = 'Pennsylvania'
+
+class Dose2AllocationByClinicSchema(pl.BaseSchema):
+    job_code = 'dose_2_by_clinic'
+    date_saved = fields.Date(dump_only=True, dump_to='date_saved', default=datetime.now().date().isoformat())
+
+    clinic_name = fields.String(load_from='Clinic Name'.lower(), dump_to='clinic_name')
+    clinic_address = fields.String(load_from='Clinic Address'.lower(), dump_to='clinic_address')
+    clinic_suite = fields.String(load_from='Clinic Suite'.lower(), dump_to='clinic_suite', allow_none=True)
+    clinic_address_additional = fields.String(load_from='Clinic Address Additional'.lower(), dump_to='clinic_address_additional', allow_none=True)
+    clinic_city = fields.String(load_from='Clinic City'.lower(), dump_to='clinic_city')
+    clinic_state = fields.String(load_from='Clinic State'.lower(), dump_to='clinic_state')
+    clinic_zip_code = fields.Integer(load_from='Clinic Zip Code'.lower(), dump_to='clinic_zip_code')
+    county_name = fields.String(load_from='County Name'.lower(), dump_to='county_name')
+    number_of_doses_allocated = fields.Integer(load_from='Number of Doses Allocated'.lower(), dump_to='number_of_doses_allocated', allow_none=True)
+    most_recent_order_date = fields.Date(load_from='Most Recent Order Date'.lower(), dump_to='most_recent_order_date', allow_none=True)
+    georeferenced_latitude_longitude = fields.String(load_from='Georeferenced Latitude & Longitude'.lower(), load_only=True, allow_none=True)
+    latitude = fields.Float(load_from='Georeferenced Latitude & Longitude'.lower(), dump_to='latitude', allow_none=True)
+    longitude = fields.Float(dump_to='longitude', allow_none=True)
+
+    date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/views/metadata/v1/8jae-5d8i")
+    date_updated = fields.Date(dump_only=True, dump_to='date_updated', default=date_updated_from_site)
+
+    class Meta:
+        ordered = True
+
+    @pre_load
+    def fix_geocoordinates(self, data):
+        if data['georeferenced_latitude_&_longitude'] is not None:
+            s = re.sub('POINT \(', '', data['georeferenced_latitude_&_longitude'])
+            coords = re.sub('\)', '', s).split(' ')
+            data['latitude'] = coords[1]
+            data['longitude'] = coords[0]
+
+    @pre_load
+    def fix_date(self, data):
+        f = 'most_recent_order_date'
+        if data[f] is not None:
+            data[f] = parser.parse(data[f]).date().isoformat()
+
+    @post_load
+    def fix_state(self, data):
+        f = 'clinic_state'
+        if data[f] in ['Pa']:
+            data[f] = 'Pennsylvania'
+
+class AllocationByPharmacySchema(pl.BaseSchema):
+    job_code = 'pharmacy_allocation'
+    date_saved = fields.Date(dump_only=True, dump_to='date_saved', default=datetime.now().date().isoformat())
+
+    retail_pharmacy_partner_name = fields.String(load_from='Retail Pharmacy Partner Name'.lower(), dump_to='retail_pharmacy_partner_name')
+    address_1 = fields.String(load_from='Address 1'.lower(), dump_to='address_1', allow_none=True)
+    address_2 = fields.String(load_from='Address 2'.lower(), dump_to='address_2', allow_none=True)
+    city = fields.String(load_from='City'.lower(), dump_to='city')
+    county = fields.String(load_from='County'.lower(), dump_to='county')
+    state = fields.String(load_from='State'.lower(), dump_to='state')
+    zip_code = fields.String(load_from='Zip Code'.lower(), dump_to='zip_code')
+    vaccine = fields.String(load_from='Vaccine'.lower(), dump_to='vaccine')
+    date = fields.Date(load_from='Date'.lower(), dump_to='date')
+    doses = fields.Integer(load_from='Doses'.lower(), dump_to='doses')
+    georeferenced_latitude_longitude = fields.String(load_from='Georeferenced Latitude & Longitude'.lower(), load_only=True, allow_none=True)
+    latitude = fields.Float(load_from='Georeferenced Latitude & Longitude'.lower(), dump_to='latitude', allow_none=True)
+    longitude = fields.Float(dump_to='longitude', allow_none=True)
+
+    date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/views/metadata/v1/vxbs-jbjq")
+    date_updated = fields.Date(dump_only=True, dump_to='date_updated', default=date_updated_from_site)
+
+    class Meta:
+        ordered = True
+
+    @pre_load
+    def fix_geocoordinates(self, data):
+        if data['georeferenced_latitude_&_longitude'] is not None:
+            s = re.sub('POINT \(', '', data['georeferenced_latitude_&_longitude'])
+            coords = re.sub('\)', '', s).split(' ')
+            data['latitude'] = coords[1]
+            data['longitude'] = coords[0]
+
+    @pre_load
+    def fix_date(self, data):
+        f = 'date'
+        if data[f] is not None:
+            data[f] = parser.parse(data[f]).date().isoformat()
+
 # dfg
 
 vaccinations_stats_weekly_archive_package_id = '78dfb4f8-2ad5-4a7c-af4c-a5982e475a8a'
@@ -363,6 +490,71 @@ job_dicts = [
         'resource_name': 'COVID-19 Vaccinations by Ethnicity Current Statewide Health (archive)',
         'upload_method': 'upsert',
         'resource_description': 'Archive of data from https://data.pa.gov/Health/COVID-19-Vaccinations-by-Ethnicity-Current-Statewi/u8hy-smfm',
+    },
+        {
+        'job_code': Dose1AllocationByClinicSchema().job_code, # 'dose_1_by_clinic'
+        'source_type': 'http',
+        'source_file': 'COVID-19_Weekly_1st_Dose_Vaccine_Allocated_by_Pennsylvania_to_Providers_Current_Health.csv',
+        'source_full_url': 'https://data.pa.gov/api/views/qsii-pka7/rows.csv?accessType=DOWNLOAD&api_foundry=true',
+        'schema': Dose1AllocationByClinicSchema,
+        'primary_key_fields': ['date_saved', 'covid_19_vaccine_clinic_name', 'street_address', 'zip_code'], # What about data_as_of_date as a date_updated surrogate?
+        'destination': 'ckan',
+        'destination_file': 'weekly_dose_1_by_clinic.csv',
+        'package': vaccinations_stats_weekly_archive_package_id,
+        'resource_name': 'COVID-19 Weekly 1st Dose Vaccine Allocated by Pennsylvania to Providers Current Health (archive)',
+        'upload_method': 'upsert',
+        'resource_description': 'Archive of data from https://data.pa.gov/Health/COVID-19-Weekly-1st-Dose-Vaccine-Allocated-by-Penn/qsii-pka7',
+    },
+    {
+        'job_code': Dose2AllocationByClinicSchema().job_code, # 'dose_2_by_clinic'
+        'source_type': 'http',
+        'source_file': 'COVID-19_Pennsylvania_Vaccine_Providers_2nd_Dose_Vaccine_Allocation_Current_Health.csv',
+        'source_full_url': 'https://data.pa.gov/api/views/8jae-5d8i/rows.csv?accessType=DOWNLOAD&api_foundry=true',
+        'schema': Dose2AllocationByClinicSchema,
+        'primary_key_fields': ['date_saved', 'clinic_name', 'clinic_address', 'clinic_zip_code'], # What about most_recent_order_date as a date_updated surrogate?
+        'destination': 'ckan',
+        'destination_file': 'weekly_dose_2_by_clinic.csv',
+        'package': vaccinations_stats_weekly_archive_package_id,
+        'resource_name': 'COVID-19 Pennsylvania Vaccine Providers 2nd Dose Vaccine Allocation Current Health (archive)',
+        'upload_method': 'upsert',
+        'resource_description': 'Archive of data from https://data.pa.gov/Health/COVID-19-Pennsylvania-Vaccine-Providers-2nd-Dose-V/8jae-5d8i',
+    },
+    { # There are two reasons this dataset is not archiveable as easily as the others.
+    # 1) The unwieldy wide (1st clinic date, 2nd clinic date, 3rd clinic date,...) format
+    # 2) There are no good primary keys. Some clinics appear with the same name/address in 3 different rows (for no evident reason).
+    # HOWEVER, this is already a cumulative dataset (like the by_day one above), so just mirror it.
+
+    # The problem with the wide format is that the schema would have to be regenerated from the dataset each time,
+    # so let's just upload the CSV file.
+        'job_code': 'long_term_care_v',
+        'source_type': 'http',
+        'source_file': 'COVID-19_Federal_Pharmacy_Partners_Long_Term_Care_Facility_Vaccine_Clinics_Current_Health.csv',
+        'source_full_url': 'https://data.pa.gov/api/views/iwiy-rwzp/rows.csv?accessType=DOWNLOAD&api_foundry=true',
+        'schema': None,
+        #'primary_key_fields': No good primary keys.
+        'always_wipe_data': True,
+        'destination': 'ckan_filestore',
+        'destination_file': 'weekly_long_term_care_vaccinations.csv',
+        'package': vaccinations_stats_weekly_archive_package_id,
+        'resource_name': 'COVID-19 Federal Pharmacy Partners Long-Term Care Facility Vaccine Clinics Current Health (mirror)',
+        'resource_description': 'Straight duplication of CSV file from https://data.pa.gov/Health/COVID-19-Federal-Pharmacy-Partners-Long-Term-Care-/iwiy-rwzp',
+    },
+    {
+    # This is another already cumulative dataset that does not require cumulative archiving.
+        'job_code': AllocationByPharmacySchema().job_code, # 'pharmacy_allocation'
+        'source_type': 'http',
+        'source_file': 'COVID-19_Retail_Pharmacy_Partners_Vaccine_Allocation_Current_Health.csv',
+        'source_full_url': 'https://data.pa.gov/api/views/vxbs-jbjq/rows.csv?accessType=DOWNLOAD&api_foundry=true',
+        'schema': AllocationByPharmacySchema,
+        #'primary_key_fields': ['date', 'retail_pharmacy_partner_name', 'address_1', 'zip_code', 'vaccine'], # <= While this would work, it's not necessary
+        # to cumulatively archive this one.
+        'always_wipe_data': True,
+        'destination': 'ckan',
+        'destination_file': 'weekly_pharmacy_allocation.csv',
+        'package': vaccinations_stats_weekly_archive_package_id,
+        'resource_name': 'COVID-19 Retail Pharmacy Partners Vaccine Allocation Current Health (mirror)',
+        'upload_method': 'insert',
+        'resource_description': 'Archive of data from https://data.pa.gov/Health/COVID-19-Retail-Pharmacy-Partners-Vaccine-Allocati/vxbs-jbjq',
     },
 ]
 
