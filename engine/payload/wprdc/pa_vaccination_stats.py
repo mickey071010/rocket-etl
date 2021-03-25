@@ -187,14 +187,31 @@ class ByDayAndCountySchema(pl.BaseSchema):
         if f in data and data[f] is not None:
             data[f] = re.sub(',', '', data[f])
 
-class ByGenderSchema(pl.BaseSchema):
-    job_code = 'by_gender'
+class OldByGenderSchema(pl.BaseSchema):
+    # Old schema made obsolete by source-data schema change on ~2021-03-24.
+    job_code = 'old_by_gender'
     date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/views/metadata/v1/jweg-3ezy")
     date_updated = fields.Date(dump_only=True, dump_to='date_updated', default=date_updated_from_site)
     county = fields.String(load_from='County_Name'.lower(), dump_to='county')
     gender = fields.String(load_from='Gender'.lower(), dump_to='gender')
     coverage = fields.String(load_from='Coverage'.lower(), dump_to='coverage')
     total_count = fields.Integer(load_from='Total_Count'.lower(), dump_to='total_count', allow_none=True)
+
+    class Meta:
+        ordered = True
+
+class ByGenderSchema(pl.BaseSchema):
+    # New schema necessitated by source-data schema change on ~2021-03-24.
+    job_code = 'by_gender'
+    date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/views/metadata/v1/jweg-3ezy")
+    date_updated = fields.Date(dump_only=True, dump_to='date_updated', default=date_updated_from_site)
+    county_name = fields.String(load_from='County Name'.lower(), dump_to='county_name')
+    partially_covered_female = fields.Integer(load_from='Partially Covered Female'.lower(), dump_to='partially_covered_female')
+    partially_covered_male = fields.Integer(load_from='Partially Covered Male'.lower(), dump_to='partially_covered_male')
+    partially_covered_unknown = fields.Integer(load_from='Partially Covered Unknown'.lower(), dump_to='partially_covered_unknown', allow_none=True)
+    fully_covered_female = fields.Integer(load_from='Fully Covered Female'.lower(), dump_to='fully_covered_female')
+    fully_covered_male = fields.Integer(load_from='Fully Covered Male'.lower(), dump_to='fully_covered_male')
+    fully_covered_unknown = fields.Integer(load_from='Fully Covered Unknown'.lower(), dump_to='fully_covered_unknown', allow_none=True)
 
     class Meta:
         ordered = True
@@ -210,14 +227,31 @@ class ByGenderStatewideSchema(pl.BaseSchema):
     class Meta:
         ordered = True
 
-class ByEthnicitySchema(pl.BaseSchema):
-    job_code = 'by_ethnicity'
+class OldByEthnicitySchema(pl.BaseSchema):
+    # Old schema made obsolete by source-data schema change on ~2021-03-24.
+    job_code = 'old_by_ethnicity'
     date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/views/metadata/v1/7ruj-m7k6")
     date_updated = fields.Date(dump_only=True, dump_to='date_updated', default=date_updated_from_site)
     county = fields.String(load_from='County_Name'.lower(), dump_to='county')
     ethnicity = fields.String(load_from='Ethnicity'.lower(), dump_to='ethnicity')
     coverage = fields.String(load_from='Coverage'.lower(), dump_to='coverage')
     total_count = fields.Integer(load_from='Total_Count'.lower(), dump_to='total_count', allow_none=True)
+
+    class Meta:
+        ordered = True
+
+class ByEthnicitySchema(pl.BaseSchema):
+    # New schema necessitated by source-data schema change on ~2021-03-24.
+    job_code = 'by_ethnicity'
+    date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/views/metadata/v1/7ruj-m7k6")
+    date_updated = fields.Date(dump_only=True, dump_to='date_updated', default=date_updated_from_site)
+    county_name = fields.String(load_from='County Name'.lower(), dump_to='county_name')
+    partially_covered_hispanic = fields.Integer(load_from='Partially Covered Hispanic'.lower(), dump_to='partially_covered_hispanic', allow_none=True)
+    partially_covered_not_hispanic = fields.Integer(load_from='Partially Covered Not Hispanic'.lower(), dump_to='partially_covered_not_hispanic')
+    partially_covered_unknown = fields.Integer(load_from='Partially Covered Unknown'.lower(), dump_to='partially_covered_unknown')
+    fully_covered_hispanic = fields.Integer(load_from='Fully Covered Hispanic'.lower(), dump_to='fully_covered_hispanic', allow_none=True)
+    fully_covered_not_hispanic = fields.Integer(load_from='Fully Covered Not Hispanic'.lower(), dump_to='fully_covered_not_hispanic')
+    fully_covered_unknown = fields.Integer(load_from='Fully Covered Unknown'.lower(), dump_to='fully_covered_unknown')
 
     class Meta:
         ordered = True
@@ -449,7 +483,7 @@ job_dicts = [
         'source_file': 'COVID-19_Vaccinations_by_Gender_Current_County_Health.csv',
         'source_full_url': 'https://data.pa.gov/api/views/jweg-3ezy/rows.csv?accessType=DOWNLOAD&api_foundry=true',
         'schema': ByGenderSchema,
-        'primary_key_fields': ['date_updated', 'county', 'gender', 'coverage'],
+        'primary_key_fields': ['date_updated', 'county_name'],
         'destination': 'ckan',
         'destination_file': 'vaccinations_by_gender.csv',
         'package': vaccinations_stats_archive_package_id,
@@ -477,7 +511,7 @@ job_dicts = [
         'source_file': 'COVID-19_Vaccinations_by_Ethnicity_Current_County_Health.csv',
         'source_full_url': 'https://data.pa.gov/api/views/7ruj-m7k6/rows.csv?accessType=DOWNLOAD&api_foundry=true',
         'schema': ByEthnicitySchema,
-        'primary_key_fields': ['date_updated', 'county', 'ethnicity', 'coverage'],
+        'primary_key_fields': ['date_updated', 'county_name'],
         'destination': 'ckan',
         'destination_file': 'vaccinations_by_ethnicity.csv',
         'package': vaccinations_stats_archive_package_id,
