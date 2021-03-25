@@ -63,6 +63,7 @@ class ByResidenceSchema(pl.BaseSchema):
         ordered = True
 
 class OldByAgeGroupSchema(pl.BaseSchema):
+    # Old schema made obsolete by source data change on ~2021-03-23.
     job_code = 'old_by_age_group'
     date_saved = fields.Date(dump_only=True, dump_to='date_saved', default=datetime.now().date().isoformat())
 
@@ -77,6 +78,7 @@ class OldByAgeGroupSchema(pl.BaseSchema):
         ordered = True
 
 class ByAgeGroupSchema(pl.BaseSchema):
+    # New schema necessitated by source data change on ~2021-03-23.
     job_code = 'by_age_group'
     date_saved = fields.Date(dump_only=True, dump_to='date_saved', default=datetime.now().date().isoformat())
 
@@ -138,14 +140,41 @@ class ByAgeGroupStatewideSchema(pl.BaseSchema):
     class Meta:
         ordered = True
 
-class ByRaceSchema(pl.BaseSchema):
-    job_code = 'by_race'
+class OldByRaceSchema(pl.BaseSchema):
+    # Old schema made obsolete by source data change on ~2021-03-24.
+    job_code = 'old_by_race'
     date_saved = fields.Date(dump_only=True, dump_to='date_saved', default=datetime.now().date().isoformat())
 
     county = fields.String(load_from='County_Name'.lower(), dump_to='county')
     race = fields.String(load_from='Race'.lower(), dump_to='race')
     coverage = fields.String(load_from='Coverage'.lower(), dump_to='coverage')
     total_count = fields.Integer(load_from='Total_Count'.lower(), dump_to='total_count', allow_none=True)
+    date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/views/metadata/v1/x5z9-57ub")
+    date_updated = fields.Date(dump_only=True, dump_to='date_updated', default=date_updated_from_site)
+
+    class Meta:
+        ordered = True
+
+class ByRaceSchema(pl.BaseSchema):
+    # New schema necessitated by source data change on ~2021-03-24.
+    job_code = 'by_race'
+    date_saved = fields.Date(dump_only=True, dump_to='date_saved', default=datetime.now().date().isoformat())
+
+    county_name = fields.String(load_from='County Name'.lower(), dump_to='county_name')
+    partially_covered_african_american = fields.Integer(load_from='Partially Covered African American'.lower(), dump_to='partially_covered_african_american', allow_none=True)
+    partially_covered_asian = fields.Integer(load_from='Partially Covered Asian'.lower(), dump_to='partially_covered_asian', allow_none=True)
+    partially_covered_native_american = fields.Integer(load_from='Partially Covered Native American'.lower(), dump_to='partially_covered_native_american', allow_none=True)
+    partially_covered_pacific_islander = fields.Integer(load_from='Partially Covered Pacific Islander'.lower(), dump_to='partially_covered_pacific_islander', allow_none=True)
+    partially_covered_multiple_other = fields.Integer(load_from='Partially Covered Multiple Other'.lower(), dump_to='partially_covered_multiple_other', allow_none=True)
+    partially_covered_white = fields.Integer(load_from='Partially Covered White'.lower(), dump_to='partially_covered_white')
+    partially_covered__unknown = fields.Integer(load_from='Partially Covered__Unknown'.lower(), dump_to='partially_covered_unknown')
+    fully_covered_african_american = fields.Integer(load_from='Fully Covered African American'.lower(), dump_to='fully_covered_african_american', allow_none=True)
+    fully_covered_asian = fields.Integer(load_from='Fully Covered Asian'.lower(), dump_to='fully_covered_asian', allow_none=True)
+    fully_covered_native_american = fields.Integer(load_from='Fully Covered Native American'.lower(), dump_to='fully_covered_native_american', allow_none=True)
+    fully_covered_pacific_islander = fields.Integer(load_from='Fully Covered Pacific Islander'.lower(), dump_to='fully_covered_pacific_islander', allow_none=True)
+    fully_covered_multiple_other = fields.Integer(load_from='Fully Covered Multiple Other'.lower(), dump_to='fully_covered_multiple_other')
+    fully_covered_white = fields.Integer(load_from='Fully Covered White'.lower(), dump_to='fully_covered_white')
+    fully_covered_unknown = fields.Integer(load_from='Fully Covered Unknown'.lower(), dump_to='fully_covered_unknown')
     date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/views/metadata/v1/x5z9-57ub")
     date_updated = fields.Date(dump_only=True, dump_to='date_updated', default=date_updated_from_site)
 
@@ -413,7 +442,7 @@ job_dicts = [
         'source_file': 'COVID-19_Vaccinations_by_Race_Current_County_Health.csv',
         'source_full_url': 'https://data.pa.gov/api/views/x5z9-57ub/rows.csv?accessType=DOWNLOAD&api_foundry=true',
         'schema': ByRaceSchema,
-        'primary_key_fields': ['date_saved', 'county', 'race', 'coverage'],
+        'primary_key_fields': ['date_saved', 'county_name'],
         'destination': 'ckan',
         'destination_file': 'weekly_vaccinations_by_race.csv',
         'package': vaccinations_stats_weekly_archive_package_id,

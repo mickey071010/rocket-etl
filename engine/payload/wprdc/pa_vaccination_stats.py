@@ -120,8 +120,9 @@ class ByAgeGroupStatewideSchema(pl.BaseSchema):
     class Meta:
         ordered = True
 
-class ByRaceSchema(pl.BaseSchema):
-    job_code = 'by_race'
+class OldByRaceSchema(pl.BaseSchema):
+    # The State data portal totally changed the schema on ~2021-03-24. This schema no longer works.
+    job_code = 'old_by_race'
     date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/views/metadata/v1/x5z9-57ub")
     date_updated = fields.Date(dump_only=True, dump_to='date_updated', default=date_updated_from_site)
 
@@ -129,6 +130,31 @@ class ByRaceSchema(pl.BaseSchema):
     race = fields.String(load_from='Race'.lower(), dump_to='race')
     coverage = fields.String(load_from='Coverage'.lower(), dump_to='coverage')
     total_count = fields.Integer(load_from='Total_Count'.lower(), dump_to='total_count', allow_none=True)
+
+    class Meta:
+        ordered = True
+
+class ByRaceSchema(pl.BaseSchema):
+    # The State data portal totally changed the schema on ~2021-03-24. This is the new schema.
+    job_code = 'by_race'
+    date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/views/metadata/v1/x5z9-57ub")
+    date_updated = fields.Date(dump_only=True, dump_to='date_updated', default=date_updated_from_site)
+
+    county_name = fields.String(load_from='County Name'.lower(), dump_to='county_name')
+    partially_covered_african_american = fields.Integer(load_from='Partially Covered African American'.lower(), dump_to='partially_covered_african_american', allow_none=True)
+    partially_covered_asian = fields.Integer(load_from='Partially Covered Asian'.lower(), dump_to='partially_covered_asian', allow_none=True)
+    partially_covered_native_american = fields.Integer(load_from='Partially Covered Native American'.lower(), dump_to='partially_covered_native_american', allow_none=True)
+    partially_covered_pacific_islander = fields.Integer(load_from='Partially Covered Pacific Islander'.lower(), dump_to='partially_covered_pacific_islander', allow_none=True)
+    partially_covered_multiple_other = fields.Integer(load_from='Partially Covered Multiple Other'.lower(), dump_to='partially_covered_multiple_other', allow_none=True)
+    partially_covered_white = fields.Integer(load_from='Partially Covered White'.lower(), dump_to='partially_covered_white')
+    partially_covered__unknown = fields.Integer(load_from='Partially Covered__Unknown'.lower(), dump_to='partially_covered_unknown')
+    fully_covered_african_american = fields.Integer(load_from='Fully Covered African American'.lower(), dump_to='fully_covered_african_american', allow_none=True)
+    fully_covered_asian = fields.Integer(load_from='Fully Covered Asian'.lower(), dump_to='fully_covered_asian', allow_none=True)
+    fully_covered_native_american = fields.Integer(load_from='Fully Covered Native American'.lower(), dump_to='fully_covered_native_american', allow_none=True)
+    fully_covered_pacific_islander = fields.Integer(load_from='Fully Covered Pacific Islander'.lower(), dump_to='fully_covered_pacific_islander', allow_none=True)
+    fully_covered_multiple_other = fields.Integer(load_from='Fully Covered Multiple Other'.lower(), dump_to='fully_covered_multiple_other')
+    fully_covered_white = fields.Integer(load_from='Fully Covered White'.lower(), dump_to='fully_covered_white')
+    fully_covered_unknown = fields.Integer(load_from='Fully Covered Unknown'.lower(), dump_to='fully_covered_unknown')
 
     class Meta:
         ordered = True
@@ -395,7 +421,7 @@ job_dicts = [
         'source_file': 'COVID-19_Vaccinations_by_Race_Current_County_Health.csv',
         'source_full_url': 'https://data.pa.gov/api/views/x5z9-57ub/rows.csv?accessType=DOWNLOAD&api_foundry=true',
         'schema': ByRaceSchema,
-        'primary_key_fields': ['date_updated', 'county', 'race', 'coverage'],
+        'primary_key_fields': ['date_updated', 'county_name'],
         'destination': 'ckan',
         'destination_file': 'vaccinations_by_race.csv',
         'package': vaccinations_stats_archive_package_id,
