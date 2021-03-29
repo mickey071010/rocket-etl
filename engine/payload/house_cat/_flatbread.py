@@ -188,7 +188,7 @@ class HUDPublicHousingSchema(pl.BaseSchema):
     tract_level = fields.String(load_from='TRACT_LEVEL'.lower(),dump_to='census_tract', allow_none=True)
     curcosub = fields.String(load_from='CURCOSUB'.lower(),dump_to='municipality_fips', allow_none=True)
     curcosub_nm = fields.String(load_from='CURCOSUB_NM'.lower(),dump_to='municipality_name', allow_none=True)
-    hud_property_name =  fields.String(load_from='PROJECT_NAME'.lower(), dump_to='hud_property_name')
+    hud_property_name = fields.String(load_from='PROJECT_NAME'.lower(), dump_to='hud_property_name')
     property_street_address = fields.String(load_from='STD_ADDR'.lower(), dump_to='property_street_address', allow_none=True)
     city = fields.String(load_from='STD_CITY'.lower(), dump_to='city')
     state = fields.String(load_from='STD_ST'.lower(), dump_to='state')
@@ -934,7 +934,7 @@ job_dicts = [
         'destination': 'ckan',
         'destination_file': 'public_housing_projects.csv',
         'package': housecat_package_id,
-        'resource_name': 'HUD Public Housing Developments (Allegheny County)',
+        'resource_name': 'HUD Public Housing Developments (Pennsylvania)',
         'upload_method': 'insert',
         'resource_description': f'Derived from https://hudgis-hud.opendata.arcgis.com/datasets/public-housing-developments', #\n\njob code: {HUDPublicHousingProjectsSchema().job_code}',
     },
@@ -981,13 +981,13 @@ job_dicts = [
         'encoding': 'binary',
         'rows_to_skip': 0,
         'schema': MultifamilyProjectsSubsidySection8Schema,
-        'filters': [['state_code', '==', 'PA']], # use 'county_code == 3' to limit to Allegheny County
+        'filters': [['state_code', '==', 'PA'], ['county_code', '==', 3]], # use 'county_code == 3' to limit to Allegheny County
         'always_wipe_data': True,
         #'primary_key_fields': ['property_id'],
         'destination': 'ckan',
         'destination_file': 'mf_subsidy_8.csv',
         'package': housecat_package_id,
-        'resource_name': 'Subsidy extract from Multifamily Assistance & Section 8 Contracts (Pennsylvania)',
+        'resource_name': 'Subsidy extract from Multifamily Assistance & Section 8 Contracts (Allegheny County)',
         'upload_method': 'insert',
         'resource_description': f'Derived from https://www.hud.gov/program_offices/housing/mfh/exp/mfhdiscl', #'\n\njob code: {MultifamilyProjectsSubsidySection8Schema().job_code}',
     },
