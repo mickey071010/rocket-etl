@@ -25,6 +25,17 @@ def get_files_in_folder(path):
 def intersection(lst1, lst2):
     return list(set(lst1) & set(lst2))
 
+def add_row_to_linking_dict(f, row, id_field, fields_to_get, ac_by_id):
+    ac_by_id[row[id_field]][id_field] = row[id_field]
+    if 'source_file' not in ac_by_id[row[id_field]]:
+        ac_by_id[row[id_field]]['source_file'] = f
+    else:
+        ac_by_id[row[id_field]]['source_file'] += '|' + f
+
+    for field in fields_to_get:
+        if field in row and row[field] not in [None, '']:
+            ac_by_id[row[id_field]][field] = row[field]
+
 files = get_files_in_folder(path)
 keys_by_file = defaultdict(list)
 files_by_key = defaultdict(list)
@@ -99,15 +110,7 @@ for f in files:
         with open(f'{path}/{f}', 'r') as g:
             reader = csv.DictReader(g)
             for row in reader:
-                mf_ac_by_property_id[row[id_field]][id_field] = row[id_field]
-                if 'source_file' not in mf_ac_by_property_id[row[id_field]]:
-                    mf_ac_by_property_id[row[id_field]]['source_file'] = f
-                else:
-                    mf_ac_by_property_id[row[id_field]]['source_file'] += '|' + f
-
-                for field in fields_to_get:
-                    if field in row and row[field] not in [None, '']:
-                        mf_ac_by_property_id[row[id_field]][field] = row[field]
+                add_row_to_linking_dict(f, row, id_field, fields_to_get, mf_ac_by_property_id)
 
 master_list = [v for k, v in mf_ac_by_property_id.items()]
 
@@ -169,15 +172,7 @@ with open(f'{path}/{f}', 'r') as g:
         in_allegheny_county = in_allegheny_county or (row[id_field] in ['PAA19890800', 'PAA19900328', 'PAA19910120'])
         # Additional inclusions could be made based on latitude+longitude or city or zip_code
         if in_allegheny_county:
-            ac_by_id[row[id_field]][id_field] = row[id_field]
-            if 'source_file' not in ac_by_id[row[id_field]]:
-                ac_by_id[row[id_field]]['source_file'] = f
-            else:
-                ac_by_id[row[id_field]]['source_file'] += '|' + f
-
-            for field in fields_to_get:
-                if field in row and row[field] not in [None, '']:
-                    ac_by_id[row[id_field]][field] = row[field]
+            add_row_to_linking_dict(f, row, id_field, fields_to_get, ac_by_id)
 
 lihtc_projects = [v for k, v in ac_by_id.items()]
 master_list += lihtc_projects
