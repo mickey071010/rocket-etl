@@ -928,13 +928,13 @@ job_dicts = [
         'source_full_url': get_arcgis_data_url('https://hudgis-hud.opendata.arcgis.com/data.json', 'Public Housing Developments', 'CSV')[0],
         'encoding': 'utf-8',
         'schema': HUDPublicHousingProjectsSchema,
-        'filters': [['std_st', '==', 'PA']], # Coordinates could be used to filter to Allegheny County.
+        'filters': [['county_level', '==', '42003'], ['std_st', '==', 'PA']],
         'always_wipe_data': True,
         #'primary_key_fields': # DEVELOPMENT_CODE seems like a possible unique key.
         'destination': 'ckan',
-        'destination_file': 'public_housing_projects_pa.csv',
+        'destination_file': 'public_housing_projects_ac.csv',
         'package': housecat_package_id,
-        'resource_name': 'HUD Public Housing Developments (Pennsylvania)',
+        'resource_name': 'HUD Public Housing Developments (Allegheny County)',
         'upload_method': 'insert',
         'resource_description': f'Derived from https://hudgis-hud.opendata.arcgis.com/datasets/public-housing-developments', #\n\njob code: {HUDPublicHousingProjectsSchema().job_code}',
     },
@@ -944,13 +944,13 @@ job_dicts = [
         'source_full_url': get_arcgis_data_url('https://hudgis-hud.opendata.arcgis.com/data.json', 'Public Housing Buildings', 'CSV')[0],
         'encoding': 'utf-8',
         'schema': HUDPublicHousingBuildingsSchema,
-        'filters': [['std_st', '==', 'PA']], # Coordinates could be used to filter to Allegheny County.
+        'filters': [['county_level', '==', '42003'], ['std_st', '==', 'PA']],
         'always_wipe_data': True,
         #'primary_key_fields': # DEVELOPMENT_CODE seems like a possible unique key.
         'destination': 'ckan',
-        'destination_file': 'public_housing_buildings_pa.csv',
+        'destination_file': 'public_housing_buildings_ac.csv',
         'package': housecat_package_id,
-        'resource_name': 'HUD Public Housing Buildings (Pennsylvania)',
+        'resource_name': 'HUD Public Housing Buildings (Allegheny County)',
         'upload_method': 'insert',
         'resource_description': f'Derived from https://hudgis-hud.opendata.arcgis.com/datasets/public-housing-buildings', #\n\njob code: {HUDPublicHousingBuildingsSchema().job_code}',
 
