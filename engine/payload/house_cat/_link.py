@@ -145,7 +145,21 @@ write_to_csv('files_by_fha_loan_id.csv', fha_loan_id_files_list, [id_field, 'fil
 
 # Add fha_loan_id-based properties to master list.
 
+ac_by_id = defaultdict(dict)
+id_field = 'fha_loan_id'
 
+fha_files = ['mf_init_commit_pa.csv', 'mf_mortgages_pa.csv']
+for f in fha_files:
+    assert f in files
+
+for f in fha_files:
+    with open(f'{path}/{f}', 'r') as g:
+        reader = csv.DictReader(g)
+        for row in reader:
+            if row[id_field] == '03332013':
+                add_row_to_linking_dict(f, row, id_field, fields_to_get, ac_by_id)
+
+master_list += [v for k, v in ac_by_id.items()]
 #########################
 # Add LIHTC to master_list
 
@@ -223,13 +237,6 @@ ic(len(files_by['property_id']))
 
 #pprint(files_by_development_code)
 ic(len(files_by_development_code))
-
-n = 0
-for k, v in mf_ac_by_property_id.items():
-    if n < 5:
-        print(k)
-        print(v)
-        n += 1
 
 # Buildings and projects should be treated distinctly. Anything else?
 
