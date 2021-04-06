@@ -8,7 +8,7 @@ DESTINATION_DIR = "/Users/drw/WPRDC/etl/rocket-etl/output_files/"
 
 path = DESTINATION_DIR + "house_cat"
 
-possible_keys = ['property_id', 'lihtc_project_id', 'development_code', 'fha_loan_id', 'state_id', 'inspection_property_id_multiformat']
+possible_keys = ['property_id', 'lihtc_project_id', 'development_code', 'fha_loan_id', 'state_id'] # 'inspection_property_id_multiformat']
 
 def write_to_csv(filename, list_of_dicts, keys):
     with open(filename, 'w') as output_file:
@@ -105,17 +105,28 @@ fields_to_get = ['hud_property_name',
         'property_street_address', 'municipality_name', 'city', 'zip_code',
         'contract_id', # mf_subsidy_ac
         'fha_loan_id',
+        'state_id',
         ]
 
 mf_ac_by_property_id = defaultdict(dict)
 id_field = 'property_id'
+ac_fha_loan_ids = []
+
+ac_property_id_files = ['mf_subsidy_8_ac.csv', 'mf_subsidy_loans_ac.csv', 'mf_loans_ac.csv']
+for a in ac_property_id_files:
+    assert a in files
+
 for f in files:
-    if f in ['mf_subsidy_8_ac.csv', 'mf_subsidy_loans_ac.csv', 'mf_loans_ac.csv']: # mf_inspections_pa.csv and mf_8_contracts_us COULD
-        # BE added here if there are other fields we want to extract (that is, beyond constructing a master list).
+    if f in ac_property_id_files:# mf_inspections_pa.csv and mf_8_contracts_us COULD
+    # BE added here if there are other fields we want to extract (that is, beyond constructing a master list).
         with open(f'{path}/{f}', 'r') as g:
             reader = csv.DictReader(g)
             for row in reader:
                 add_row_to_linking_dict(f, row, id_field, fields_to_get, mf_ac_by_property_id)
+                if f == 'mf_loans_ac.csv':
+                    if 'fha_loan_id' in row and row['fha_loan_id'] not in [None, '']:
+                        ac_fha_loan_ids.append(row['fha_loan_id'])
+
 
 master_list = [v for k, v in mf_ac_by_property_id.items()]
 
@@ -150,6 +161,7 @@ write_to_csv('files_by_fha_loan_id.csv', fha_loan_id_files_list, [id_field, 'fil
 
 # Add fha_loan_id-based properties to master list.
 
+#<<<<<<< Updated upstream
 ac_by_id = defaultdict(dict)
 id_field = 'fha_loan_id'
 
@@ -233,7 +245,6 @@ with open(f'{path}/{f}', 'r') as g:
                 if field in row and row[field] not in [None, '']:
                     ac_by_id[row[id_field]][field] = row[field]
 
-
 #########################
 # Examine the breakdown of records containing development_code.
 id_field = 'development_code'
@@ -266,6 +277,24 @@ master_list += [v for k, v in ac_by_id.items()]
 
 write_to_csv('master_list.csv', master_list, fields_to_get + possible_keys + ['source_file'])
 
+#########################
+# Examine the breakdown of records containing development_code values based on which files each development_code appears in.
+id_field = 'development_code'
+pa_files_by_id = defaultdict(list)
+for dev_code, file_list in files_by_development_code.items():
+    pa_files_by_id[dev_code] = '|'.join(sorted(list(set(file_list))))
+
+files_list = [{id_field: k, 'file_list': v} for k, v in pa_files_by_id.items()]
+for d in files_list:
+    d['city'] = city_by_dev_code[d[id_field]]
+
+write_to_csv('files_by_development_code.csv', files_list, [id_field, 'file_list', 'city'])
+# Two records that are in the statewide
+
+#########################
+write_to_csv('master_list.csv', master_list, fields_to_get + possible_keys + ['source_file'])
+
+#########################
 pprint(keys_by_file)
 pprint(files_by_key)
 #pprint(pa_files_by_property_id)
@@ -278,4 +307,13 @@ ic(len(files_by_development_code))
 # Buildings and projects should be treated distinctly. Anything else?
 
 # We need to filter some files down to Allegheny County.
+
+# Two records with fha_loan_id == '03335292' were found, one from mf_subsidy_loans_ac.csv|mf_loans.csv and one from mf_mortgages_pa.csv (based on the linking attempt that just added separate records rather than linking).
+# The first two files both had a correct street address but the wrong ZIP code, while the second had the right ZIP code but a seemingly very wrong street address.
+#hud_property_name      property_street_address         city        zip_code    fha_loan_id property_id source_file
+#Oak Hill Brackenridge  537 Oak Hill Drive              Pittsburgh  15213       03335292    800244735   mf_subsidy_loans_ac.csv|mf_loans_ac.csv
+#Oak Hill Brackenridge  120  209 & 239 Blakey Court  1  Pittsburgh  15219       03335292                mf_mortgages_pa.csv
+# This will present a linking problem.
+# One option: Make lists of all the conflicting address information.
+# Another option: Use the (seemingly accurate) geocoordinates in mf_loans.
 
