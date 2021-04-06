@@ -505,7 +505,9 @@ class Job:
 
     def select_extractor(self):
         extension = (self.source_file.split('.')[-1]).lower()
-        if extension == 'csv':
+        if self.destination == 'ckan_filestore': # If destination == 'ckan_filestore' (meaning there's no schema)
+            self.extractor = pl.FileExtractor # we just want to extract the file, not tabular data.
+        elif extension == 'csv':
             self.extractor = pl.CSVExtractor
         elif extension == 'json':
             self.extractor = pl.JSONExtractor
