@@ -702,7 +702,7 @@ job_dicts = [
         'job_code': 'monthly_pageviews',
         'source_type': 'local',
         'source_dir': '',
-        'source_file': f'dataset_pageviews_by_month.csv',
+        'source_file': f'resource_pageviews_by_month.csv',
         'custom_processing': pull_monthly_pageviews_from_ga,
         'encoding': 'utf-8-sig',
         'schema': MonthlyPageviewsSchema,
@@ -733,9 +733,12 @@ job_dicts = [
         'source_type': 'local',
         'source_dir': '',
         'source_file': f'package_downloads_by_month.csv',
+        # The reason that there is no custom_processing function here is that
+        # pull_monthly_downloads_from_ga generates both resource_downloads_by_month.csv
+        # and package_downloads_by_month.csv.
         'encoding': 'utf-8-sig',
         'schema': MonthlyPackageDownloadsSchema,
-        'primary_key_fields': ['Year+month', 'Package ID'], # Why isn't this by Resource ID?
+        'primary_key_fields': ['Year+month', 'Package ID'],
         'always_wipe_data': False,
         'upload_method': 'upsert',
         'destination': 'file', # These lines are just for testing
