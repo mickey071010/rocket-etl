@@ -70,6 +70,8 @@ for f in files:
                         if 'city' in row and row['city'] not in [None, '']:
                             city_by_development_code[row[field]] = row['city']
                         files_by_development_code[row[field]].append(f)
+                        if 'city' in row and row['city'] not in [None, '']:
+                            city_by_dev_code[row[field]] = row['city']
                     elif field == 'fha_loan_id':
                         if 'city' in row and row['city'] not in [None, '']:
                             city_by_fha_loan_id[row[field]] = row['city']
@@ -161,7 +163,6 @@ write_to_csv('files_by_fha_loan_id.csv', fha_loan_id_files_list, [id_field, 'fil
 
 # Add fha_loan_id-based properties to master list.
 
-#<<<<<<< Updated upstream
 ac_by_id = defaultdict(dict)
 id_field = 'fha_loan_id'
 
