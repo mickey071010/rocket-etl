@@ -129,7 +129,7 @@ class MultifamilyProductionInitialCommitmentSchema(pl.BaseSchema):
 
 class HousingInspectionScoresSchema(pl.BaseSchema):
     job_code = 'housing_inspections'
-    property_id = fields.String(load_from='DEVELOPMENT_ID'.lower(), dump_to='property_id')
+    development_id = fields.String(load_from='DEVELOPMENT_ID'.lower(), dump_to='development_code')
     state = fields.String(load_from='STATE_NAME'.lower(), dump_to='state')
     latitude = fields.Float(load_from='LATITUDE'.lower(), allow_none=True)
     longitude = fields.Float(load_from='LONGITUDE'.lower(), allow_none=True)
@@ -138,7 +138,7 @@ class HousingInspectionScoresSchema(pl.BaseSchema):
     hud_property_name = fields.String(load_from='development_name', dump_to='hud_property_name')
     property_street_address = fields.String(load_from='ADDRESS'.lower(), dump_to='property_street_address')
     inspection_id = fields.Integer(load_from='INSPECTION_ID'.lower())
-    inspection_property_id = fields.String(load_from='DEVELOPMENT_ID'.lower(), dump_to='inspection_property_id')
+    inspection_property_id_multiformat = fields.String(load_from='DEVELOPMENT_ID'.lower(), dump_to='inspection_property_id_multiformat')
     inspection_score = fields.Integer(load_from='INSPECTION_SCORE'.lower(), dump_to='inspection_score')
     inspection_date = fields.Date(load_from='INSPECTION DATE'.lower(), dump_to='inspection_date')
     pha_code = fields.String(load_from='PHA_CODE'.lower(), dump_to='participant_code')
@@ -503,7 +503,7 @@ class MultifamilyGuaranteedLoansSchema(pl.BaseSchema):
 
 class LIHTCSchema(pl.BaseSchema):
     job_code = 'lihtc'
-    hud_id = fields.String(load_from='\ufeffhud_id'.lower(), dump_to='hud_id')
+    hud_id = fields.String(load_from='\ufeffhud_id'.lower(), dump_to='lihtc_project_id')
     latitude = fields.Float(load_from='latitude'.lower(), dump_to='latitude', allow_none=True)
     longitude = fields.Float(load_from='longitude'.lower(), dump_to='longitude', allow_none=True)
 
@@ -625,7 +625,7 @@ class LIHTCSchema(pl.BaseSchema):
 
 class LIHTCBuildingSchema(pl.BaseSchema):
     job_code = 'lihtc_building'
-    hud_id = fields.String(load_from='\ufeffhud_id'.lower(), dump_to='hud_id')
+    hud_id = fields.String(load_from='\ufeffhud_id'.lower(), dump_to='lihtc_project_id')
     project = fields.String(load_from='project'.lower(), dump_to='hud_property_name')
     proj_add = fields.String(load_from='proj_add'.lower(), dump_to='property_street_address', allow_none=True)
     proj_cty = fields.String(load_from='proj_cty'.lower(), dump_to='city', allow_none=True)
@@ -640,7 +640,7 @@ class BaseMultifamilyInspectionsSchema(pl.BaseSchema):
     job_code = 'mf_inspections'
     rems_property_id = fields.String(load_from='REMS Property Id'.lower(), dump_to='property_id')
     property_name = fields.String(load_from='Property Name'.lower(), dump_to='hud_property_name')
-    inspection_property_id = fields.String(load_from='REMS_Property_Id'.lower(), dump_to='inspection_property_id')
+    inspection_property_id_multiformat = fields.String(load_from='REMS_Property_Id'.lower(), dump_to='inspection_property_id_multiformat')
     city = fields.String(load_from='city'.lower(), dump_to='city')
     state_code = fields.String(load_from='state_code'.lower(), dump_to='state')
 
