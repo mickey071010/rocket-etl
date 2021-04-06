@@ -711,10 +711,11 @@ class Job:
         wipe_data = kwparameters['wipe_data']
         migrate_schema = kwparameters['migrate_schema']
         ignore_empty_rows = kwparameters['ignore_empty_rows']
+        retry_without_last_line = kwparameters['retry_without_last_line']
         self.configure_pipeline_with_options(**kwparameters)
 
         self.custom_processing(self, **kwparameters) # In principle, filtering could be done here, but this might be kind of a hack.
-        locators_by_destination = self.run_pipeline(clear_first, wipe_data, migrate_schema, retry_without_last_line=False, ignore_empty_rows=ignore_empty_rows)
+        locators_by_destination = self.run_pipeline(clear_first, wipe_data, migrate_schema, retry_without_last_line=retry_without_last_line, ignore_empty_rows=ignore_empty_rows)
         self.custom_post_processing(self, **kwparameters)
         return locators_by_destination # Return a dict allowing look up of final destinations of data (filepaths for local files and resource IDs for data sent to a CKAN instance).
 

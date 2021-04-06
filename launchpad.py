@@ -79,6 +79,9 @@ def main(**kwargs):
     migrate_schema = kwargs.get('migrate_schema', False)
     test_mode = kwargs.get('test_mode', False)
     ignore_empty_rows = kwargs.get('ignore_empty_rows', False)
+    retry_without_last_line = kwargs.get('retry_without_last_line', False) # Workaround devised for
+    # CSV files that stop in the middle of a line, probably due to an incomplete file transfer
+    # or disk-limit size associated with the City FTP server.
     if selected_job_codes == []:
         selected_jobs = [Job(job_dict) for job_dict in job_dicts]
     else:
@@ -163,6 +166,7 @@ if __name__ == '__main__':
                         'test_mode': True,
                         'migrate_schema': False,
                         'ignore_empty_rows': False,
+                        'retry_without_last_line': False,
                         }
                     try:
                         main(**kwargs) # Try to run all jobs in the module.
@@ -180,6 +184,7 @@ if __name__ == '__main__':
             wipe_data = False
             migrate_schema = False
             ignore_empty_rows = False
+            retry_without_last_line = False
             logging = False
             test_mode = not PRODUCTION # Use PRODUCTION boolean from parameters/local_parameters.py to set whether test_mode defaults to True or False
             wake_me_when_found = False
@@ -256,6 +261,9 @@ if __name__ == '__main__':
                 elif arg in ['ignore_empty_rows']:
                     ignore_empty_rows = True
                     args.remove(arg)
+                elif arg in ['retry_without_last_line']:
+                    retry_without_last_line= True
+                    args.remove(arg)
                 elif arg in ['log']:
                     logging = True
                     log_path_plus = LOG_DIR + payload_location + '/' + module_name
@@ -293,6 +301,7 @@ if __name__ == '__main__':
                 'wipe_data': wipe_data,
                 'migrate_schema': migrate_schema,
                 'ignore_empty_rows': ignore_empty_rows,
+                'retry_without_last_line': retry_without_last_line,
                 'test_mode': test_mode,
                 }
             main(**kwargs)
