@@ -235,7 +235,12 @@ def initialize_ga_api():
 
     #Create a service object
     http = credentials.authorize(httplib2.Http())
-    service = build('analytics', 'v4', http=http, discoveryServiceUrl=('https://analyticsreporting.googleapis.com/$discovery/rest'))
+    # This line stopped working at some point:
+    #service = build('analytics', 'v4', http=http, discoveryServiceUrl=('https://analyticsreporting.googleapis.com/$discovery/rest'))
+    # https://github.com/googleapis/google-api-python-client/issues/712
+    from googleapiclient import discovery
+    service = discovery.build('analyticsreporting', 'v4', http=http)
+
     return service
 
 def get_metrics(service, profile, metrics, start_date='30daysAgo', end_date='today', dimensions=[], sort_by=[], filters='', page_size=100000, page_token=None):
