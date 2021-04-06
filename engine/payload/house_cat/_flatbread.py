@@ -378,6 +378,10 @@ class MultifamilyProjectsSection8ContractsSchema(pl.BaseSchema):
                 data[f] = str(data[f])
 
 class MultifamilyProjectsSubsidyLoansSchema(pl.BaseSchema):
+    # This schema is applied to the same file as mf_loans. While different fields are being used
+    # to pull property_manager_name and property_manager_phone, the values are identical for
+    # all 95 records. These two schema could therefore be easily merged into a single
+    # one (though they pull some nonoverlapping fields), but we'll leave them as separate for now.
     job_code = 'mf_subsidy_loans'
     property_id = fields.String(load_from='property_id'.lower(), dump_to='property_id')
     latitude = fields.Float(load_from='\ufeffX'.lower(), dump_to='latitude', allow_none=True)
