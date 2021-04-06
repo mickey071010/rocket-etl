@@ -45,6 +45,21 @@ class CasesByPlaceSchema(pl.BaseSchema):
     class Meta:
         ordered = True
 
+class CasesByPlaceArchiveSchema(pl.BaseSchema):
+    neighborhood_municipality = fields.String()
+    month = fields.String()
+    indv_tested = fields.Integer()
+    cases = fields.Integer()
+    deaths = fields.Integer()
+    update_date = fields.Date()
+
+    class Meta:
+        ordered = True
+
+    @pre_load
+    def fix_month(self, data):
+        data['month'] = data['month'][:7]
+
 class TestsSchema(pl.BaseSchema):
     indv_id = fields.String()
     collection_date = fields.Date()
@@ -165,6 +180,23 @@ job_dicts = [
         'resource_name': f'Allegheny County COVID-19 Counts by Municipality and Pittsburgh Neighborhood',
         'custom_post_processing': express_load_then_delete_file
     },
+#    {
+#        'job_code': 'cases_by_place_archive',
+#        'source_type': 'sftp',
+#        'source_dir': 'Health Department',
+#        'source_file': f'monthly_munihood_counts.csv',
+#        'connector_config_string': 'sftp.county_sftp',
+#        'encoding': 'utf-8-sig',
+#        'schema': CasesByPlaceArchiveSchema,
+#        #'primary_key_fields': [], # Could be neighborhood_municipality * month
+#        'always_wipe_data': True,
+#        'upload_method': 'insert',
+#        'destination': 'file',
+#        'destination_file': f'covid_19_cases_by_place_by_month.csv',
+#        'package': covid_19_package_id,
+#        'resource_name': f'Archive of Allegheny County COVID-19 Counts by Municipality and Pittsburgh Neighborhood',
+#        #'custom_post_processing': express_load_then_delete_file
+#    },
     {
         'job_code': 'tests',
         'source_type': 'sftp',
