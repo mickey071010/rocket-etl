@@ -827,6 +827,7 @@ job_dicts = [
         'source_file': 'FHA_BF90_RM_A_01042021.xlsx',
         #'source_full_url': 'https://www.hud.gov/sites/dfiles/Housing/images/FHA_BF90_RM_A_01042021.xlsx',
         'source_full_url': scrape_nth_link('https://www.hud.gov/program_offices/housing/comp/rpts/mfh/mf_f47', 'xlsx', 1, 2, 'FHA'),
+        'updates': 'Monthly',
         'encoding': 'binary',
         'schema': MultifamilyInsuredMortgagesSchema,
         'filters': [['property_state', '==', 'PA']], # Location information includes city, state, and ZIP code.
@@ -845,6 +846,7 @@ job_dicts = [
         'source_file': 'Initi_Endores_Firm%20Comm_DB_FY21_Q1.xlsx',
         #'source_full_url': 'https://www.hud.gov/sites/dfiles/Housing/documents/Initi_Endores_Firm%20Comm_DB_FY21_Q1.xlsx',
         'source_full_url': scrape_nth_link('https://www.hud.gov/program_offices/housing/mfh/mfdata/mfproduction', 'xlsx', 0, 2, 'Q'),
+        'updates': 'Quarterly',
         'encoding': 'binary',
         'rows_to_skip': 3,
         'schema': MultifamilyProductionInitialCommitmentSchema,
