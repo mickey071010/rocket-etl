@@ -3,6 +3,7 @@ from pprint import pprint
 
 from engine.parameters.local_parameters import SOURCE_DIR
 from engine.parameters.remote_parameters import TEST_PACKAGE_ID
+from engine.notify import send_to_slack
 from engine.credentials import site, API_key
 
 try:
