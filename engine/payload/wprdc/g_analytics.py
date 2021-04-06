@@ -34,6 +34,13 @@ class WebStatsSchema(pl.BaseSchema):
     class Meta:
         ordered = True
 
+    @pre_load
+    def fix_precision(self, data):
+        fields = ['pageviews_per_session', 'average_session_duration_(seconds)']
+        for f in fields:
+            if f in data and data[f] not in ['', None]:
+                data[f] = str(round(float(data[f]), 2))
+
 class MonthlyPageviewsSchema(pl.BaseSchema):
     year_month = fields.String(load_from='Year+month'.lower(), dump_to='Year+month', allow_none=False)
     package = fields.String(load_from='Package'.lower(), dump_to='Package', allow_none=False)
