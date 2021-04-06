@@ -194,6 +194,18 @@ def custom_processing(job, **kwparameters):
     ## END CUSTOMIZABLE SECTION ##
 
 
+raise ValueError("resource_name == name_file_resource() won't work because it will create a new resource rather than replacing the existing one. It's necessary to identify the resource ID (somehow) and change the resource name, which feels like either a custom_pre/post-processing operation or else the right time to expand that 'resource_description'-setting post-processing code to look for a metadata-to-set field that could have any package- or resource-level metadata.")
+# 'resource_name':
+# 'metadata_to_set':
+#   {'resource':
+#        {'description': "***********",
+#        'whatever': 69105},
+#   {'package':
+#        {'tag': 'cool_data',
+#        'time_field':
+#        'again_whatever: }
+#   }
+
 job_dicts = [
 #    {
 #        'job_code': 'assessments_filestore',
