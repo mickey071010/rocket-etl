@@ -2969,6 +2969,45 @@ class PublicArtSchema(AssetSchema):
     @post_load
     def fix_synthesized_key(self, data):
         data['synthesized_key'] = synthesize_key(data, ['primary_key_from_rocket'])
+
+class PDHHealthCareFacilitiesSchema(AssetSchema):
+    job_code = 'doh_health_care_facilities'
+    asset_type = fields.String(load_from='asset_type') # Note that multiple asset types appear here.
+    name = fields.String(load_from='asset_name')
+    asset_name = fields.String(load_from='asset_name')
+    localizability = fields.String(dump_only=True, default='fixed')
+    street_address = fields.String(load_from='street_address')
+    city = fields.String(load_from='city')
+    state = fields.String(load_from='state')
+    zip_code = fields.String(load_from='zip_code')
+    latitude = fields.Float(load_from='latitude', allow_none=True)
+    longitude = fields.Float(load_from='longitude', allow_none=True)
+    phone = fields.String(load_from='phone', allow_none=True)
+    taxonomy_code = fields.String(load_from='taxonomy_code')
+    facility_type = fields.String(load_only=True, load_from='facility_type')
+    #sensitive = fields.Boolean(dump_only=True, allow_none=True, default=False)
+    # Include any of these or just leave them in the master table?
+    #date_entered = Leave blank.
+    #last_updated = # pull last_modified date from resource # 2014
+    data_source_name = fields.String(default='Pennsylvania Department of Health: Health Care Facilities')
+    data_source_url = fields.String(default='https://sais.health.pa.gov/commonpoc/content/publiccommonpoc/commonpocselect.asp?FORMSUBMITTED=normalSearch&selcty=Allegheny')
+    tags = fields.String(load_from='tag', allow_none=True)
+    #primary_key_from_rocket = fields.String(load_from='clpid', allow_none=False)
+    #county is constrained to be Allegheny based on the data_source_url
+    geocoding_properties = fields.String(load_from='geocoding_match_type', allow_none=True)
+
+    @pre_load
+    def make_geocoding_properties(self, data):
+        if 'geocoding_confidence' in data and data['geocoding_confidence'] not in [None, '']:
+            data['geocoding_properties'] = f"Confidence: {data['geocoding_confidence']}, Match type: {data['geocoding_match_type']}, Accuracy: {data['geocoding_accuracy']}, Source: {data['geocoding_source']}"
+        if 'geocoding_match_type' in data and data['geocoding_match_type'] == 'street_center':
+            data['geocoding_properties'] += f" (geocoordinates ignored based on suspect quality)"
+            data['latitude'] = None
+            data['longitude'] = None
+
+    @post_load
+    def fix_synthesized_key(self, data):
+        data['synthesized_key'] = synthesize_key(data, ['facility_type'])
 #when,neighborhood,time_range,where_description,street_address_or_intersection
 # dfg
 
@@ -3772,6 +3811,18 @@ job_dicts = [
         'primary_key_fields': ['id'],
         'destination': 'file',
         'destination_file': ASSET_MAP_PROCESSED_DIR + 'public-art-pgh.csv',
+    },
+    {
+        'update': 3,
+        'job_code': PDHHealthCareFacilitiesSchema().job_code, #'doh_health_care_facilities'
+        'source_type': 'local',
+        'source_file': ASSET_MAP_SOURCE_DIR + 'sais.health.pa.gov/pa_health_facitilities--allegheny--open--geocoded.csv',
+        'encoding': 'utf-8-sig',
+        'schema': PDHHealthCareFacilitiesSchema,
+        'always_wipe_data': True,
+        #'primary_key_fields': None
+        'destination': 'file',
+        'destination_file': ASSET_MAP_PROCESSED_DIR + 'pa_health_facitilities--allegheny--open--geocoded.csv',
     },
 ]
 
