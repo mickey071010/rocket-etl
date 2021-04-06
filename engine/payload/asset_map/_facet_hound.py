@@ -391,6 +391,7 @@ class FarmersMarketsSchema(GeocodedAssetSchema):
         services = fields.String(default='', allow_none=True)
         synthesized_key = fields.String(default='', allow_none=True)
         tags = fields.String(default='', allow_none=True)
+        taxonomy_code = fields.String(default='', allow_none=True)
         url = fields.String(default='', allow_none=True)
 
     @pre_load
@@ -2984,6 +2985,8 @@ class PDHHealthCareFacilitiesSchema(AssetSchema):
     longitude = fields.Float(load_from='longitude', allow_none=True)
     phone = fields.String(load_from='phone', allow_none=True)
     taxonomy_code = fields.String(load_from='taxonomy_code')
+    # [ ] It will probably be necessary to change the taxonomy_code values
+    # in this source file to migrate to the final taxonomy.
     facility_type = fields.String(load_only=True, load_from='facility_type')
     #sensitive = fields.Boolean(dump_only=True, allow_none=True, default=False)
     # Include any of these or just leave them in the master table?
