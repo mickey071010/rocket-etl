@@ -277,7 +277,7 @@ class Dose1AllocationByClinicSchema(pl.BaseSchema):
     city = fields.String(load_from='City'.lower(), dump_to='city')
     state = fields.String(load_from='State'.lower(), dump_to='state')
     zip_code = fields.String(load_from='ZIP Code'.lower(), dump_to='zip_code')
-    county_name = fields.String(load_from='County Name'.lower(), dump_to='county_name')
+    county_name = fields.String(load_from='County Name'.lower(), dump_to='county_name', allow_none=True) # Accidental nulls started appearing in older data.
     data_as_of_date = fields.Date(load_from='Data as of Date'.lower(), dump_to='data_as_of_date')
     clinic_website = fields.String(load_from='Clinic Website'.lower(), dump_to='clinic_web_site', allow_none=True)
     phone_number = fields.String(load_from='Phone Number'.lower(), dump_to='phone_number', allow_none=True)
