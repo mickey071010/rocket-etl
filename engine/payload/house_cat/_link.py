@@ -30,7 +30,8 @@ def add_row_to_linking_dict(f, row, id_field, fields_to_get, ac_by_id):
     if 'source_file' not in ac_by_id[row[id_field]]:
         ac_by_id[row[id_field]]['source_file'] = f
     else:
-        ac_by_id[row[id_field]]['source_file'] += '|' + f
+        xs = ac_by_id[row[id_field]]['source_file'].split('|')
+        ac_by_id[row[id_field]]['source_file'] = '|'.join(list(set(xs + [f])))
 
     for field in fields_to_get:
         if field in row and row[field] not in [None, '']:
@@ -41,9 +42,10 @@ keys_by_file = defaultdict(list)
 files_by_key = defaultdict(list)
 
 files_by_property_id = defaultdict(list)
+files_by_development_code = defaultdict(list)
 city_by_property_id = defaultdict(str)
 city_by_fha_loan_id = defaultdict(str)
-files_by_development_code = defaultdict(list)
+city_by_development_code = defaultdict(str)
 
 files_by = defaultdict(lambda: defaultdict(list))
 
@@ -65,6 +67,8 @@ for f in files:
                             city_by_property_id[row[field]] = row['city']
                         files_by_property_id[row[field]].append(f)
                     elif field == 'development_code':
+                        if 'city' in row and row['city'] not in [None, '']:
+                            city_by_development_code[row[field]] = row['city']
                         files_by_development_code[row[field]].append(f)
                     elif field == 'fha_loan_id':
                         if 'city' in row and row['city'] not in [None, '']:
@@ -87,7 +91,7 @@ for d in prop_id_files_list:
 write_to_csv('files_by_property_id.csv', prop_id_files_list, ['property_id', 'file_list', 'city'])
 
 # property_id
-# Out of the 794 property_id values in mf_inspections_us that are not in any of the 3 mf*ac.csv files,
+# Out of the 794 property_id values in mf_inspections_pa that are not in any of the 3 mf*ac.csv files,
 # only one is in Pittsburgh (Lemington Heights apartments) with a 2005 inspection, and it's no longer 
 # in existence. None of the others appear to be in Allegheny County (based on city name and my untrained eye).
 
@@ -106,7 +110,8 @@ fields_to_get = ['hud_property_name',
 mf_ac_by_property_id = defaultdict(dict)
 id_field = 'property_id'
 for f in files:
-    if f in ['mf_subsidy_8_ac.csv', 'mf_subsidy_loans_ac.csv', 'mf_loans_ac.csv']:
+    if f in ['mf_subsidy_8_ac.csv', 'mf_subsidy_loans_ac.csv', 'mf_loans_ac.csv']: # mf_inspections_pa.csv and mf_8_contracts_us COULD
+        # BE added here if there are other fields we want to extract (that is, beyond constructing a master list).
         with open(f'{path}/{f}', 'r') as g:
             reader = csv.DictReader(g)
             for row in reader:
@@ -227,6 +232,38 @@ with open(f'{path}/{f}', 'r') as g:
             for field in fields_to_get:
                 if field in row and row[field] not in [None, '']:
                     ac_by_id[row[id_field]][field] = row[field]
+
+
+#########################
+# Examine the breakdown of records containing development_code.
+id_field = 'development_code'
+pa_files_by_id = {}
+for dev_code, flist in files_by_development_code.items():
+    unique_files = list(set(flist))
+    pa_files_by_id[dev_code] = '|'.join(sorted(unique_files))
+
+list_of_dicts = [{id_field: k, 'file_list': v} for k, v in pa_files_by_id.items()]
+for d in list_of_dicts:
+    d['city'] = city_by_development_code[d[id_field]]
+
+write_to_csv('files_by_development_code.csv', list_of_dicts, [id_field, 'file_list', 'city'])
+
+ac_by_id = defaultdict(dict)
+
+dev_code_files = ['housing_inspections_ac.csv', 'public_housing_projects_ac.csv'] #, 'public_housing_buildings_ac.csv']
+for f in dev_code_files:
+    assert f in files
+
+for f in dev_code_files:
+    with open(f'{path}/{f}', 'r') as g:
+        reader = csv.DictReader(g)
+        for row in reader:
+            add_row_to_linking_dict(f, row, id_field, fields_to_get, ac_by_id)
+
+master_list += [v for k, v in ac_by_id.items()]
+
+################
+
 write_to_csv('master_list.csv', master_list, fields_to_get + possible_keys + ['source_file'])
 
 pprint(keys_by_file)
