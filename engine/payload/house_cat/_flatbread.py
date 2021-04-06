@@ -1087,7 +1087,7 @@ job_dicts = [
     },
 # All the jobs below are being commented out because the desired fields have not yet been identified.
 #    {
-#        'job_code': USDAProgramExitSchema().job_code, # 'usda_exit'
+#        'job_code': USDAProgramExitSchema().job_code, # 'usda_exit' # I only see one record that is in Allegheny County (based on State County FIPS Code).
 #        'source_type': 'http',
 #        #'source_file': 'USDA_RD_MHF_Program_Exit-2020-12-31.xlsx',
 #        'source_full_url': scrape_nth_link('https://www.sc.egov.usda.gov/data/MFH.html', 'xlsx', 0, 2, regex='xit', verify=False),
@@ -1150,9 +1150,9 @@ job_dicts = [
 #        'upload_method': 'insert',
 #    },
 #    {
-#        'job_code': USDA538Schema().job_code, # 'usda_538'
+#        'job_code': USDA538Schema().job_code, # 'usda_538' # I'm not sure that any of these are in Allegheny County.
 #        'source_type': 'http',
-#        #'source_file': 'USDA_RD_MHF_Program_Exit-2020-12-31.xlsx',
+#        #'source_file': 'USDA_RD_MFHG538_2021-02-18.xls',
 #        'source_full_url': scrape_nth_link('https://www.sc.egov.usda.gov/data/MFH.html', 'xls', 0, 1, regex='538', verify=False),
 #        # This web page has incorrectly configured certificates, so we'll need to route around that with requests.get(url, verify=False).
 #        'ignore_certificate_errors': True,
