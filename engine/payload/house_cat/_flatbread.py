@@ -10,7 +10,7 @@ from engine.etl_util import fetch_city_file
 from engine.arcgis_util import get_arcgis_data_url
 from engine.notify import send_to_slack
 from engine.scraping_util import scrape_nth_link
-from engine.parameters.local_parameters import SOURCE_DIR
+from engine.parameters.local_parameters import SOURCE_DIR, PRODUCTION
 
 try:
     from icecream import ic
@@ -549,6 +549,18 @@ class LIHTCSchema(pl.BaseSchema):
     class Meta:
         ordered = True
 
+    @pre_load
+    def future_proof(self, data):
+        global fips2020_notified
+        if not fips2020_notified and 'fips2020' in data:
+            msg = "The fips2020 variable was found in LIHTCPUB.csv. Edit house_cat/_flatbread.py, switching LIHTCSchema to use fips2020 rather than fips2010 for extracting census_tract and county_fips_code. Also re-evaluate the methods for filtering these properties to Allegheny County (as the 42XXX issue caused both fips2010 and fips2000 to be previously incorporated)."
+            print(msg)
+            channel = "@david" if (not PRODUCTION) else "#etl-hell"
+            if channel != "@david":
+                msg = f"@david {msg}"
+            send_to_slack(msg, username='house_cat schema monitor', channel=channel, icon=':tessercat:')
+            fips2020_notified = True
+
     @post_load
     def form_address(self, data): # [ ] Is there any chance we want to keep these parts as separate fields?
         address = ''
@@ -776,6 +788,7 @@ class MultifamilyInspectionsSchema3(BaseMultifamilyInspectionsSchema):
 
 # dfg
 
+fips2020_notified = False
 housecat_package_id = 'bb77b955-b7c3-4a05-ac10-448e4857ade4'
 
 job_dicts = [
