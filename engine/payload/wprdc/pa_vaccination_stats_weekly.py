@@ -388,7 +388,7 @@ class AllocationByPharmacySchema(pl.BaseSchema):
     zip_code = fields.String(load_from='Zip Code'.lower(), dump_to='zip_code')
     vaccine = fields.String(load_from='Vaccine'.lower(), dump_to='vaccine')
     date = fields.Date(load_from='Date'.lower(), dump_to='date')
-    doses = fields.Integer(load_from='Doses'.lower(), dump_to='doses')
+    doses = fields.Integer(load_from='Doses'.lower(), dump_to='doses', allow_none=True)
     georeferenced_latitude_longitude = fields.String(load_from='Georeferenced Latitude & Longitude'.lower(), load_only=True, allow_none=True)
     latitude = fields.Float(load_from='Georeferenced Latitude & Longitude'.lower(), dump_to='latitude', allow_none=True)
     longitude = fields.Float(dump_to='longitude', allow_none=True)
@@ -615,6 +615,7 @@ job_dicts = [
         'schema': AllocationByPharmacySchema,
         #'primary_key_fields': ['date', 'retail_pharmacy_partner_name', 'address_1', 'zip_code', 'vaccine'], # <= While this would work, it's not necessary
         # to cumulatively archive this one.
+        'filters': [['retail_pharmacy_partner_name', '!=', None], ['date', '!=', None]], # Eliminate empty lines
         'always_wipe_data': True,
         'destination': 'ckan',
         'destination_file': 'weekly_pharmacy_allocation.csv',
