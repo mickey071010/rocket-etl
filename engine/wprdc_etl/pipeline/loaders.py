@@ -581,6 +581,7 @@ class FileLoader(Loader):
         self.clear_first = kwargs.get('clear_first', False)
         self.wipe_data = kwargs.get('wipe_data', False)
         self.first_pass = True
+        self.encoding = kwargs.get('encoding', None)
 
     def delete_file(self, filepath):
         """Delete the file."""
@@ -696,7 +697,8 @@ class NontabularFileLoader(FileLoader):
         Returns:
             request status
         """
-        with open(filepath, 'wb') as f: # [ ] Should this be 'wb' sometimes?
+        mode = 'wb' if self.encoding == 'binary' else 'w'
+        with open(filepath, mode) as f:
             f.write(data.read())
 
     def load(self, data):
