@@ -227,7 +227,7 @@ class CKANFilestoreLoader(CKANLoader):
             upload_kwargs['id'] = self.resource_id
 
         # If we pass an in-memory file-stream version of a file (like one obtained via the
-        # SFTPConnector and loaded into memory, it has no filename. It is of type
+        # SFTPConnector and loaded into memory), it has no filename. It is of type
         # <class '_io.TextIOWrapper'> but has no name, and the name attribute of TextIOWrapper
         # cannot be changed/set. The solution to this is to note that the CKAN API
         # accepts 'upload' values specified with multipart/form-data, which allows the
@@ -697,7 +697,8 @@ class NontabularFileLoader(FileLoader):
         Returns:
             request status
         """
-        mode = 'wb' if self.encoding == 'binary' else 'w'
+        import io
+        mode = 'wb' if type(data) == io.BytesIO else 'w' # io.TextIOWrapper
         with open(filepath, mode) as f:
             f.write(data.read())
 
