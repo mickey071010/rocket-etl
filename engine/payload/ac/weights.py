@@ -60,7 +60,7 @@ class StoresSchema(pl.BaseSchema):
     address = fields.String()
     mailingcity = fields.String(load_from='MailingCity', dump_to='mailing_city', allow_none=True)
     state = fields.String()
-    zip = fields.String()
+    zip = fields.String(allow_none=True)
     municipality = fields.String(allow_none=True)
     corpid = fields.String(load_from='CorpID', dump_to='corp_id',allow_none=True)
     neighborhood = fields.String(allow_none=True)
