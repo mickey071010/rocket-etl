@@ -165,8 +165,10 @@ class HousingInspectionScoresSchema(pl.BaseSchema):
         date_fields = ['inspection_date']
         for f in date_fields:
             if data[f] is not None:
-                data[f] = parser.parse(data[f]).date().isoformat()
-
+                if type(data[f]) == datetime:
+                    data[f] = data[f].date().isoformat()
+                else:
+                    data[f] = parser.parse(data[f]).date().isoformat()
 
 class HUDPublicHousingSchema(pl.BaseSchema):
     latitude = fields.Float(load_from='\ufeffX'.lower(), dump_to='latitude', allow_none=True)
@@ -925,7 +927,7 @@ job_dicts = [
     {
         'job_code': HousingInspectionScoresSchema().job_code, # 'housing_inspections'
         'source_type': 'http',
-        'source_file': 'public_housing_physical_inspection_scores_0620.xlsx',
+        'source_file': 'public_housing_physical_inspection_scores_0321.xlsx',
         #'source_full_url': 'https://www.huduser.gov/portal/sites/default/files/xls/public_housing_physical_inspection_scores_0620.xlsx',
         'source_full_url': scrape_nth_link('https://www.huduser.gov/portal/datasets/pis.html', 'xlsx', 0, None, 'public'), # The number of links increases each year.
         'encoding': 'binary',
