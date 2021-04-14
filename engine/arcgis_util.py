@@ -11,7 +11,6 @@ def get_arcgis_dataset(title, data_json_url):
     try:
         r = requests.get(data_json_url)
     except requests.exceptions.ConnectionError: # Retry on ConnectionError
-        import time
         time.sleep(10)
         r = requests.get(data_json_url)
 
