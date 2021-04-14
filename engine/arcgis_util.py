@@ -1,5 +1,5 @@
 """Functions for getting file URLs from an ArcGIS server through its data.json file."""
-import requests, re
+import requests, re, time
 from pprint import pprint
 
 try:
@@ -8,10 +8,17 @@ except ImportError:  # Graceful fallback if IceCream isn't installed.
     ic = lambda *a: None if not a else (a[0] if len(a) == 1 else a)  # noqa
 
 def get_arcgis_dataset(title, data_json_url):
-    r = requests.get(data_json_url)
+    try:
+        r = requests.get(data_json_url)
+    except requests.exceptions.ConnectionError: # Retry on ConnectionError
+        import time
+        time.sleep(10)
+        r = requests.get(data_json_url)
+
     catalog = r.json()
     candidates = [dataset for dataset in catalog['dataset'] if dataset['title'] == title]
     if len(candidates) == 1:
+        time.sleep(1)
         return candidates[0]
     raise ValueError(f"{len(candidates)} datasets found with the title '{title}'.")
 

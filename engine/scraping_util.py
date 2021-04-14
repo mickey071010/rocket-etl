@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-import requests, re
+import requests, re, time
 
 try:
     from icecream import ic
@@ -41,4 +41,5 @@ def scrape_nth_link(web_page_url, extension, n, expected_matches, regex=None, ve
     if regex is not None:
         assert re.search(regex, nth_url) is not None
     nth_url = make_relative_url_absolute(nth_url, web_page_url)
+    time.sleep(1)
     return nth_url
