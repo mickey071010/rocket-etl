@@ -165,7 +165,7 @@ job_dicts = [
         'upload_method': 'upsert',
         #'destination_file': f'air_daily.csv',
         'package': air_quality_package_id,
-        'resource_name': f'Daily Air Quality Data (new format)'
+        'resource_name': f'Daily Air Quality Data'
     },
     {
         'job_code': 'air_hourly',
@@ -180,7 +180,7 @@ job_dicts = [
         'upload_method': 'upsert',
         #'destination_file': f'air_hourly.csv',
         'package': air_quality_package_id,
-        'resource_name': f'Hourly Air Quality Data (new format)'
+        'resource_name': f'Hourly Air Quality Data'
     },
     {
         'job_code': 'air_max_today',
@@ -195,7 +195,7 @@ job_dicts = [
         'upload_method': 'upsert',
         #'destination_file': f'air_max_today.csv',
         'package': air_quality_package_id,
-        'resource_name': f"Current Maximum Air Quality Readings for Today (new format)",
+        'resource_name': f"Current Maximum Air Quality Readings for Today",
 #        'custom_post_processing': express_load_then_delete_file
     },
     {
