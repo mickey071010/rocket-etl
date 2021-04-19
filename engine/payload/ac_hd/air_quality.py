@@ -148,8 +148,8 @@ def express_load_then_delete_file(job, **kwparameters):
     print(f"Removing temp file at {csv_file_path}")
     os.remove(csv_file_path)
 
-#air_quality_package_id = 'c7b3266c-adc6-41c0-b19a-8d4353bfcdaf' # Production version of air-quality data package
-air_quality_package_id = '4659f303-d189-489c-8c94-87e1fb7407cf' # Test version of air-quality data package
+#air_quality_package_id = '4659f303-d189-489c-8c94-87e1fb7407cf' # Test version of air-quality data package
+air_quality_package_id = 'c7b3266c-adc6-41c0-b19a-8d4353bfcdaf' # Production version of air-quality data package
 
 job_dicts = [
     {
