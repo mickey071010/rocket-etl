@@ -80,10 +80,8 @@ class TestsSchema(pl.BaseSchema):
     race = fields.String(load_from='RACE'.lower(), dump_to='race')
     sex = fields.String(load_from='SEX'.lower(), dump_to='sex')
     ethnicity = fields.String(load_from='ETHNICITY'.lower(), dump_to='ethnicity')
-#    specimen_collected_year = fields.Date(load_from='SPECIMEN_COLLECTED_DATE'.lower(), dump_to='specimen_collected_date', allow_none=True)
-    specimen_collected_year = fields.Integer(dump_only=True, dump_to='specimen_collected_year', allow_none=True)
-#    specimen_collected_quarter = fields.Integer(load_from='SPECIMEN_COLLECTED_DATE'.lower(), dump_to='specimen_collected_quarter', allow_none=True)
-    specimen_collected_quarter = fields.Integer(dump_only=True, dump_to='specimen_collected_quarter', allow_none=True)
+    test_report_year = fields.Integer(dump_only=True, dump_to='test_report_year', allow_none=True)
+    test_report_quarter = fields.Integer(dump_only=True, dump_to='test_report_quarter', allow_none=True)
     update_date = fields.Date(load_from='UPDATE_DATE'.lower(), dump_to='update_date')
 
     class Meta:
@@ -100,53 +98,13 @@ class TestsSchema(pl.BaseSchema):
 
     @post_load
     def add_filter_fields(self, data):
-        data['specimen_collected_year'] = None
-        data['specimen_collected_quarter'] = None
-        if data['specimen_collected_date'] is not None:
-            #year, month, day = data['specimen_collected_date'].split('-')
-            year = data['specimen_collected_date'].year
-            month = data['specimen_collected_date'].month
-            data['specimen_collected_year'] = year
-            data['specimen_collected_quarter'] = (int(month)-1)//3 + 1
-
-
-class NewTestsSchema(pl.BaseSchema):
-    report_id = fields.String(load_from='REPORT_ID'.lower(), dump_to='report_id')
-    test_type_2 = fields.String(load_from='TEST_TYPE_2'.lower(), dump_to='test_type') ## Does this actually need the trailing 2?
-    test_result = fields.String(load_from='TEST_RESULT'.lower(), dump_to='test_result')
-    specimen_collected_date = fields.Date(load_from='SPECIMEN_COLLECTED_DATE'.lower(), dump_to='specimen_collected_date', allow_none=True)
-    test_report_date = fields.Date(load_from='TEST_REPORT_DATE'.lower(), dump_to='test_report_date', allow_none=True)
-    test_completed_date = fields.Date(load_from='TEST_COMPLETED_DATE'.lower(), dump_to='test_completed_date', allow_none=True)
-    test_report_date = fields.Date(load_from='TEST_REPORT_DATE'.lower(), dump_to='test_report_date')
-    public_age_bucket = fields.String(load_from='PUBLIC_AGE_BUCKET'.lower(), dump_to='public_age_bucket')
-    public_sex = fields.String(load_from='PUBLIC_SEX'.lower(), dump_to='public_sex')
-    public_ethnicity = fields.String(load_from='PUBLIC_ETHNICITY'.lower(), dump_to='public_ethnicity')
-    specimen_collected_year = fields.Integer(dump_only=True, dump_to='specimen_collected_year', allow_none=True)
-    specimen_collected_quarter = fields.Integer(dump_only=True, dump_to='specimen_collected_quarter', allow_none=True)
-    update_date = fields.Date(load_from='UPDATE_DATE'.lower(), dump_to='update_date')
-
-    class Meta:
-        ordered = True
-
-    @pre_load
-    def remove_bogus_dates_and_add_filter_fields(self, data):
-        date_fields = ['specimen_collected_date', 'test_report_date', 'test_completed_date']
-        for f in date_fields:
-            if data[f] == 'NA':
-                data[f] = None
-            elif data[f][:4] < '2020':
-                data[f] = None
-
-    @post_load
-    def add_filter_fields(self, data):
-        data['specimen_collected_year'] = None
-        data['specimen_collected_quarter'] = None
-        if data['specimen_collected_date'] is not None:
-            #year, month, day = data['specimen_collected_date'].split('-')
-            year = data['specimen_collected_date'].year
-            month = data['specimen_collected_date'].month
-            data['specimen_collected_year'] = year
-            data['specimen_collected_quarter'] = (int(month)-1)//3 + 1
+        data['test_report_year'] = None
+        data['test_report_quarter'] = None
+        if data['test_report_date'] is not None:
+            year = data['test_report_date'].year
+            month = data['test_report_date'].month
+            data['test_report_year'] = year
+            data['test_report_quarter'] = (int(month)-1)//3 + 1
 
 class TestingCasesSchema(pl.BaseSchema):
     indv_id = fields.String()
@@ -308,24 +266,6 @@ job_dicts = [
         'resource_description': 'Test results by individual test. Updated daily.',
         'custom_post_processing': express_load_then_delete_file
     },
-#    {
-#        'job_code': 'new_tests',
-#        'source_type': 'sftp',
-#        'source_dir': 'Health Department',
-#        'source_file': f'CovidTests_new.csv',
-#        'connector_config_string': 'sftp.county_sftp',
-#        'encoding': 'utf-8-sig',
-#        'schema': NewTestsSchema,
-#        #'primary_key_fields': [],
-#        'always_wipe_data': True,
-#        'upload_method': 'insert',
-#        'destination': 'file',
-#        'destination_file': f'covid_19_tests_new.csv',
-#        'package': covid_19_package_id,
-#        'resource_name': f'Allegheny County COVID-19 Individual Test Results (New)',
-#        'resource_description': 'Test results by individual test. Updated daily.',
-#        'custom_post_processing': express_load_then_delete_file
-#    },
     {
         'job_code': 'testing_cases',
         'source_type': 'sftp',
