@@ -151,6 +151,7 @@ class NewTestsSchema(pl.BaseSchema):
 class TestingCasesSchema(pl.BaseSchema):
     indv_id = fields.String()
     collection_date = fields.Date()
+    report_date = fields.Date(load_from='REPORT_DATE'.lower(), dump_to='report_date')
     test_result = fields.String(allow_none=True)
     case_status = fields.String()
     hospital_flag = fields.String(allow_none=True)
@@ -160,7 +161,7 @@ class TestingCasesSchema(pl.BaseSchema):
     sex = fields.String()
     race = fields.String()
     ethnicity = fields.String()
-    update_date = fields.Date()
+    update_date = fields.Date(load_from='UPDATE_DATE'.lower(), dump_to='update_date')
 
     class Meta:
         ordered = True
