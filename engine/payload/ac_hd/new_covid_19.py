@@ -214,7 +214,7 @@ def express_load_then_delete_file(job, **kwparameters):
 
     # Since launchpad.py doesn't update the last_etl_update metadata value in this case
     # because this is a workaround, do it manually here:
-    post_process(resource_id, job)
+    post_process(resource_id, job, **kwparameters)
     # [ ] But really, an ExpressLoader is probably called for, or at least a standardized express_load_then_delete_file function.
 
 #covid_19_package_id = '80e0ca5d-c88a-4b1a-bf5d-51d0aaeeac86' # Production version of COVID-19 testing data package
