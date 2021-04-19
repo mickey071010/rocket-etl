@@ -36,11 +36,17 @@ class DeathsByDateSchema(pl.BaseSchema):
         ordered = True
 
 class CasesByPlaceSchema(pl.BaseSchema):
-    neighborhood_municipality = fields.String()
-    indv_tested = fields.Integer()
-    cases = fields.Integer()
-    deaths = fields.Integer()
-    update_date = fields.Date()
+    neighborhood_municipality = fields.String(load_from='NEIGHBORHOOD_MUNICIPALITY'.lower(), dump_to='neighborhood_municipality')
+    individuals_tested = fields.Integer(load_from='INDIVIDUALS_TESTED'.lower(), dump_to='individuals_tested')
+    cases = fields.Integer(load_from='CASES'.lower(), dump_to='cases')
+    deaths = fields.Integer(load_from='DEATHS'.lower(), dump_to='deaths')
+    tests = fields.Integer(load_from='TESTS'.lower(), dump_to='tests')
+    postives = fields.Integer(load_from='POSTIVES'.lower(), dump_to='postives')
+    ag_tests = fields.Integer(load_from='AG_TESTS'.lower(), dump_to='ag_tests')
+    positive_ag_tests = fields.Integer(load_from='POSITIVE_AG_TESTS'.lower(), dump_to='positive_ag_tests')
+    pcr_tests = fields.Integer(load_from='PCR_TESTS'.lower(), dump_to='pcr_tests')
+    positive_pcr_tests = fields.Integer(load_from='POSITIVE_PCR_TESTS'.lower(), dump_to='positive_pcr_tests')
+    update_date = fields.Date(load_from='UPDATE_DATE'.lower(), dump_to='update_date')
 
     class Meta:
         ordered = True
