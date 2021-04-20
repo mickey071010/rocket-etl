@@ -153,6 +153,9 @@ class SFTPConnector(FileConnector):
     def connect(self, target):
         try:
             self.transport = paramiko.Transport((self.host, self.port))
+            #self.transport.timeout = 180 # This is where and how to increase the timeouts to deal with a slow FTP server.
+            #self.transport.banner_timeout = 180
+            #self.transport.auth_timeout = 180
             self.transport.connect(
                 username=self.username, password=self.password
             )
