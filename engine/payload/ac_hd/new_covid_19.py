@@ -40,6 +40,7 @@ class CasesByPlaceSchema(pl.BaseSchema):
     individuals_tested = fields.Integer(load_from='INDIVIDUALS_TESTED'.lower(), dump_to='individuals_tested')
     cases = fields.Integer(load_from='CASES'.lower(), dump_to='cases')
     deaths = fields.Integer(load_from='DEATHS'.lower(), dump_to='deaths')
+    hospitalizations = fields.Integer(load_from='HOSPITALIZATIONS'.lower(), dump_to='hospitalizations')
     tests = fields.Integer(load_from='TESTS'.lower(), dump_to='tests')
     postives = fields.Integer(load_from='POSTIVES'.lower(), dump_to='postives')
     ag_tests = fields.Integer(load_from='AG_TESTS'.lower(), dump_to='ag_tests')
@@ -63,6 +64,7 @@ class CasesByPlaceArchiveSchema(pl.BaseSchema):
     positive_pcr_tests = fields.Integer(load_from='POSITIVE_PCR_TESTS'.lower(), dump_to='positive_pcr_tests')
     cases = fields.Integer(load_from='CASES'.lower(), dump_to='cases')
     deaths = fields.Integer(load_from='DEATHS'.lower(), dump_to='deaths')
+    hospitalizations = fields.Integer(load_from='HOSPITALIZATIONS'.lower(), dump_to='hospitalizations')
 
     class Meta:
         ordered = True
