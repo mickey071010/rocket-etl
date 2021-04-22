@@ -56,3 +56,129 @@ def get_arcgis_data_url(data_json_url, dataset_title, file_format, dataset=None,
             filename, query_string = filename_and_query_string.split('?')
             return url_without_query_string, filename
     raise ValueError(f"Unable to find title file of type {file_format} and the '{dataset_title}' dataset in {data_json_url}.")
+
+def standard_arcgis_job_dicts(data_json_url, arcgis_dataset_title, base_job_code, package_id, schema, new_wave_format=True):
+    ag_dataset = get_arcgis_dataset(arcgis_dataset_title, data_json_url)
+    if new_wave_format:
+        job_dicts = [
+            {
+                'job_code': f'{base_job_code}_csv',
+                'source_type': 'http',
+                'source_full_url': get_arcgis_data_url(data_json_url, arcgis_dataset_title, 'CSV', ag_dataset)[0],
+                'encoding': 'utf-8',
+                'schema': schema,
+                'always_wipe_data': True,
+                #'primary_key_fields': ['\ufeffobjectid', 'id_no', 'oid', 'id']
+                'destination': 'ckan' if schema is not None else 'ckan_filestore',
+                'package': package_id,
+                'resource_name': f'{arcgis_dataset_title} (CSV)',
+                'upload_method': 'insert',
+            },
+            {
+                'job_code': f'{base_job_code}_geojson',
+                'source_type': 'http',
+                'source_full_url': get_arcgis_data_url(data_json_url, arcgis_dataset_title, 'GeoJSON', ag_dataset)[0],
+                'encoding': 'utf-8',
+                'destination': 'ckan_filestore',
+                'package': package_id,
+                'resource_name': f'{arcgis_dataset_title} (GeoJSON)',
+            },
+            {
+                'job_code': f'{base_job_code}_kml',
+                'source_type': 'http',
+                'source_full_url': get_arcgis_data_url(data_json_url, arcgis_dataset_title, 'KML', ag_dataset)[0],
+                'encoding': 'utf-8',
+                'destination': 'ckan_filestore',
+                'package': package_id,
+                'resource_name': f'{arcgis_dataset_title} (KML)',
+            },
+            {
+                'job_code': f'{base_job_code}_shapefile',
+                'source_type': 'http',
+                'source_full_url': get_arcgis_data_url(data_json_url, arcgis_dataset_title, 'Shapefile', ag_dataset)[0],
+                'encoding': 'binary',
+                'destination': 'ckan_filestore',
+                'package': package_id,
+                'resource_name': f'{arcgis_dataset_title} (Shapefile)',
+            },
+            {
+                'job_code': f'{base_job_code}_api',
+                'source_type': 'http',
+                'source_full_url': get_arcgis_data_url(data_json_url, arcgis_dataset_title, 'Esri Rest API', ag_dataset, True)[0],
+                'encoding': 'utf-8',
+                'destination': 'ckan_link',
+                'package': package_id,
+                'resource_name': f'{arcgis_dataset_title} (ESRI REST API)',
+            },
+            {
+                'job_code': f'{base_job_code}_web',
+                'source_type': 'http',
+                'source_full_url': get_arcgis_data_url(data_json_url, arcgis_dataset_title, 'ArcGIS Hub Dataset', ag_dataset, True)[0],
+                'encoding': 'utf-8',
+                'destination': 'ckan_link',
+                'package': package_id,
+                'resource_name': f'{arcgis_dataset_title} (data source landing page)',
+            },
+        ]
+    else: # Use traditional resource naming set by the harvester.
+        job_dicts = [
+            {
+                'job_code': f'{base_job_code}_web',
+                'source_type': 'http',
+                'source_full_url': get_arcgis_data_url(data_json_url, arcgis_dataset_title, 'ArcGIS Hub Dataset', ag_dataset, True)[0],
+                'encoding': 'utf-8',
+                'destination': 'ckan_link',
+                'package': package_id,
+                'resource_name': f'ArcGIS Hub Dataset',
+            },
+            {
+                'job_code': f'{base_job_code}_api',
+                'source_type': 'http',
+                'source_full_url': get_arcgis_data_url(data_json_url, arcgis_dataset_title, 'Esri Rest API', ag_dataset, True)[0],
+                'encoding': 'utf-8',
+                'destination': 'ckan_link',
+                'package': package_id,
+                'resource_name': f'Esri Rest API',
+            },
+            {
+                'job_code': f'{base_job_code}_geojson',
+                'source_type': 'http',
+                'source_full_url': get_arcgis_data_url(data_json_url, arcgis_dataset_title, 'GeoJSON', ag_dataset)[0],
+                'encoding': 'utf-8',
+                'destination': 'ckan_filestore',
+                'package': package_id,
+                'resource_name': f'GeoJSON',
+            },
+            {
+                'job_code': f'{base_job_code}_csv',
+                'source_type': 'http',
+                'source_full_url': get_arcgis_data_url(data_json_url, arcgis_dataset_title, 'CSV', ag_dataset)[0],
+                'encoding': 'utf-8',
+                'schema': schema,
+                'always_wipe_data': True,
+                #'primary_key_fields': ['\ufeffobjectid', 'id_no', 'oid', 'id']
+                'destination': 'ckan',
+                'package': package_id,
+                'resource_name': f'CSV',
+                'upload_method': 'insert',
+            },
+            {
+                'job_code': f'{base_job_code}_kml',
+                'source_type': 'http',
+                'source_full_url': get_arcgis_data_url(data_json_url, arcgis_dataset_title, 'KML', ag_dataset)[0],
+                'encoding': 'utf-8',
+                'destination': 'ckan_filestore',
+                'package': package_id,
+                'resource_name': f'KML',
+            },
+            {
+                'job_code': f'{base_job_code}_shapefile',
+                'source_type': 'http',
+                'source_full_url': get_arcgis_data_url(data_json_url, arcgis_dataset_title, 'Shapefile', ag_dataset)[0],
+                'encoding': 'binary',
+                'destination': 'ckan_filestore',
+                'package': package_id,
+                'resource_name': f'Shapefile',
+            },
+        ]
+    return job_dicts
