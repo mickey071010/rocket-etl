@@ -21,9 +21,11 @@ def get_arcgis_dataset(title, data_json_url):
         return candidates[0]
     raise ValueError(f"{len(candidates)} datasets found with the title '{title}'.")
 
-def get_arcgis_data_url(data_json_url, dataset_title, file_format):
+def get_arcgis_data_url(data_json_url, dataset_title, file_format, dataset=None, link=False):
     """Get the URL for a file of a given format from a dataset, based on its title,
     found in data.json file at the given URL.
+
+    If a link to a web page is desired instead of a link to a file, set the link flag to True.
 
     Example:
         To get the CSV version of the data at
@@ -37,10 +39,13 @@ def get_arcgis_data_url(data_json_url, dataset_title, file_format):
         ('https://hudgis-hud.opendata.arcgis.com/datasets/52a6a3a2ef1e4489837f97dcedaf8e27_0.csv',
             '52a6a3a2ef1e4489837f97dcedaf8e27_0.csv')
     """
-    dataset = get_arcgis_dataset(dataset_title, data_json_url)
+    if dataset is None:
+        dataset = get_arcgis_dataset(dataset_title, data_json_url)
     for distribution in dataset['distribution']:
         if distribution['title'].lower() == file_format.lower():
             url = distribution['accessURL']
+            if link:
+                return url, None
             url_without_query_string, query_string = url.split('?')
             # The query string is being stripped because a) it makes the file extension no
             # longer the last thing in the filename component and b) in this case being
