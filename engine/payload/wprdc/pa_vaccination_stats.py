@@ -275,10 +275,10 @@ class Dose1AllocationByClinicSchema(pl.BaseSchema):
     covid_19_vaccine_clinic_name = fields.String(load_from='COVID_19_Vaccine_Clinic_Name'.lower(), dump_to='covid_19_vaccine_clinic_name')
     street_address = fields.String(load_from='Street Address'.lower(), dump_to='street_address')
     city = fields.String(load_from='City'.lower(), dump_to='city')
-    state = fields.String(load_from='State'.lower(), dump_to='state')
+    state = fields.String(load_from='State'.lower(), dump_to='state', allow_none=True)
     zip_code = fields.String(load_from='ZIP Code'.lower(), dump_to='zip_code')
     county_name = fields.String(load_from='County Name'.lower(), dump_to='county_name', allow_none=True) # Accidental nulls started appearing in older data.
-    data_as_of_date = fields.Date(load_from='Data as of Date'.lower(), dump_to='data_as_of_date')
+    data_as_of_date = fields.Date(load_from='Data as of Date'.lower(), dump_to='data_as_of_date', allow_none=True)
     clinic_website = fields.String(load_from='Clinic Website'.lower(), dump_to='clinic_web_site', allow_none=True)
     phone_number = fields.String(load_from='Phone Number'.lower(), dump_to='phone_number', allow_none=True)
     number_of_doses_allocated = fields.Integer(load_from='Number of Doses Allocated'.lower(), dump_to='number_of_doses_allocated', allow_none=True)
