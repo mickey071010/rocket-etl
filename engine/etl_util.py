@@ -610,6 +610,22 @@ class Job:
         # The retry_without_last_line option is a way of dealing with CSV files
         # that abruptly end mid-line.
         locators_by_destination = {}
+
+        if self.destination == 'ckan_link': # Handle special case of just wanting to make a resource that is just a hyperlink
+            # which really doesn't need a full pipeline at this point.
+            from engine.credentials import site, API_key
+            ckan = ckanapi.RemoteCKAN(site, apikey=API_key)
+            resource_id = find_resource_id(self.package_id, self.resource_name)
+            if resource_id is None:
+                resource_as_dict = ckan.action.resource_create(package_id=self.package_id, url=self.source_full_url, format='HTML', name=self.resource_name)
+                resource_id = resource_as_dict['id']
+            else:
+                resource_as_dict = ckan.action.resource_update(id=resource_id, url=self.source_full_url, format='HTML', name=self.resource_name)
+
+            locators_by_destination[self.destination] = resource_id
+            return locators_by_destination
+
+
         source_file_format = self.source_file.split('.')[-1].lower()
         if self.destination_file is not None:
             self.destination_file_format = self.destination_file.split('.')[-1].lower()
