@@ -177,8 +177,8 @@ def express_load_then_delete_file(job, **kwparameters):
     post_process(resource_id, job, **kwparameters)
     # [ ] But really, an ExpressLoader is probably called for, or at least a standardized express_load_then_delete_file function.
 
-#covid_19_package_id = '80e0ca5d-c88a-4b1a-bf5d-51d0aaeeac86' # Production version of COVID-19 testing data package
-covid_19_package_id = '265e27f9-a600-45da-bfb2-64f812505f29' # Test version of COVID-19 testing data package
+covid_19_package_id = '80e0ca5d-c88a-4b1a-bf5d-51d0aaeeac86' # Production version of COVID-19 testing data package
+#covid_19_package_id = '265e27f9-a600-45da-bfb2-64f812505f29' # Test version of COVID-19 testing data package
 
 job_dicts = [
     {
