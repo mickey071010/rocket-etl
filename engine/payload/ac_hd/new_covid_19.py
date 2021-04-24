@@ -251,6 +251,23 @@ job_dicts = [
         'custom_post_processing': express_load_then_delete_file
     },
     {
+        'job_code': 'testing_cases',
+        'source_type': 'sftp',
+        'source_dir': 'Health Department',
+        'source_file': f'CovidTestingCases_new.csv',
+        'connector_config_string': 'sftp.county_sftp',
+        'encoding': 'utf-8-sig',
+        'schema': TestingCasesSchema,
+        #'primary_key_fields': [],
+        'always_wipe_data': True,
+        'upload_method': 'insert',
+        'destination': 'file',
+        'destination_file': f'covid_19_testing_cases.csv',
+        'package': covid_19_package_id,
+        'resource_name': f'Allegheny County COVID-19 Tests and Cases',
+        'custom_post_processing': express_load_then_delete_file
+    },
+    {
         'job_code': 'tests',
         'source_type': 'sftp',
         'source_dir': 'Health Department',
@@ -266,23 +283,6 @@ job_dicts = [
         'package': covid_19_package_id,
         'resource_name': f'Allegheny County COVID-19 Individual Test Results',
         'resource_description': 'Test results by individual test. Updated daily.',
-        'custom_post_processing': express_load_then_delete_file
-    },
-    {
-        'job_code': 'testing_cases',
-        'source_type': 'sftp',
-        'source_dir': 'Health Department',
-        'source_file': f'CovidTestingCases_new.csv',
-        'connector_config_string': 'sftp.county_sftp',
-        'encoding': 'utf-8-sig',
-        'schema': TestingCasesSchema,
-        #'primary_key_fields': [],
-        'always_wipe_data': True,
-        'upload_method': 'insert',
-        'destination': 'file',
-        'destination_file': f'covid_19_testing_cases.csv',
-        'package': covid_19_package_id,
-        'resource_name': f'Allegheny County COVID-19 Tests and Cases',
         'custom_post_processing': express_load_then_delete_file
     },
 ]
