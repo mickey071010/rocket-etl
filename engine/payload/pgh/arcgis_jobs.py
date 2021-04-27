@@ -7,7 +7,7 @@ from collections import OrderedDict, defaultdict
 from marshmallow import fields, pre_load, post_load
 from engine.wprdc_etl import pipeline as pl
 from engine.etl_util import fetch_city_file
-from engine.arcgis_util import get_arcgis_data_url, standard_arcgis_job_dicts
+from engine.arcgis_util import get_arcgis_dataset, get_arcgis_data_url, standard_arcgis_job_dicts
 from engine.notify import send_to_slack
 from engine.scraping_util import scrape_nth_link
 from engine.parameters.local_parameters import SOURCE_DIR, PRODUCTION
@@ -25,6 +25,9 @@ job_dicts = []
 
 data_json_url = 'https://pghgishub-pittsburghpa.opendata.arcgis.com/data.json'
 test_package_id = 'f618f456-0d69-46ff-abc2-1e80ef101c49' # Test package for arcgis_jobs.py
+
+_, data_json_content = get_arcgis_dataset('Pittsburgh Steps', data_json_url, None) # Cache data.json
+# to avoid looking it up for each job in this file.
 #############
 
 class StepsSchema(pl.BaseSchema):
@@ -71,7 +74,7 @@ seeds.append({
         'new_wave_format': True
         })
 
-job_dicts += standard_arcgis_job_dicts(data_json_url, **seeds[-1])
+job_dicts += standard_arcgis_job_dicts(data_json_url, data_json_content, **seeds[-1])
 
 ##########
 class LandslidesSchema(pl.BaseSchema):
@@ -98,6 +101,6 @@ seeds.append({
         'new_wave_format': False
         })
 
-job_dicts += standard_arcgis_job_dicts(data_json_url, **seeds[-1])
+job_dicts += standard_arcgis_job_dicts(data_json_url, data_json_content, **seeds[-1])
 
 assert len(job_dicts) == len({d['job_code'] for d in job_dicts}) # Verify that all job codes are unique.

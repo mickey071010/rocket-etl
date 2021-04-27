@@ -7,18 +7,19 @@ try:
 except ImportError:  # Graceful fallback if IceCream isn't installed.
     ic = lambda *a: None if not a else (a[0] if len(a) == 1 else a)  # noqa
 
-def get_arcgis_dataset(title, data_json_url):
-    try:
-        r = requests.get(data_json_url)
-    except requests.exceptions.ConnectionError: # Retry on ConnectionError
-        time.sleep(10)
-        r = requests.get(data_json_url)
+def get_arcgis_dataset(title, data_json_url, catalog=None):
+    if catalog is None:
+        try:
+            r = requests.get(data_json_url)
+        except requests.exceptions.ConnectionError: # Retry on ConnectionError
+            time.sleep(10)
+            r = requests.get(data_json_url)
 
-    catalog = r.json()
+        catalog = r.json()
     candidates = [dataset for dataset in catalog['dataset'] if dataset['title'] == title]
     if len(candidates) == 1:
         time.sleep(1)
-        return candidates[0]
+        return candidates[0], catalog
     raise ValueError(f"{len(candidates)} datasets found with the title '{title}'.")
 
 def get_arcgis_data_url(data_json_url, dataset_title, file_format, dataset=None, link=False):
@@ -40,7 +41,7 @@ def get_arcgis_data_url(data_json_url, dataset_title, file_format, dataset=None,
             '52a6a3a2ef1e4489837f97dcedaf8e27_0.csv')
     """
     if dataset is None:
-        dataset = get_arcgis_dataset(dataset_title, data_json_url)
+        dataset, data_json_content = get_arcgis_dataset(dataset_title, data_json_url)
     for distribution in dataset['distribution']:
         if distribution['title'].lower() == file_format.lower():
             url = distribution['accessURL']
@@ -57,8 +58,8 @@ def get_arcgis_data_url(data_json_url, dataset_title, file_format, dataset=None,
             return url_without_query_string, filename
     raise ValueError(f"Unable to find title file of type {file_format} and the '{dataset_title}' dataset in {data_json_url}.")
 
-def standard_arcgis_job_dicts(data_json_url, arcgis_dataset_title, base_job_code, package_id, schema, new_wave_format=True):
-    ag_dataset = get_arcgis_dataset(arcgis_dataset_title, data_json_url)
+def standard_arcgis_job_dicts(data_json_url, data_json_content, arcgis_dataset_title, base_job_code, package_id, schema, new_wave_format=True):
+    ag_dataset, data_json_content = get_arcgis_dataset(arcgis_dataset_title, data_json_url, data_json_content)
     if new_wave_format:
         job_dicts = [
             {
