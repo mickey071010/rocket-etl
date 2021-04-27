@@ -92,13 +92,13 @@ class ToxicWaterSchema(ToxicAirSchema):
                     data[k] = str(int(float(data[k])))
 
 class ToxicOffsiteSchema(ToxicTemplate):
-    transfer_loc_num = fields.Integer(load_from='TRANSFER_LOC_NUM'.lower(), dump_to='transfer_loc_num')
-    off_site_amount_sequence = fields.Integer(load_from='OFF_SITE_AMOUNT_SEQUENCE'.lower(), dump_to='off_site_amount_sequence')
-    type_of_waste_management = fields.String(load_from='TYPE_OF_WASTE_MANAGEMENT'.lower(), dump_to='type_of_waste_management', allow_none=True)
-    transfer_range_code = fields.String(load_from='TRANSFER_RANGE_CODE'.lower(), dump_to='transfer_range_code', allow_none=True)
-    transfer_amt = fields.Float(load_from='TRANSFER_AMT'.lower(), dump_to='transfer_amt')
-    transfer_est_na = fields.String(load_from='TRANSFER_EST_NA'.lower(), dump_to='transfer_est_na')
-    transfer_basis_est_code = fields.String(load_from='TRANSFER_BASIS_EST_CODE'.lower(), dump_to='transfer_basis_est_code', allow_none=True)
+    transfer_loc_num = fields.Integer(load_from='TRANSFER_LOC_NUM'.lower(), dump_to='TRANSFER_LOC_NUM')
+    off_site_amount_sequence = fields.Integer(load_from='OFF_SITE_AMOUNT_SEQUENCE'.lower(), dump_to='OFF_SITE_AMOUNT_SEQUENCE')
+    type_of_waste_management = fields.String(load_from='TYPE_OF_WASTE_MANAGEMENT'.lower(), dump_to='TYPE_OF_WASTE_MANAGEMENT', allow_none=True)
+    transfer_range_code = fields.String(load_from='TRANSFER_RANGE_CODE'.lower(), dump_to='TRANSFER_RANGE_CODE', allow_none=True)
+    transfer_amt = fields.Float(load_from='TRANSFER_AMT'.lower(), dump_to='TRANSFER_AMT')
+    transfer_est_na = fields.String(load_from='TRANSFER_EST_NA'.lower(), dump_to='TRANSFER_EST_NA')
+    transfer_basis_est_code = fields.String(load_from='TRANSFER_BASIS_EST_CODE'.lower(), dump_to='TRANSFER_BASIS_EST_CODE', allow_none=True)
     off_site_name = fields.String(load_from='OFF_SITE_NAME'.lower(), dump_to='OFF_SITE_NAME', allow_none=True)
     off_site_street_address = fields.String(load_from='OFF_SITE_STREET_ADDRESS'.lower(), dump_to='OFF_SITE_STREET_ADDRESS', allow_none=True)
     transfer_city_name = fields.String(load_from='TRANSFER_CITY_NAME'.lower(), dump_to='TRANSFER_CITY_NAME', allow_none=True)
@@ -107,7 +107,7 @@ class ToxicOffsiteSchema(ToxicTemplate):
     transfer_zip_code = fields.String(load_from='TRANSFER_ZIP_CODE'.lower(), dump_to='TRANSFER_ZIP_CODE', allow_none=True)
     transfer_country_code = fields.String(load_from='TRANSFER_COUNTRY_CODE'.lower(), dump_to='TRANSFER_COUNTRY_CODE', allow_none=True)
     rcra_num = fields.String(load_from='RCRA_NUM'.lower(), dump_to='RCRA_NUM', allow_none=True)
-    controlled_loc = fields.String(load_from='CONTROLLED_LOC'.lower(), dump_to='controlled_loc')
+    controlled_loc = fields.String(load_from='CONTROLLED_LOC'.lower(), dump_to='CONTROLLED_LOC')
     transfer_loc_epa_registry_id = fields.String(load_from='TRANSFER_LOC_EPA_REGISTRY_ID'.lower(), dump_to='TRANSFER_LOC_EPA_REGISTRY_ID', allow_none=True)
 
     @pre_load
@@ -120,7 +120,7 @@ class ToxicOffsiteSchema(ToxicTemplate):
                     data[k] = None
 
 class ToxicFacilitiesSchema(pl.BaseSchema):
-    _id = fields.String(load_from='ID'.lower(), dump_to='id')
+    _id = fields.String(load_from='ID'.lower(), dump_to='ID')
     facility_name = fields.String(load_from='FACILITY_NAME'.lower(), dump_to='FACILITY_NAME')
     street_address = fields.String(load_from='STREET_ADDRESS'.lower(), dump_to='STREET_ADDRESS')
     city_name = fields.String(load_from='CITY_NAME'.lower(), dump_to='CITY_NAME')
