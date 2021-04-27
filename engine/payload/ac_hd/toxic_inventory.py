@@ -25,14 +25,14 @@ class ToxicTemplate(pl.BaseSchema):
     state_abbr = fields.String(load_from='STATE_ABBR'.lower(), dump_to='STATE_ABBR')
     zip_code = fields.String(load_from='ZIP_CODE'.lower(), dump_to='ZIP_CODE')
     region = fields.String(load_from='REGION'.lower(), dump_to='REGION')
-    fac_closed_ind = fields.Boolean(load_from='FAC_CLOSED_IND'.lower(), dump_to='FAC_CLOSED_IND')
+    fac_closed_ind = fields.String(load_from='FAC_CLOSED_IND'.lower(), dump_to='FAC_CLOSED_IND')
     asgn_federal_ind = fields.String(load_from='ASGN_FEDERAL_IND'.lower(), dump_to='ASGN_FEDERAL_IND')
     asgn_agency = fields.String(load_from='ASGN_AGENCY'.lower(), dump_to='ASGN_AGENCY', allow_none=True)
     parent_co_db_num = fields.String(load_from='PARENT_CO_DB_NUM'.lower(), dump_to='PARENT_CO_DB_NUM', allow_none=True)
     parent_co_name = fields.String(load_from='PARENT_CO_NAME'.lower(), dump_to='PARENT_CO_NAME')
     standardized_parent_company = fields.String(load_from='STANDARDIZED_PARENT_COMPANY'.lower(), dump_to='STANDARDIZED_PARENT_COMPANY', allow_none=True)
     epa_registry_id = fields.String(load_from='EPA_REGISTRY_ID'.lower(), dump_to='EPA_REGISTRY_ID', allow_none=True)
-    trade_secret_ind = fields.Boolean(load_from='TRADE_SECRET_IND'.lower(), dump_to='TRADE_SECRET_IND')
+    trade_secret_ind = fields.String(load_from='TRADE_SECRET_IND'.lower(), dump_to='TRADE_SECRET_IND')
     reporting_year = fields.Integer(load_from='REPORTING_YEAR'.lower(), dump_to='REPORTING_YEAR')
     cas_num = fields.String(load_from='CAS_NUM'.lower(), dump_to='CAS_NUM', allow_none=True)
     elemental_metal_included = fields.String(load_from='ELEMENTAL_METAL_INCLUDED'.lower(), dump_to='ELEMENTAL_METAL_INCLUDED', allow_none=True)
@@ -65,17 +65,6 @@ class ToxicAirSchema(ToxicTemplate):
                 data[k] = 'No US Parent'
             elif k.lower() in ['asgn_agency', 'parent_co_db_num', 'standardized_parent_company', 'epa_registry_id', 'cas_num', 'primary_sic_code', 'sic_codes', 'release_range_code', 'total_release', 'release_basis_est_code', 'srs_id']:
                 if v in ['NA']:
-                    data[k] = None
-
-    @pre_load
-    def boolify(self, data):
-        for k, v in data.items():
-            if k.lower() in ['fac_closed_ind', 'trade_secret_ind']:
-                if v in ['0', 0]:
-                    data[k] = False
-                elif v in ['1', 1]:
-                    data[k] = True
-                else:
                     data[k] = None
 
 class ToxicWaterSchema(ToxicAirSchema):
@@ -140,7 +129,7 @@ class ToxicFacilitiesSchema(pl.BaseSchema):
     state_abbr = fields.String(load_from='STATE_ABBR'.lower(), dump_to='STATE_ABBR')
     zip_code = fields.String(load_from='ZIP_CODE'.lower(), dump_to='ZIP_CODE')
     region = fields.String(load_from='REGION'.lower(), dump_to='REGION')
-    fac_closed_ind = fields.Boolean(load_from='FAC_CLOSED_IND'.lower(), dump_to='FAC_CLOSED_IND')
+    fac_closed_ind = fields.String(load_from='FAC_CLOSED_IND'.lower(), dump_to='FAC_CLOSED_IND')
     mail_name = fields.String(load_from='MAIL_NAME'.lower(), dump_to='MAIL_NAME', allow_none=True)
     mail_street_address = fields.String(load_from='MAIL_STREET_ADDRESS'.lower(), dump_to='MAIL_STREET_ADDRESS')
     mail_city = fields.String(load_from='MAIL_CITY'.lower(), dump_to='MAIL_CITY')
@@ -163,7 +152,7 @@ class ToxicFacilitiesSchema(pl.BaseSchema):
     pref_horizontal_datum = fields.String(load_from='PREF_HORIZONTAL_DATUM'.lower(), dump_to='PREF_HORIZONTAL_DATUM', allow_none=True)
     pref_source_scale = fields.String(load_from='PREF_SOURCE_SCALE'.lower(), dump_to='PREF_SOURCE_SCALE', allow_none=True)
     pref_qa_code = fields.String(load_from='PREF_QA_CODE'.lower(), dump_to='PREF_QA_CODE', allow_none=True)
-    asgn_partial_ind = fields.Boolean(load_from='ASGN_PARTIAL_IND'.lower(), dump_to='ASGN_PARTIAL_IND')
+    asgn_partial_ind = fields.String(load_from='ASGN_PARTIAL_IND'.lower(), dump_to='ASGN_PARTIAL_IND')
     asgn_public_contact = fields.String(load_from='ASGN_PUBLIC_CONTACT'.lower(), dump_to='ASGN_PUBLIC_CONTACT', allow_none=True)
     asgn_public_phone = fields.String(load_from='ASGN_PUBLIC_PHONE'.lower(), dump_to='ASGN_PUBLIC_PHONE', allow_none=True)
     asgn_public_phone_ext = fields.String(load_from='ASGN_PUBLIC_PHONE_EXT'.lower(), dump_to='ASGN_PUBLIC_PHONE_EXT', allow_none=True)
@@ -182,17 +171,6 @@ class ToxicFacilitiesSchema(pl.BaseSchema):
                 data[k] = 'No US Parent'
             elif k.lower() in ['mail_name', 'mail_province', 'mail_country', 'asgn_agency', 'frs_id', 'parent_co_db_num', 'parent_co_name', 'fac_latitude', 'fac_longitude', 'pref_latitude', 'pref_longitude', 'pref_accuracy', 'pref_collect_meth', 'pref_desc_category', 'pref_horizontal_datum', 'pref_source_scale', 'pref_qa_code', 'asgn_public_contact', 'asgn_public_phone', 'asgn_public_contact_email', 'bia_code', 'standardized_parent_company', 'asgn_public_phone_ext', 'epa_registry_id']:
                 if v in ['NA']:
-                    data[k] = None
-
-    @pre_load
-    def boolify(self, data):
-        for k, v in data.items():
-            if k.lower() in ['fac_closed_ind', 'asgn_partial_ind']:
-                if v in ['0', 0]:
-                    data[k] = False
-                elif v in ['1', 1]:
-                    data[k] = True
-                else:
                     data[k] = None
 
 toxic_releases_package_id = TEST_PACKAGE_ID
