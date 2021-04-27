@@ -173,7 +173,7 @@ class ToxicFacilitiesSchema(pl.BaseSchema):
                 if v in ['NA']:
                     data[k] = None
 
-toxic_releases_package_id = TEST_PACKAGE_ID
+toxic_releases_package_id = '2cff4c07-423a-4b61-af08-7288fbb773eb' # Production package for Toxic Release Inventory
 
 job_dicts = [
     {
