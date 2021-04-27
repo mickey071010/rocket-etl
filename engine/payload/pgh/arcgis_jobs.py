@@ -102,5 +102,35 @@ seeds.append({
         })
 
 job_dicts += standard_arcgis_job_dicts(data_json_url, data_json_content, **seeds[-1])
+#####
+class IPODSchema(pl.BaseSchema):
+    fid = fields.String(load_from='\ufeffFID'.lower(), dump_to='fid')
+    created_user = fields.String(load_from='created_user'.lower(), dump_to='created_user')
+    created_date = fields.DateTime(load_from='created_date'.lower(), dump_to='created_date')
+    last_edited_user = fields.String(load_from='last_edited_user'.lower(), dump_to='last_edited_user')
+    last_edited_date = fields.DateTime(load_from='last_edited_date'.lower(), dump_to='last_edited_date')
+    uptown_ipod = fields.String(load_from='uptown_ipod'.lower(), dump_to='uptown_ipod')
+    shape_length = fields.Float(load_from='SHAPE_Length'.lower(), dump_to='shape_length')
+    shape_area = fields.Float(load_from='SHAPE_Area'.lower(), dump_to='shape_area')
+
+    class Meta:
+        ordered = True
+
+    @pre_load
+    def fix_datetimes(self, data):
+        for f in ['created_date', 'last_edited_date']:
+            if data[f] not in ['', 'NA', None]:
+                data[f] = parser.parse(data[f]).isoformat()
+
+seeds.append({
+        'arcgis_dataset_title': 'Uptown IPOD Zoning',
+        'base_job_code': 'ipod',
+        'package_id': '06c15511-37dd-44eb-9148-73c135457b07', # Production package ID for Uptown IPOD Zoning
+        'schema': IPODSchema,
+        'new_wave_format': False
+        })
+
+job_dicts += standard_arcgis_job_dicts(data_json_url, data_json_content, **seeds[-1])
+
 
 assert len(job_dicts) == len({d['job_code'] for d in job_dicts}) # Verify that all job codes are unique.
