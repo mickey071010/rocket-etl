@@ -17,6 +17,16 @@ try:
 except ImportError:  # Graceful fallback if IceCream isn't installed.
     ic = lambda *a: None if not a else (a[0] if len(a) == 1 else a)  # noqa
 
+seeds = [] # The point of the seeds list is to let another counterpart script (called "counterpart.py")
+# come along, pull the data_json_url and list of seeds out of this script, and
+# then look for deviations between the live data.json file and the seeds coverage.
+
+job_dicts = []
+
+data_json_url = 'https://pghgishub-pittsburghpa.opendata.arcgis.com/data.json'
+test_package_id = 'f618f456-0d69-46ff-abc2-1e80ef101c49' # Test package for arcgis_jobs.py
+#############
+
 class StepsSchema(pl.BaseSchema):
     objectid = fields.Integer(load_from='\ufeffobjectid'.lower(), dump_to='objectid')
     length = fields.String(load_from='length'.lower(), dump_to='length')
@@ -53,16 +63,15 @@ class StepsSchema(pl.BaseSchema):
     class Meta:
         ordered = True
 
-job_dicts = []
+seeds.append({
+        'arcgis_dataset_title': 'Pittsburgh Steps',
+        'base_job_code': 'steps',
+        'package_id': '9d35d609-e8f9-4c51-9dce-e7dd14e252d4', # Production version of Pittsburgh Steps package
+        'schema': StepsSchema,
+        'new_wave_format': True
+        })
 
-base_job_code = 'steps'
-package_id = '9d35d609-e8f9-4c51-9dce-e7dd14e252d4' # Production version of Pittsburgh Steps package
-arcgis_dataset_title = 'Pittsburgh Steps'
-data_json_url = 'https://pghgishub-pittsburghpa.opendata.arcgis.com/data.json'
-schema = StepsSchema
-new_wave_format = True
-
-job_dicts += standard_arcgis_job_dicts(data_json_url, arcgis_dataset_title, base_job_code, package_id, schema=schema, new_wave_format=new_wave_format)
+job_dicts += standard_arcgis_job_dicts(data_json_url, **seeds[-1])
 
 ##########
 class LandslidesSchema(pl.BaseSchema):
@@ -81,11 +90,14 @@ class LandslidesSchema(pl.BaseSchema):
     class Meta:
         ordered = True
 
-base_job_code = 'landslides'
-package_id = 'f618f456-0d69-46ff-abc2-1e80ef101c49' # Test package for arcgis_jobs.py
-arcgis_dataset_title = 'Landslide Prone Areas'
-schema = LandslidesSchema
-new_wave_format = False
-job_dicts += standard_arcgis_job_dicts(data_json_url, arcgis_dataset_title, base_job_code, package_id, schema=schema, new_wave_format=new_wave_format)
+seeds.append({
+        'arcgis_dataset_title': 'Landslide Prone Areas',
+        'base_job_code': 'landslides',
+        'package_id': '6eb1be84-7abe-45c3-8a37-90db80ea6149', # Production package ID for Landslide Prone Areas
+        'schema': LandslidesSchema,
+        'new_wave_format': False
+        })
+
+job_dicts += standard_arcgis_job_dicts(data_json_url, **seeds[-1])
 
 assert len(job_dicts) == len({d['job_code'] for d in job_dicts}) # Verify that all job codes are unique.
