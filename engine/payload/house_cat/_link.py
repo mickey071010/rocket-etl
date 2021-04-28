@@ -95,7 +95,7 @@ write_to_csv('files_by_property_id.csv', prop_id_files_list, ['property_id', 'fi
 
 # property_id
 # Out of the 794 property_id values in mf_inspections_pa that are not in any of the 3 mf*ac.csv files,
-# only one is in Pittsburgh (Lemington Heights apartments) with a 2005 inspection, and it's no longer 
+# only one is in Pittsburgh (Lemington Heights apartments) with a 2005 inspection, and it's no longer
 # in existence. None of the others appear to be in Allegheny County (based on city name and my untrained eye).
 
 # Thus, joining mf_*_ac and then adding in only those property_id values from mf_contracts and mf_inspections
@@ -104,7 +104,7 @@ write_to_csv('files_by_property_id.csv', prop_id_files_list, ['property_id', 'fi
 
 # [ ] Combine mf_subsidy_ac, mf_subsidy_loans_ac, and mf_loans_ac, join with mf_8_contracts_us
 
-fields_to_get = ['hud_property_name', 
+fields_to_get = ['hud_property_name',
         'property_street_address', 'municipality_name', 'city', 'zip_code',
         'contract_id', # mf_subsidy_ac
         'fha_loan_id',
@@ -155,7 +155,7 @@ write_to_csv('files_by_fha_loan_id.csv', fha_loan_id_files_list, [id_field, 'fil
 
 # I can't find any Allegheny County cities in the first grouping (mf_mortgages_pa records
 # that are not in mf_loans_ac), so basically we can use mf_loans_ac to join to the other
-# files. This is great because mf_loans_ac already has the property_id value. 
+# files. This is great because mf_loans_ac already has the property_id value.
 # The only exception was one of the eight records in the intersection of mf_init_commit_pa
 # (which itself only has 8 records): River Vue Apartments, which is listed in both files
 # as having the city name "Pittsburg" and the ZIP code "51212".
@@ -185,11 +185,11 @@ master_list += [v for k, v in ac_by_id.items()]
 # Some locations in Allegheny County have a county_fips_code of '42XXX'. Most of those
 # have a fips2000[:5] == '42XXX'.
 # The only properties which have county_fips_code == '42XXX' and fips2000[:5] == '42XXX',
-# AND are in Allgeheny County have lihtc_property_id values of 
+# AND are in Allgeheny County have lihtc_property_id values of
 # PAA19890800 ("NORTH BRADDOCK")
 # PAA19900328 ("WILKINSBURG")
 # PAA19910120 ("SWISSV[D]ALE")
-# These particular records also lack geocoordinates, so they could not be pulled out of 
+# These particular records also lack geocoordinates, so they could not be pulled out of
 # lihtc_projects_pa.csv based on latitude and longitude either.
 
 f = 'lihtc_projects_pa.csv'
@@ -218,7 +218,7 @@ write_to_csv('lihtc_projects_ac.csv', lihtc_projects, fields_to_get + possible_k
 
 # It's not even clear that adding the buildings gives us much. In some cases, there are 6 identical records
 # in the LIHTC buildings file, representing 6 different buildings all at the same address.
-# The advantage might be that it makes it easier to link projects across files based on something like 
+# The advantage might be that it makes it easier to link projects across files based on something like
 # inspections, linking through the street address rather than project name.
 
 # I'm skipping this for now.
@@ -260,6 +260,7 @@ for d in list_of_dicts:
     d['city'] = city_by_development_code[d[id_field]]
 
 write_to_csv('files_by_development_code.csv', list_of_dicts, [id_field, 'file_list', 'city'])
+# Presently, all development codes are in both
 
 ac_by_id = defaultdict(dict)
 
