@@ -1,4 +1,4 @@
-import csv
+import re, csv
 from pprint import pprint
 from icecream import ic
 from collections import defaultdict
@@ -37,7 +37,8 @@ def add_row_to_linking_dict(f, row, id_field, fields_to_get, ac_by_id):
         if field in row and row[field] not in [None, '']:
             ac_by_id[row[id_field]][field] = row[field]
 
-files = get_files_in_folder(path)
+all_files = get_files_in_folder(path)
+files = [f for f in all_files if f[-3:].lower() == 'csv']
 keys_by_file = defaultdict(list)
 files_by_key = defaultdict(list)
 
@@ -45,7 +46,7 @@ files_by_property_id = defaultdict(list)
 files_by_development_code = defaultdict(list)
 city_by_property_id = defaultdict(str)
 city_by_fha_loan_id = defaultdict(str)
-city_by_development_code = defaultdict(str)
+city_by_dev_code = defaultdict(str)
 
 files_by = defaultdict(lambda: defaultdict(list))
 
@@ -68,7 +69,7 @@ for f in files:
                         files_by_property_id[row[field]].append(f)
                     elif field == 'development_code':
                         if 'city' in row and row['city'] not in [None, '']:
-                            city_by_development_code[row[field]] = row['city']
+                            city_by_dev_code[row[field]] = row['city']
                         files_by_development_code[row[field]].append(f)
                         if 'city' in row and row['city'] not in [None, '']:
                             city_by_dev_code[row[field]] = row['city']
