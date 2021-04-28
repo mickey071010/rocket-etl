@@ -257,7 +257,7 @@ for dev_code, flist in files_by_development_code.items():
 
 list_of_dicts = [{id_field: k, 'file_list': v} for k, v in pa_files_by_id.items()]
 for d in list_of_dicts:
-    d['city'] = city_by_development_code[d[id_field]]
+    d['city'] = city_by_dev_code[d[id_field]]
 
 write_to_csv('files_by_development_code.csv', list_of_dicts, [id_field, 'file_list', 'city'])
 # Presently, all development codes are in both
