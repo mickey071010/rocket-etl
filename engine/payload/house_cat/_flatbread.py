@@ -670,6 +670,13 @@ class BaseMultifamilyInspectionsSchema(pl.BaseSchema):
             if data[f] is not None:
                 data[f] = str(int(data[f]))
 
+    @pre_load
+    def remove_trailing_spaces(self, data):
+        fields = ['property_name', 'city']
+        for f in fields:
+            if data[f] is not None:
+                data[f] = data[f].strip()
+
 #    @pre_load
 #    def fix_dates(self, data):
 #        """Marshmallow doesn't know how to handle a datetime as input. It can only
