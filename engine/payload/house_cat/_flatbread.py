@@ -11,6 +11,7 @@ from engine.arcgis_util import get_arcgis_data_url
 from engine.notify import send_to_slack
 from engine.scraping_util import scrape_nth_link
 from engine.parameters.local_parameters import SOURCE_DIR, PRODUCTION
+from engine.post_processors import check_for_empty_table
 
 try:
     from icecream import ic
@@ -1053,6 +1054,7 @@ job_dicts = [
         'resource_name': 'Subsidy extract from Multifamily Assistance & Section 8 Contracts (Allegheny County)',
         'upload_method': 'insert',
         'resource_description': f'Derived from https://www.hud.gov/program_offices/housing/mfh/exp/mfhdiscl', #'\n\njob code: {MultifamilyProjectsSubsidySection8Schema().job_code}',
+        'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
     },
     {
         'job_code': MultifamilyProjectsSection8ContractsSchema().job_code, # 'mf_contracts_8'
