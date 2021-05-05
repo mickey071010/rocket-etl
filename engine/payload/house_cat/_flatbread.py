@@ -171,8 +171,8 @@ class HousingInspectionScoresSchema(pl.BaseSchema):
                     data[f] = parser.parse(data[f]).date().isoformat()
 
 class HUDPublicHousingSchema(pl.BaseSchema):
-    latitude = fields.Float(load_from='\ufeffX'.lower(), dump_to='latitude', allow_none=True)
-    longitude = fields.Float(load_from='Y'.lower(), dump_to='longitude', allow_none=True)
+    longitude = fields.Float(load_from='\ufeffX'.lower(), dump_to='longitude', allow_none=True)
+    latitude = fields.Float(load_from='Y'.lower(), dump_to='latitude', allow_none=True)
     lvl2kx = fields.String(load_from='LVL2KX', dump_to='geocoding_accuracy')
         # 'R' - Interpolated rooftop (high degree of accuracy, symbolized as green)
         # '4' - ZIP+4 centroid (high degree of accuracy, symbolized as green)
@@ -386,8 +386,8 @@ class MultifamilyProjectsSubsidyLoansSchema(pl.BaseSchema):
     # one (though they pull some nonoverlapping fields), but we'll leave them as separate for now.
     job_code = 'mf_subsidy_loans'
     property_id = fields.String(load_from='property_id'.lower(), dump_to='property_id')
-    latitude = fields.Float(load_from='\ufeffX'.lower(), dump_to='latitude', allow_none=True)
-    longitude = fields.Float(load_from='Y'.lower(), dump_to='longitude', allow_none=True)
+    longitude = fields.Float(load_from='\ufeffX'.lower(), dump_to='longitude', allow_none=True)
+    latitude = fields.Float(load_from='Y'.lower(), dump_to='latitude', allow_none=True)
     lvl2kx = fields.String(load_from='LVL2KX', dump_to='geocoding_accuracy')
         # 'R' - Interpolated rooftop (high degree of accuracy, symbolized as green)
         # '4' - ZIP+4 centroid (high degree of accuracy, symbolized as green)
@@ -454,8 +454,8 @@ class MultifamilyProjectsSubsidyLoansSchema(pl.BaseSchema):
 class MultifamilyGuaranteedLoansSchema(pl.BaseSchema):
     job_code = 'mf_loans'
     property_id = fields.String(load_from='property_id'.lower(), dump_to='property_id')
-    latitude = fields.Float(load_from='\ufeffX'.lower(), dump_to='latitude', allow_none=True)
-    longitude = fields.Float(load_from='Y'.lower(), dump_to='longitude', allow_none=True)
+    longitude = fields.Float(load_from='\ufeffX'.lower(), dump_to='longitude', allow_none=True)
+    latitude = fields.Float(load_from='Y'.lower(), dump_to='latitude', allow_none=True)
     lvl2kx = fields.String(load_from='LVL2KX', dump_to='geocoding_accuracy')
         # 'R' - Interpolated rooftop (high degree of accuracy, symbolized as green)
         # '4' - ZIP+4 centroid (high degree of accuracy, symbolized as green)
