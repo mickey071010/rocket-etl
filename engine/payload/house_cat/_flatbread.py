@@ -625,6 +625,35 @@ class LIHTCSchema(pl.BaseSchema):
         if data[f] is not None:
             data[f] = str(data[f])[:5]
 
+class LIHTC2019Schema(LIHTCSchema):
+    job_code = 'lihtc_2019'
+    contact = fields.String(load_from='contact'.lower(), dump_to='owner_organization_name', allow_none=True)
+    property_manager_address = fields.String(dump_only=True, dump_to='property_manager_address', allow_none=True)
+    co_add = fields.String(load_from='co_add', load_only=True, allow_none=True)
+    co_cty = fields.String(load_from='co_cty', load_only=True, allow_none=True)
+    co_st = fields.String(load_from='co_st', load_only=True, allow_none=True)
+    co_zip = fields.String(load_from='co_zip', load_only=True, allow_none=True)
+    company = fields.String(load_from='company'.lower(), dump_to='property_manager_company', allow_none=True)
+    co_tel = fields.String(load_from='co_tel'.lower(), dump_to='property_manager_phone', allow_none=True)
+
+    lihtc_federal_id = fields.String(load_from='\ufeffhud_id'.lower(), dump_to='federal_id') # The older file had an extra FEFF character in the field name.
+
+    @post_load
+    def form_address(self, data): # [ ] Is there any chance we want to keep these parts as separate fields?
+        address = ''
+        if data['co_add'] not in ['', None]:
+            address += f"{data['co_add']}, "
+        if data['co_cty'] not in ['', None]:
+            address += f"{data['co_cty']}, "
+        if data['co_st'] not in ['', None]:
+            address += f"{data['co_st']} "
+        if data['co_zip'] not in ['', None]:
+            address += f"{data['co_zip']}"
+        address = address.strip()
+        if address in ['', 'PA']:
+            address = None
+        data['property_manager_address'] = address
+
 class LIHTCBuildingSchema(pl.BaseSchema):
     job_code = 'lihtc_building'
     hud_id = fields.String(load_from='\ufeffhud_id'.lower(), dump_to='lihtc_project_id')
@@ -862,7 +891,7 @@ job_dicts = [
         'source_type': 'http',
         'source_full_url': 'https://lihtc.huduser.gov/lihtcpub.zip',
         'source_file': 'lihtcpub.zip',
-        'compressed_file_to_extract': 'LIHTCPUB.csv',
+        'compressed_file_to_extract': 'LIHTCPUB.CSV',
         'encoding': 'binary',
         'always_wipe_data': True,
         'destination': 'file',
@@ -887,6 +916,24 @@ job_dicts = [
         'upload_method': 'insert',
         'resource_description': f'Derived from https://lihtc.huduser.gov/lihtcpub.zip', #\n\njob_code: {LIHTCSchema().job_code}',
     },
+#    {   # This is a job to preserve the old LIHTC data for internal use.
+#        'job_code': LIHTC2019Schema().job_code, # 'lihtc_2019'
+#        'source_type': 'local',
+#        'source_file': 'archive/LIHTCPUB_2019.csv',
+#        'schema': LIHTC2019Schema,
+#        'filters': [['proj_st', '==', 'PA']], # It would seem that the county FIPS
+#        # code could be used to narrow this table to just Allegheny County, but
+#        # the presence of 42XXX codes and also the truncation required to get
+#        # the 5-digit code make this complicated.
+#        #'always_wipe_data': True,
+#        #'destination': 'ckan',
+#        'destination': 'file',
+#        'destination_file': f'lihtc_projects_pa_2019.csv',
+#        #'package': housecat_package_id,
+#        #'resource_name': 'LIHTC (Pennsylvania)',
+#        #'upload_method': 'insert',
+#        #'resource_description': f'Derived from https://lihtc.huduser.gov/lihtcpub.zip', #\n\njob_code: {LIHTCSchema().job_code}',
+#    },
     {   # This job is a two-step job. Step 1: Get the buildings from the file that
         # either has to be manually pulled from lihtc.huduser.gov or extracted from
         # the Access database.
