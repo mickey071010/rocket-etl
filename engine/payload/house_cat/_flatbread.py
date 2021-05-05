@@ -272,6 +272,7 @@ class MultifamilyProjectsSubsidySection8Schema(pl.BaseSchema):
     job_code = 'mf_subsidy_8'
     property_id = fields.String(load_from='property_id'.lower(), dump_to='property_id')
     county_code = fields.String(load_from='county_code'.lower(), dump_to='county_code')
+    county_name_text = fields.String(load_from='county_name_text'.lower(), dump_to='county_name_text')
     congressional_district_code = fields.String(load_from='congressional_district_code'.lower(), dump_to='congressional_district_code', allow_none=True)
     placed_base_city_name_text = fields.String(load_from='placed_base_city_name_text'.lower(), dump_to='municipality_name', allow_none=True)
     property_name_text = fields.String(load_from='property_name_text'.lower(), dump_to='hud_property_name')
@@ -1045,7 +1046,10 @@ job_dicts = [
         'encoding': 'binary',
         'rows_to_skip': 0,
         'schema': MultifamilyProjectsSubsidySection8Schema,
-        'filters': [['state_code', '==', 'PA'], ['county_code', '==', 3]], # use 'county_code == 3' to limit to Allegheny County
+        'filters': [['state_code', '==', 'PA'], ['county_name_text', 'in', ['Allegheny                     ' ,'ALLEGHENY                     ' ,'Allegheny', 'ALLEGHENY']]],
+            # Upstream Excel shenanigans caused the county_code field (which we were previously filtering on) to have values
+            # that switched from 3 (an integer) to '003' (a string). This time, I'm trying to filter on the county_name_text
+            # field, but it also has a problem: trailing spaces.
         'always_wipe_data': True,
         #'primary_key_fields': ['property_id'],
         'destination': 'ckan',
