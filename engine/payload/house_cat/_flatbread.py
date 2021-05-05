@@ -321,7 +321,12 @@ class MultifamilyProjectsSubsidySection8Schema(pl.BaseSchema):
         date_fields = ['ownership_effective_date']
         for f in date_fields:
             if data[f] is not None:
-                data[f] = data[f].date().isoformat()
+                try:
+                    data[f] = parser.parse(data[f]).date().isoformat() # Now we're doing
+                    # this because the format changed to store dates as stings.
+                except:
+                    data[f] = data[f].date().isoformat() # We used to do this because
+                    # the Excel file was storing the dates as dates.
 
     @pre_load
     def transform_ints_to_strings(self, data):
