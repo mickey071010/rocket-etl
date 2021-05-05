@@ -504,6 +504,10 @@ class MultifamilyGuaranteedLoansSchema(pl.BaseSchema):
         ordered = True
 
 class LIHTCSchema(pl.BaseSchema):
+    # Changes to the LIHTCPUB.csv schema between the 2018/2019 version of the data and the May 2021 update:
+    # It abandoned "contact", "company", "co_add", "co_cty", "co_st", "co_zip", and "co_tel".
+    #   This orphaned the fields "owner_organization_name", "property_manager_company", "property_manager_address", and "property_manager_phone".
+    # It added "place1990", "place2000", "place2010", "st2010", and "cnty2010".
     job_code = 'lihtc'
     hud_id = fields.String(load_from='\ufeffhud_id'.lower(), dump_to='lihtc_project_id')
     latitude = fields.Float(load_from='latitude'.lower(), dump_to='latitude', allow_none=True)
@@ -526,16 +530,16 @@ class LIHTCSchema(pl.BaseSchema):
     n_2br = fields.Integer(load_from='n_2br'.lower(), dump_to='count_2br', allow_none=True)
     n_3br = fields.Integer(load_from='n_3br'.lower(), dump_to='count_3br', allow_none=True)
     n_4br = fields.Integer(load_from='n_4br'.lower(), dump_to='count_4br', allow_none=True)
-    contact = fields.String(load_from='contact'.lower(), dump_to='owner_organization_name', allow_none=True)
-    property_manager_address = fields.String(dump_only=True, dump_to='property_manager_address', allow_none=True)
-    co_add = fields.String(load_from='co_add', load_only=True, allow_none=True)
-    co_cty = fields.String(load_from='co_cty', load_only=True, allow_none=True)
-    co_st = fields.String(load_from='co_st', load_only=True, allow_none=True)
-    co_zip = fields.String(load_from='co_zip', load_only=True, allow_none=True)
-    company = fields.String(load_from='company'.lower(), dump_to='property_manager_company', allow_none=True)
-    co_tel = fields.String(load_from='co_tel'.lower(), dump_to='property_manager_phone', allow_none=True)
+    ##contact = fields.String(load_from='contact'.lower(), dump_to='owner_organization_name', allow_none=True)
+    ##property_manager_address = fields.String(dump_only=True, dump_to='property_manager_address', allow_none=True)
+    ##co_add = fields.String(load_from='co_add', load_only=True, allow_none=True)
+    ##co_cty = fields.String(load_from='co_cty', load_only=True, allow_none=True)
+    ##co_st = fields.String(load_from='co_st', load_only=True, allow_none=True)
+    ##co_zip = fields.String(load_from='co_zip', load_only=True, allow_none=True)
+    ##company = fields.String(load_from='company'.lower(), dump_to='property_manager_company', allow_none=True)
+    ##co_tel = fields.String(load_from='co_tel'.lower(), dump_to='property_manager_phone', allow_none=True)
 
-    lihtc_federal_id = fields.String(load_from='\ufeffhud_id'.lower(), dump_to='federal_id')
+    lihtc_federal_id = fields.String(load_from='hud_id'.lower(), dump_to='federal_id')
     state_id = fields.String(load_from='state_id'.lower(), dump_to='state_id', allow_none=True)
     credit = fields.Integer(load_from='credit'.lower(), dump_to='lihtc_credit', allow_none=True)
 
@@ -555,29 +559,13 @@ class LIHTCSchema(pl.BaseSchema):
     def future_proof(self, data):
         global fips2020_notified
         if not fips2020_notified and 'fips2020' in data:
-            msg = "The fips2020 variable was found in LIHTCPUB.csv. Edit house_cat/_flatbread.py, switching LIHTCSchema to use fips2020 rather than fips2010 for extracting census_tract and county_fips_code. Also re-evaluate the methods for filtering these properties to Allegheny County (as the 42XXX issue caused both fips2010 and fips2000 to be previously incorporated)."
+            msg = "The fips2020 variable was found in LIHTCPUB.CSV. Edit house_cat/_flatbread.py, switching LIHTCSchema to use fips2020 rather than fips2010 for extracting census_tract and county_fips_code. Also re-evaluate the methods for filtering these properties to Allegheny County (as the 42XXX issue caused both fips2010 and fips2000 to be previously incorporated)."
             print(msg)
             channel = "@david" if (not PRODUCTION) else "#etl-hell"
             if channel != "@david":
                 msg = f"@david {msg}"
             send_to_slack(msg, username='house_cat schema monitor', channel=channel, icon=':tessercat:')
             fips2020_notified = True
-
-    @post_load
-    def form_address(self, data): # [ ] Is there any chance we want to keep these parts as separate fields?
-        address = ''
-        if data['co_add'] not in ['', None]:
-            address += f"{data['co_add']}, "
-        if data['co_cty'] not in ['', None]:
-            address += f"{data['co_cty']}, "
-        if data['co_st'] not in ['', None]:
-            address += f"{data['co_st']} "
-        if data['co_zip'] not in ['', None]:
-            address += f"{data['co_zip']}"
-        address = address.strip()
-        if address in ['', 'PA']:
-            address = None
-        data['property_manager_address'] = address
 
     @pre_load
     def pre_decode_booleans(self, data):
