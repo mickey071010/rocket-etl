@@ -872,6 +872,7 @@ job_dicts = [
         'resource_name': 'Active HUD Multifamily Insured Mortgages (Pennsylvania)',
         'upload_method': 'insert',
         'resource_description': f'Derived from https://www.hud.gov/program_offices/housing/comp/rpts/mfh/mf_f47', #\n\njob code: {MultifamilyInsuredMortgagesSchema().job_code}',
+        'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
     },
     {
         'job_code': MultifamilyProductionInitialCommitmentSchema().job_code, # 'mf_init_commit'
@@ -892,6 +893,7 @@ job_dicts = [
         'resource_name': 'HUD Multifamily Fiscal Year Production (Pennsylvania)',
         'upload_method': 'insert',
         'resource_description': f'Derived from https://www.hud.gov/program_offices/housing/mfh/mfdata/mfproduction', #\n\njob code: {MultifamilyProductionInitialCommitmentSchema().job_code},'
+        'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
     },
     {
         'job_code': f'unzip_{LIHTCSchema().job_code}', # 'unzip_lihtc'
@@ -922,6 +924,7 @@ job_dicts = [
         'resource_name': 'LIHTC (Pennsylvania)',
         'upload_method': 'insert',
         'resource_description': f'Derived from https://lihtc.huduser.gov/lihtcpub.zip', #\n\njob_code: {LIHTCSchema().job_code}',
+        'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
     },
 #    {   # This is a job to preserve the old LIHTC data for internal use.
 #        'job_code': LIHTC2019Schema().job_code, # 'lihtc_2019'
@@ -956,6 +959,7 @@ job_dicts = [
         'resource_name': 'All Buildings from LIHTC Projects (Pennsylvania)',
         'upload_method': 'insert',
         'resource_description': f'Derived from https://lihtc.huduser.gov/', #\n\njob_code: {LIHTCBuildingSchema().job_code}',
+        'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
     },
     {   # Step 2: Get the buildings which are in the original project-level file
         # and (probably) not in the multi-address building-level extraction.
@@ -972,6 +976,7 @@ job_dicts = [
         'resource_name': 'All Buildings from LIHTC Projects (Pennsylvania)',
         'upload_method': 'insert',
         'resource_description': f'Derived from https://lihtc.huduser.gov/', #\n\njob_code: {LIHTCBuildingSchema().job_code}',
+        'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
     },
     {
         'job_code': HousingInspectionScoresSchema().job_code, # 'housing_inspections'
@@ -991,6 +996,7 @@ job_dicts = [
         'resource_name': 'HUD Inspection Scores (Allegheny County)',
         'upload_method': 'insert',
         'resource_description': f'Derived from https://www.huduser.gov/portal/datasets/pis.html', #\n\njob code: {HousingInspectionScoresSchema().job_code}',
+        'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
     },
     {
         'job_code': HUDPublicHousingProjectsSchema().job_code, # 'hud_public_housing_projects'
@@ -1007,6 +1013,7 @@ job_dicts = [
         'resource_name': 'HUD Public Housing Developments (Allegheny County)',
         'upload_method': 'insert',
         'resource_description': f'Derived from https://hudgis-hud.opendata.arcgis.com/datasets/public-housing-developments', #\n\njob code: {HUDPublicHousingProjectsSchema().job_code}',
+        'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
     },
     {
         'job_code': HUDPublicHousingBuildingsSchema().job_code, # 'hud_public_housing_buildings'
@@ -1023,7 +1030,7 @@ job_dicts = [
         'resource_name': 'HUD Public Housing Buildings (Allegheny County)',
         'upload_method': 'insert',
         'resource_description': f'Derived from https://hudgis-hud.opendata.arcgis.com/datasets/public-housing-buildings', #\n\njob code: {HUDPublicHousingBuildingsSchema().job_code}',
-
+        'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
     },
     {
         'job_code': MultifamilyProjectsSubsidyLoansSchema().job_code, # 'mf_subsidy_loans'
@@ -1042,6 +1049,7 @@ job_dicts = [
         'resource_name': 'Subsidy extract from HUD Insured Multifamily Properties (Allegheny County)',
         'upload_method': 'insert',
         'resource_description': f'Derived from https://hudgis-hud.opendata.arcgis.com/datasets/hud-insured-multifamily-properties', # \nnjob code: {MultifamilyGuaranteedLoansSchema().job_code}', # 'mf_subsidy_loans'
+        'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
     },
     {
         'job_code': MultifamilyProjectsSubsidySection8Schema().job_code, # 'mf_subsidy_8'
@@ -1100,6 +1108,7 @@ job_dicts = [
         'resource_name': 'HUD Insured Multifamily Properties (Allegheny County)',
         'upload_method': 'insert',
         'resource_description': f'Derived from https://hudgis-hud.opendata.arcgis.com/datasets/hud-insured-multifamily-properties', #\n\njob code: {MultifamilyGuaranteedLoansSchema().job_code}',
+        'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
     },
     { # The source file is in a weird wide format, listing three different columns
       # for each of the three last inspections.
@@ -1122,6 +1131,7 @@ job_dicts = [
         'resource_name': 'HUD Multifamily Inspection Scores (Pennsylvania)',
         'upload_method': 'insert',
         'resource_description': f'Derived from https://www.hud.gov/program_offices/housing/mfh/rems/remsinspecscores/remsphysinspscores', # \n\njob_code: {MultifamilyInspectionsSchema1().job_code[:-2]}'
+        'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
     },
     {
         'job_code': MultifamilyInspectionsSchema2().job_code, # 'mf_inspections_2'
@@ -1138,6 +1148,7 @@ job_dicts = [
         'package': housecat_package_id,
         'resource_name': 'HUD Multifamily Inspection Scores (Pennsylvania)',
         'upload_method': 'insert',
+        'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
     },
     {
         'job_code': MultifamilyInspectionsSchema3().job_code, # 'mf_inspections_3'
@@ -1154,6 +1165,7 @@ job_dicts = [
         'package': housecat_package_id,
         'resource_name': 'HUD Multifamily Inspection Scores (Pennsylvania)',
         'upload_method': 'insert',
+        'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
     },
 # All the jobs below are being commented out because the desired fields have not yet been identified.
 #    {
@@ -1176,6 +1188,7 @@ job_dicts = [
 #        'package': housecat_package_id,
 #        'resource_name': USDAProgramExitSchema().job_code, # 'usda_exit'
 #        'upload_method': 'insert',
+#        'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
 #    },
 #    {
 #        'job_code': USDA514515ActiveSchema().job_code, # 'usda_active'
@@ -1197,6 +1210,7 @@ job_dicts = [
 #        'package': housecat_package_id,
 #        'resource_name': 'USDA Rural Development Multi-Family Section 514 and 515 Active (Allegheny County)',
 #        'upload_method': 'insert',
+#        'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
 #    },
 #    {
 #        'job_code': USDA514515TenantSchema().job_code, # 'usda_tenant'
@@ -1218,6 +1232,7 @@ job_dicts = [
 #        'package': housecat_package_id,
 #        'resource_name': 'USDA Rural Development Multi-Family Section 514 and 515 Tenant (Allegheny County)',
 #        'upload_method': 'insert',
+#        'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
 #    },
 #    {
 #        'job_code': USDA538Schema().job_code, # 'usda_538' # I'm not sure that any of these are in Allegheny County.
@@ -1239,6 +1254,7 @@ job_dicts = [
 #        'package': housecat_package_id,
 #        'resource_name': 'USDA Rural Program Multi-Family Housing 538 (Pennsylvania)',
 #        'upload_method': 'insert',
+#        'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
 #    },
 #    {
 #        'job_code': HousingInventoryCountSchema().job_code, # 'hic' (related to homelessness)
@@ -1258,6 +1274,7 @@ job_dicts = [
 #        'package': housecat_package_id,
 #        'resource_name': 'HUD Exchange Housing Inventory Count (Allegheny County)',
 #        'upload_method': 'insert',
+#        'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
 #    },
 #    { # This one is incomplete because the desired fields have not been identified yet.
 #        'job_code': MultifamilyTerminatedMortgagesSchema().job_code, #'terminated_mortgages'
@@ -1277,6 +1294,7 @@ job_dicts = [
 #        'resource_name': 'HUD Terminated Multifamily Mortgages (Pennsylvania)',
 #        'upload_method': 'insert',
 #        'resource_description': f'Derived from https://www.hud.gov/program_offices/housing/comp/rpts/mfh/mf_f47t', #\n\njob code: {MultifamilyTerminatedMortgagesSchema().job_code}',
+#        'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
 #    },
 ]
 
