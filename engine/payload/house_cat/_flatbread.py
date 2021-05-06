@@ -1081,15 +1081,16 @@ job_dicts = [
         'encoding': 'binary',
         'rows_to_skip': 0,
         'schema': MultifamilyProjectsSection8ContractsSchema,
-        #'filters': # Nothing to directly filter on here. The property_id needs to be joined to mf_subsidy_8 to determine the property locations.
+        'filters': [['contract_number', '>=', 'PA'], ['contract_number', '<', 'PB']], # We could filter on contract_id since the first two letters code for the state (PA). The property_id needs to be joined to mf_subsidy_8 to determine the property locations.
         'always_wipe_data': True,
         #'primary_key_fields': ['property_id'],
         'destination': 'ckan',
-        'destination_file': 'mf_8_contracts_us.csv',
+        'destination_file': 'mf_8_contracts_pa.csv',
         'package': housecat_package_id,
-        'resource_name': 'Multifamily Assistance & Section 8 Contracts (All)',
+        'resource_name': 'Multifamily Assistance & Section 8 Contracts (Pennsylvania)',
         'upload_method': 'insert',
         'resource_description': f'Derived from https://www.hud.gov/program_offices/housing/mfh/exp/mfhdiscl\n\n', #job code: {MultifamilyProjectsSection8ContractsSchema().job_code}',
+        'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
     },
     {
         'job_code': MultifamilyGuaranteedLoansSchema().job_code, # 'mf_loans'
