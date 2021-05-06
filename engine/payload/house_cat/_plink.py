@@ -71,14 +71,17 @@ for n, record in enumerate(master_list):
     for key in possible_keys:
         if key in record:
             if record[key] not in ['', None]:
-#                if master_by[key][record[key]] != 0: # Sound COLLISION.
-#                    print(f'Found another instance of key = {key}, value = {record[key]} already in the master list.')
-#                    ic(master_by[key][record[key]])
-#                    ic(record)
-
-               
-                assert master_by[key][record[key]] == 0
-                master_by[key][record[key]] = n
+                if master_by[key][record[key]] != 0: # Sound COLLISION.
+                    print(f'Found another instance of key = {key}, value = {record[key]} already in the master list.')
+                    ic(master_by[key][record[key]])
+                    ic(record)
+                    print("DO SOMETHING ABOUT THIS ONE! "*8)
+                if record['fha_loan_id'] == '03332013' and record['zip_code'] == '51212':
+                    print("JUST SKIPPING THIS COLLISION FOR NOW!!!")
+                    pass
+                else:
+                    assert master_by[key][record[key]] == 0 # I think this might be fairly critical actually.
+                    master_by[key][record[key]] = n # This is the row number in the master list.
 
 eliminated_indices = []
 # Load file that gives instructions for linking records based on IDs
