@@ -215,8 +215,12 @@ class Pipeline(object):
             return value_1 != value_2
         if operator == ">":
             return value_1 > value_2
+        if operator == ">=":
+            return value_1 >= value_2
         if operator == "<":
-            return value_1 > value_2
+            return value_1 < value_2
+        if operator == "<=":
+            return value_1 <= value_2
         if operator == "in":
             return value_1 in value_2
         if operator == "not in":
