@@ -548,6 +548,7 @@ class LIHTCSchema(pl.BaseSchema):
 
     lihtc_federal_id = fields.String(load_from='hud_id'.lower(), dump_to='federal_id')
     state_id = fields.String(load_from='state_id'.lower(), dump_to='state_id', allow_none=True)
+    normalized_state_id = fields.String(load_from='state_id'.lower(), dump_to='normalized_state_id', allow_none=True)
     credit = fields.Integer(load_from='credit'.lower(), dump_to='lihtc_credit', allow_none=True)
 
     construction_type = fields.String(load_from='type'.lower(), dump_to='lihtc_construction_type', allow_none=True)
@@ -583,6 +584,13 @@ class LIHTCSchema(pl.BaseSchema):
                     data[f] = True
                 elif str(data[f]) == '2':
                     data[f] = False
+
+    @post_load
+    def normalize_the_state_id(self, data):
+        f = 'normalized_state_id'
+        if f in data:
+            if re.match('^TC\d{8}', data[f]):
+                data[f] = f'{data[f][:6]}-{data[f][6:]}'
 
     @post_load
     def decode_fields(self, data):
@@ -670,9 +678,17 @@ class LIHTCBuildingSchema(pl.BaseSchema):
     proj_st = fields.String(load_from='proj_st'.lower(), dump_to='state')
     proj_zip = fields.String(load_from='proj_zip'.lower(), dump_to='zip_code', allow_none=True)
     state_id = fields.String(load_from='state_id'.lower(), dump_to='state_id', allow_none=True)
+    normalized_state_id = fields.String(load_from='state_id'.lower(), dump_to='normalized_state_id', allow_none=True)
 
     class Meta:
         ordered = True
+
+    @post_load
+    def normalize_the_state_id(self, data):
+        f = 'normalized_state_id'
+        if f in data:
+            if re.match('^TC\d{8}', data[f]):
+                data[f] = f'{data[f][:6]}-{data[f][6:]}'
 
 class BaseMultifamilyInspectionsSchema(pl.BaseSchema):
     job_code = 'mf_inspections'
