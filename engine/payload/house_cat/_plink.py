@@ -3,12 +3,40 @@ from pprint import pprint
 from icecream import ic
 from collections import defaultdict
 
-
 def write_to_csv(filename, list_of_dicts, keys):
     with open(filename, 'w') as output_file:
         dict_writer = csv.DictWriter(output_file, keys, extrasaction='ignore', lineterminator='\n')
         dict_writer.writeheader()
         dict_writer.writerows(list_of_dicts)
+
+
+def merge(record_1, record_2):
+    for key, value in record_1.items():
+        other_value = record_2.get(key, None)
+        if key == 'index':
+            merged_record[key] = min(value, other_value)
+        elif other_value is None:
+            merged_record[key] = value
+        elif value.upper() == other_value.upper():
+            merged_record[key] = value
+        elif key == 'source_file':
+            source_files = sorted(value.split('|') + other_value.split('|'))
+            merged_record[key] = '|'.join(source_files)
+        elif re.match(value.upper(), other_value.upper()) is not None: # other_value starts with value
+            merged_record[key] = other_value # Go with the longer version
+        elif re.match(other_value.upper(), value.upper()) is not None:
+            merged_record[key] = value
+        else:
+            print(f"Since this code doesn't know how to merge key = {key}, value = {value}, other value = {record_2[key]}, it's just going to list both.")
+            merged_record[key] = f'{value}|{other_value}'
+
+            #raise ValueError(f'What should we do with key = {key}, value = {value}, other value = {dups[1][key]}?')
+
+    for key, value in record_2.items():
+        if key not in merged_record or merged_record[key] == '':
+            merged_record[key] = value
+
+    return merged_record
 
 fields_to_get = ['hud_property_name',
         'property_street_address', 'municipality_name', 'city', 'zip_code',
@@ -82,34 +110,7 @@ with open(f'unidirectional_links.csv', 'r') as g:
             record_1 = master_list[index_1]
             record_2 = master_list[index_2]
 
-
-            #merged_record = merge(record_1, record_2)
-            for key, value in record_1.items():
-                other_value = record_2.get(key, None)
-                if key == 'index':
-                    merged_record[key] = min(value, other_value)
-                elif other_value is None:
-                    merged_record[key] = value
-                elif value.upper() == other_value.upper():
-                    merged_record[key] = value
-                elif key == 'source_file':
-                    source_files = sorted(value.split('|') + other_value.split('|'))
-                    merged_record[key] = '|'.join(source_files)
-                elif re.match(value.upper(), other_value.upper()) is not None: # other_value starts with value
-                    merged_record[key] = other_value # Go with the longer version
-                elif re.match(other_value.upper(), value.upper()) is not None:
-                    merged_record[key] = value
-                else:
-                    ic(record_1)
-                    ic(record_2)
-                    print(f"Since this code doesn't know how to merge key = {key}, value = {value}, other value = {record_2[key]}, it's just going to list both.")
-                    merged_record[key] = f'{value}|{other_value}'
-
-                    #raise ValueError(f'What should we do with key = {key}, value = {value}, other value = {dups[1][key]}?')
-
-            for key, value in record_2.items():
-                if key not in merged_record or merged_record[key] == '':
-                    merged_record[key] = value
+            merged_record = merge(record_1, record_2)
 
             master_list[index_1] = master_list[index_2] = merged_record
             master_by[source_field][source_value] = min(index_1, index_2)
