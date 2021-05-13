@@ -281,11 +281,18 @@ def get_metrics(service, profile, metrics, start_date='30daysAgo', end_date='tod
     except HttpError:
         # Retry after failure
         time.sleep(5)
-        response = service.reports().batchGet(
-                    body={
-                        'reportRequests': [ args_dict ]
-                    }
-                    ).execute()
+        try:
+            response = service.reports().batchGet(body={'reportRequests': [ args_dict ] }).execute()
+        except HttpError:
+            # Retry after failure
+            print("Waiting a minute due to two consecutive HttpErrors.")
+            time.sleep(60)
+            try:
+                response = service.reports().batchGet(body={'reportRequests': [ args_dict ] }).execute()
+            except HttpError:
+                time.sleep(300)
+                print("Waiting 5 minutes due to three consecutive HttpErrors.")
+                response = service.reports().batchGet(body={'reportRequests': [ args_dict ] }).execute()
 
     new_rows = response.get("reports")[0].get('data', {}).get('rows', [])
 #    ic| response.get("reports"): [{'columnHeader': {'dimensions': ['ga:yearMonth',
