@@ -9,6 +9,7 @@ import pandas as pd
 
 from engine.parameters.google_api_credentials import profile
 #from google_api_credentials import profile
+from engine.parameters.local_parameters import BASE_DIR
 
 from marshmallow import fields, pre_load, post_load
 from engine.wprdc_etl import pipeline as pl
@@ -238,7 +239,7 @@ def insert_zeros_dicts(list_of_dicts, metric_dict_template, metrics_names, yearm
 def initialize_ga_api():
     #Create service credentials
     #Rename your JSON key to client_secrets.json and save it to your working folder
-    credentials = ServiceAccountCredentials.from_json_keyfile_name('analytics_credentials.json', ['https://www.googleapis.com/auth/analytics.readonly'])
+    credentials = ServiceAccountCredentials.from_json_keyfile_name(f'{BASE_DIR}engine/parameters/analytics_credentials.json', ['https://www.googleapis.com/auth/analytics.readonly'])
 
     #Create a service object
     http = credentials.authorize(httplib2.Http())
