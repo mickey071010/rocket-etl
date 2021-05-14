@@ -731,7 +731,7 @@ class Job:
         ignore_empty_rows = kwparameters['ignore_empty_rows']
         retry_without_last_line = kwparameters['retry_without_last_line']
         self.configure_pipeline_with_options(**kwparameters)
-        self.handle_schema_migrations_and_data_dictionary_stashing(**kwparameters)
+        #self.handle_schema_migrations_and_data_dictionary_stashing(**kwparameters) # Temporarily comment this out.
 
         self.custom_processing(self, **kwparameters)
         self.locators_by_destination = self.run_pipeline(clear_first, wipe_data, migrate_schema, retry_without_last_line=retry_without_last_line, ignore_empty_rows=ignore_empty_rows)
