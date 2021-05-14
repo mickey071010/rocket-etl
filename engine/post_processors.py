@@ -2,6 +2,7 @@ import os, ckanapi
 from engine.parameters.remote_parameters import TEST_PACKAGE_ID
 from engine.etl_util import post_process
 from engine.credentials import site, API_key
+from engine.ckan_util import get_number_of_rows
 
 def express_load_then_delete_file(job, **kwparameters):
     """The basic idea is that the job processes with a 'file' destination,
@@ -61,9 +62,17 @@ def check_for_empty_table(job, **kwparameters):
                 elif length == 1 and job.destination_file_format == 'csv':
                     print(f'The destination file ({file_path}) contains zero records!')
                     assert False
+    elif job.destination in ['ckan']:
+        rows = get_number_of_rows(job.locators_by_destination[job.destination])
+        if rows is None:
+            print(f"The row count of {job.job_code} couldn't be determined.")
+            really_empty = True
+        else:
+            really_empty = (rows == 0)
+
+        if really_empty:
+            msg = f"{job.job_code} resulted in a CKAN table with {row} rows. It looks like the upload or ETL script broke."
+            print(msg)
+            raise ValueError(msg)
     else:
-        raise ValueError(f'check_for_empty_table is not yet checking CKAN tables (or anything other than local files).')
-    
-    # Since launchpad.py doesn't update the last_etl_update metadata value in this case
-    # because this is a workaround, do it manually here:
-    #post_process(resource_id, job, **kwparameters)
+        raise ValueError(f'check_for_empty_table is not yet checking job.destination == {job.destination}.')
