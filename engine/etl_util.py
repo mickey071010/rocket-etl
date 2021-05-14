@@ -604,6 +604,42 @@ class Job:
         ic(self.__dict__)
         ## END SET DESTINATION PROPERTIES ##
 
+    def handle_schema_migrations_and_data_dictionary_stashing(self, **kwargs):
+        # The code below was moved here to benefit from configure_pipeline_with_options
+        # setting the effective destination options and package ID first (after taking
+        # into account the presence of the to_file parameter).
+
+        if (kwargs['clear_first'] or kwargs['migrate_schema']) and self.destination == 'ckan': # This deliberately excludes 'ckan_filestore'
+            # because the shenanigans below (Data Tables and data dictionaries)
+            # are datastore-specific.
+            resource_id = find_resource_id(self.package_id, self.resource_name)
+
+        if kwargs['migrate_schema'] and self.destination == 'ckan':
+            # Delete the Data Table view to avoid new fields not getting added to an existing view.
+            delete_datatable_views(resource_id)
+            # Is this really necessary though? In etl_util.py, migrate_schema being True is already going to force clear_first to be True
+            # which should delete all the views.
+            # The scenario of concern is when the schema changes by eliminating a field, and it's not clear whether CKAN
+            # supports just dropping a field from the schema and auto-dropping the field from the table while preserving
+            # the other values.
+            print("Note that setting migrate_schema == True is going to clear the associated datastore.")
+
+        if (kwargs['clear_first'] or kwargs['migrate_schema']) and self.destination == 'ckan': # if the target is a CKAN datastore
+            # [ ] Maybe add a check to see if an integrated data dictionary exists.
+            self.saved_data_dictionary = get_data_dictionary(resource_id) # If so, obtain it.
+            # Save it to a local file as a backup.
+            data_dictionary_filepath = save_to_waiting_room(self.saved_data_dictionary, resource_id, self.resource_name)
+
+            # wipe_data should preserve the data dictionary when the schema stays the same, and
+            # migrate_schema should be used to change the schema but try to preserve the data dictionary.
+
+                # If migrate_schema == True, 1) backup the data dictionary,
+                # 2) delete the Data Table view, 3) clear the datastore, 4) run the job, and 5) try to restore the data dictionary.
+
+            # Or could we overload "wipe_data" to include schema migration?
+
+            # [ ] Also, it really seems that always_clear_first should become always_wipe_data.
+
     def run_pipeline(self, clear_first, wipe_data, migrate_schema, retry_without_last_line=False, ignore_empty_rows=False):
         # target is a filepath which is actually the source filepath.
 
@@ -731,7 +767,7 @@ class Job:
         ignore_empty_rows = kwparameters['ignore_empty_rows']
         retry_without_last_line = kwparameters['retry_without_last_line']
         self.configure_pipeline_with_options(**kwparameters)
-        #self.handle_schema_migrations_and_data_dictionary_stashing(**kwparameters) # Temporarily comment this out.
+        self.handle_schema_migrations_and_data_dictionary_stashing(**kwparameters)
 
         self.custom_processing(self, **kwparameters)
         self.locators_by_destination = self.run_pipeline(clear_first, wipe_data, migrate_schema, retry_without_last_line=retry_without_last_line, ignore_empty_rows=ignore_empty_rows)

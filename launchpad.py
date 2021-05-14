@@ -92,39 +92,6 @@ def main(**kwargs):
     # server to be searched for unharvested tables.
     for job in selected_jobs:
         kwparameters = dict(kwargs)
-        if job.destination == 'ckan': # This deliberately excludes 'ckan_filestore'
-            # because the shenanigans below (Data Tables and data dictionaries)
-            # are datastore-specific.
-            package_id = get_package_id(job, test_mode) # This stuff needs to be tested.
-            resource_id = find_resource_id(package_id, job.resource_name)
-
-        if migrate_schema and job.destination == 'ckan':
-            # Delete the Data Table view to avoid new fields not getting added to an existing view.
-            delete_datatable_views(resource_id)
-            # Is this really necessary though? In etl_util.py, migrate_schema being True is already going to force clear_first to be True
-            # which should delete all the views.
-            # The scenario of concern is when the schema changes by eliminating a field, and it's not clear whether CKAN
-            # supports just dropping a field from the schema and auto-dropping the field from the table while preserving
-            # the other values.
-            print("Note that setting migrate_schema = True is going to clear the associated datastore.")
-
-        if (clear_first or migrate_schema) and job.destination == 'ckan': # if the target is a CKAN datastore
-                                                                          # resource being cleared
-            # [ ] Maybe add a check to see if an integrated data dictionary exists.
-            data_dictionary = get_data_dictionary(resource_id) # If so, obtain it.
-            # Save it to a local file as a backup.
-            data_dictionary_filepath = save_to_waiting_room(data_dictionary, resource_id, job.resource_name)
-
-            # wipe_data should preserve the data dictionary when the schema stays the same, and
-            # migrate_schema should be used to change the schema but try to preserve the data dictionary.
-
-                # If migrate_schema == True, 1) backup the data dictionary,
-                # 2) delete the Data Table view, 3) clear the datastore, 4) run the job, and 5) try to restore the data dictionary.
-
-            # Or could we overload "wipe_data" to include schema migration?
-
-            # [ ] Also, it really seems that always_clear_first should become always_wipe_data.
-
         locators_by_destination = job.process_job(**kwparameters)
         for destination, table_locator in locators_by_destination.items():
             if destination in ['ckan', 'ckan_filestore']: # [ ] So far all post-processing is CKAN-specific.
