@@ -143,3 +143,18 @@ def set_resource_description(job, **kwparameters):
                     print("Updating the resource description")
                 else:
                     print(f"Not updating the resource description because existing_resource_description = {existing_resource_description}.")
+
+def get_number_of_rows(resource_id):
+    # On other/later versions of CKAN it would make sense to use
+    # the datastore_info API endpoint here, but that endpoint is
+    # broken on WPRDC.org.
+    try:
+        ckan = ckanapi.RemoteCKAN(site, apikey=API_key)
+        results_dict = ckan.action.datastore_search(resource_id=resource_id, limit=1) # The limit
+        # must be greater than zero for this query to get the 'total' field to appear in
+        # the API response.
+        count = results_dict['total']
+    except:
+        print("get_number_of_rows threw an exception. Returning 'None'.")
+        return None
+    return count
