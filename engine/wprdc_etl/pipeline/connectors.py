@@ -9,6 +9,12 @@ import ftplib
 from io import TextIOWrapper
 
 from engine.wprdc_etl.pipeline.exceptions import HTTPConnectorError
+from engine.parameters.google_api_credentials import PATH_TO_SERVICE_ACCOUNT_JSON_FILE, GCP_BUCKET_NAME # These imports
+# are the first instance of crossing over the boundary between wprdc-etl and rocket-etl.
+# These libraries could be kept more isolated by passing such parameters through the
+# calls to the pipeline code, but this is smoother.
+# [ ] This paves the way to eliminate settings.json, which is in a different format and
+# location than all the other parameters/credentials.
 
 SFTP_MAX_FILE_SIZE = 500000 #KiB
 
@@ -92,6 +98,36 @@ class FileConnector(Connector):
         if not self._file.closed:
             self._file.close()
         return
+
+class GoogleCloudStorageFileConnector(FileConnector):
+    '''Connector for a file located in a Google Cloud Storage bucket.
+    '''
+    def connect(self, target):
+        '''Connect to a Google Cloud Storage bucket
+
+        Arguments:
+            target: Blob name
+
+        Returns:
+            :py:class:`io.TextIOWrapper` around the opened URL unless
+            the encoding is 'binary', in which case it returns
+            a `io.BufferedReader` instance.
+        '''
+        from google.cloud import storage
+
+        storage_client = storage.Client.from_service_account_json(PATH_TO_SERVICE_ACCOUNT_JSON_FILE)
+        blobs = list(storage_client.list_blobs(GCP_BUCKET_NAME))
+        possible_blobs = [b for b in blobs if b.name == target]
+        if len(possible_blobs) != 1:
+            raise RuntimeError(f'{len(possible_blobs)} blobs found with the file name {target}.')
+
+        blob = possible_blobs[0]
+
+        if self.encoding == 'binary':
+            self._file = blob.open()
+        else:
+            self._file = blob.open(encoding=self.encoding)
+        return self._file
 
 class RemoteFileConnector(FileConnector):
     '''Connector for a file located at a remote (HTTP-accessible) resource

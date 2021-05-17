@@ -5,7 +5,8 @@ from engine.wprdc_etl.pipeline.extractors import (
 )
 from engine.wprdc_etl.pipeline.connectors import (
     FileConnector, RemoteFileConnector, HTTPConnector,
-    SFTPConnector, FTPConnector
+    SFTPConnector, FTPConnector,
+    GoogleCloudStorageFileConnector
 )
 from engine.wprdc_etl.pipeline.loaders import (CKANFilestoreLoader,
         CKANDatastoreLoader, TabularFileLoader,
