@@ -103,7 +103,6 @@ class RightOfWaySchema(pl.BaseSchema):
     class Meta:
         ordered = True
 
-#package_id = "23482953-50cc-4370-858c-eb0c034b8157"
 package_id = "23482953-50cc-4370-858c-eb0c034b8157" # Production package for Right-of-Way Permits
 
 if package_id == "812527ad-befc-4214-a4d3-e621d8230563":
@@ -121,7 +120,7 @@ job_dicts = [
         'primary_key_fields': ['id', 'sequence', 'type'],
         'upload_method': 'upsert',
         'package': package_id,
-        'resource_name': 'Right-of-Way Permits and Traffic-Obstruction Permits',
-#        #'custom_post_processing': function_to_verify_that_the_table_was_updated_and_then_delete_the_gcp_blob,
+        'resource_name': 'Right of Way Permits',
+#        #'custom_post_processing': verify_update_backup_source_file_and_then_delete_the_gcp_blob,
     }
 ]
