@@ -558,6 +558,9 @@ class Job:
             elif self.source_type == 'sftp':
                 self.target = ftp_target(self)
                 self.source_connector = pl.SFTPConnector
+            elif self.source_type == 'gcp':
+                self.target = self.source_file
+                self.source_connector = pl.GoogleCloudStorageFileConnector
             elif self.source_type == 'local':
                 self.source_connector = pl.FileConnector
             else:
