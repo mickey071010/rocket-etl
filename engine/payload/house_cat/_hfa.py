@@ -21,7 +21,7 @@ except ImportError:  # Graceful fallback if IceCream isn't installed.
 
 class HFALIHTCSchema(pl.BaseSchema):
     job_code = 'hfa_lihtc'
-    pmindx = fields.Integer(load_from='PMINDX'.lower(), dump_to='pmindx')
+    pmindx = fields.String(load_from='PMINDX'.lower(), dump_to='pmindx')
     property_name = fields.String(load_from='Property Name'.lower(), dump_to='hud_property_name')
     lihtc_units = fields.Integer(load_from='LIHTC Units'.lower(), dump_to='assisted_units')
     lihtc_allocation = fields.Integer(load_from='LIHTC Allocation'.lower(), dump_to='lihtc_allocation') # There can be multiple
@@ -79,6 +79,60 @@ class HFALIHTCSchema(pl.BaseSchema):
             if f in data and data[f] == '0':
                 data[f] = None
 
+class HFADemographics(pl.BaseSchema):
+    job_code = 'hfa_demographics'
+    pmindx = fields.String(load_from='PMINDX'.lower(), dump_to='pmindx')
+    application_number = fields.String(load_from='Application Number'.lower(), dump_to='application_number') # Sometimes this is the state_id, but other times it isn't.
+    s8cnid = fields.String(load_from='S8CNID'.lower(), dump_to='contract_id', allow_none=True)
+    hud_rems = fields.String(load_from='HUD REMS'.lower(), dump_to='property_id', allow_none=True)
+    fha_loan_id = fields.String(load_from='fha_#', dump_to='fha_loan_id', allow_none=True)
+    project_name = fields.String(load_from='Project Name'.lower(), dump_to='hud_property_name')
+    address = fields.String(load_from='Address'.lower(), dump_to='property_street_address')
+    city_state_zip = fields.String(load_from='City, State, Zip'.lower(), load_only=True)
+    city = fields.String(dump_to='city')
+    state = fields.String(dump_to='state')
+    zip_code = fields.String(dump_to='zip_code')
+    legal_owner_entity = fields.String(load_from='Legal Owner Entity'.lower(), dump_to='owner_organization_name', allow_none=True)
+    units = fields.Integer(load_from='Units'.lower(), dump_to='units')
+    individuals_with_a_occ_type = fields.String(load_from='individuals_with_a:_occtype', dump_to='demographic')
+    physical = fields.Boolean(load_from='Physical'.lower(), dump_to='physical', allow_none=False)
+    mental = fields.Boolean(load_from='Mental'.lower(), dump_to='mental', allow_none=False)
+    homeless = fields.Boolean(load_from='Homeless'.lower(), dump_to='homeless', allow_none=False)
+    owner_representative = fields.String(load_from='Owner Representative'.lower(), dump_to='owner_representative')
+    # For 800018475, the "Owner Representative" field maps to the property_manager_company in mf_subsidy_8_ac.csv.
+    # but for 800237654, it is the "Management Agent" field that maps to the property_manager_company in mf_subsidy_8_ac.csv.
+    non_profit = fields.Boolean(load_from='Non-Profit'.lower(), dump_to='non_profit', allow_none=True)
+    management_agent = fields.String(load_from='Management Agent'.lower(), dump_to='management_agent')
+
+    class Meta:
+        ordered = True
+
+    @pre_load
+    def set_city_state_and_zip_code(self, data):
+        f = 'city,_state,_zip'
+        if f in data and data[f] not in ['', None]:
+            city, state_zip = data[f].strip().split(', ')
+            data['state'], data['zip_code'] = state_zip.split('  ')
+            data['city'] = city
+
+    @pre_load
+    def trim_strings(self, data):
+        fs = ['project_name', 'address', 'legal_owner_entity',
+              'owner_representative', 'management_agent']
+        for f in fs:
+            if f in data and data[f] is not None:
+                data[f] = data[f].strip()
+
+    @pre_load
+    def boolify(self, data):
+        fs = ['physical', 'mental', 'homeless', 'non_profit']
+        for f in fs:
+            if f in data:
+                if data[f] is None:
+                    data[f] = False
+                else:
+                    data[f] = data[f] == 'X'
+
 #housecat_package_id = 'bb77b955-b7c3-4a05-ac10-448e4857ade4'
 
 job_dicts = [
@@ -87,6 +141,18 @@ job_dicts = [
         'source_type': 'local',
         'source_file': 'phfa_lihtc.csv',
         'schema': HFALIHTCSchema,
+        'always_wipe_data': True,
+        'destination': 'file',
+        #'package': housecat_package_id,
+        #'resource_name': 'Active HUD Multifamily Insured Mortgages (Pennsylvania)',
+        'upload_method': 'insert',
+        #'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
+    },
+    {
+        'job_code': HFADemographics().job_code, #'hfa_demographics'
+        'source_type': 'local',
+        'source_file': 'phfa_pgh_demographics.csv',
+        'schema': HFADemographics,
         'always_wipe_data': True,
         'destination': 'file',
         #'package': housecat_package_id,
