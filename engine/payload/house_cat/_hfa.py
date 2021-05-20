@@ -133,6 +133,26 @@ class HFADemographics(pl.BaseSchema):
                 else:
                     data[f] = data[f] == 'X'
 
+    @pre_load
+    def fix_known_errors(self, data):
+        f = 'huds_rems'
+        if f in data and data[f] == '800018558':
+            f2 = 'project_name'
+            if f2 in data and data[f2].strip() == 'JOHN PAUL PLAZA':
+                data[f] = '800018554'
+
+        f = 'fha_#'
+        if f in data and data[f] == '033-11076':
+            f2 = 'project_name'
+            if f2 in data and data[f2].strip() == 'ST JUSTIN PLAZA':
+                data[f] = '03311061'
+
+        f = 's8cnid'
+        if f in data and data[f] == 'PAT28T861013':
+            data[f] = 'PA28T861013'
+        elif f in data and data[f] == 'PAT28T791005':
+            data[f] = 'PA28T791005'
+
 #housecat_package_id = 'bb77b955-b7c3-4a05-ac10-448e4857ade4'
 
 job_dicts = [
