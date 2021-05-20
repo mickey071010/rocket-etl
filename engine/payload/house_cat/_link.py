@@ -1,4 +1,4 @@
-import re, csv
+import re, csv, copy
 from pprint import pprint
 from icecream import ic
 from collections import defaultdict
@@ -26,7 +26,13 @@ def intersection(lst1, lst2):
     return list(set(lst1) & set(lst2))
 
 def add_row_to_linking_dict(f, row, id_field, fields_to_get, ac_by_id):
-    ac_by_id[row[id_field]][id_field] = row[id_field]
+    try:
+        ac_by_id[row[id_field]][id_field] = row[id_field]
+    except:
+        ic(ac_by_id)
+        ic(row)
+        ic(id_field, row[id_field])
+        raise
     if 'source_file' not in ac_by_id[row[id_field]]:
         ac_by_id[row[id_field]]['source_file'] = f
     else:
@@ -303,10 +309,14 @@ ids_by = defaultdict(lambda: defaultdict(list))
 #                ids_by[c_id][row[c_id]] = row
 
 # Construct bidirectional lookup table for linking IDs
+house_cat_id_name = 'house_cat_id'
 
 all_ids_by = defaultdict(list)
 crosslinks = {}
-with open(f'unidirectional_links.csv', 'r') as g:
+ids_to_add = {} # Used for adding 'house_cat_id' 
+# values.
+
+with open(f'punidirectional_links.csv', 'r') as g:
     reader = csv.DictReader(g)
     for row in reader:
         source_field = row['source_field']
@@ -316,18 +326,26 @@ with open(f'unidirectional_links.csv', 'r') as g:
         assert source_value != ''
         assert target_value != ''
 
-        ids_by[source_field][source_value] = {target_field: target_value}
-        ids_by[target_field][target_value] = {source_field: source_value}
-        all_ids_by[source_field].append(source_value)
-        all_ids_by[target_field].append(target_value)
-        equations = sorted([f'{source_field}=={source_value}', f'{target_field}=={target_value}'])
-        crosslinks['+'.join(equations)] = {'source_field': source_field, 'source_value': source_value,
-                'target_field': target_field, 'target_value': target_value}
+        if row['relationship'] == 'needs': #target_field == house_cat_id_name:
+            ids_to_add[f'{source_field}=={source_value}'] = target_value
+        else:
+            ids_by[source_field][source_value] = {target_field: target_value}
+            ids_by[target_field][target_value] = {source_field: source_value}
+            all_ids_by[source_field].append(source_value)
+            all_ids_by[target_field].append(target_value)
+            equations = sorted([f'{source_field}=={source_value}', f'{target_field}=={target_value}'])
+            crosslinks['+'.join(equations)] = {'source_field': source_field, 'source_value': source_value,
+                    'target_field': target_field, 'target_value': target_value}
 
 
 deduplicated_master_list = []
 duplicates_to_merge = defaultdict(list)
+
 for record in master_list:
+    for id_condition, value_to_add in ids_to_add.items():
+        id_field, id_value = id_condition.split('==')
+        if id_field in record and record[id_field] == id_value:
+            record[house_cat_id_name] = value_to_add
     for key, crosslink in crosslinks.items():
         source_field = crosslink['source_field']
         source_value = crosslink['source_value']
@@ -335,12 +353,14 @@ for record in master_list:
         target_value = crosslink['target_value']
 
         if (source_field in record and record[source_field] == source_value) or (target_field in record and record[target_field] == target_value):
-            duplicates_to_merge[key].append(record)
+            duplicates_to_merge[key].append(copy.deepcopy(record))
             print(record)
-            break # Stop searching for crosslinks
+            break # Stop searching for crosslinks (however, this prevents multi-record merges)
     else:
         deduplicated_master_list.append(record)
 
+ic(duplicates_to_merge)
+assert False
 # Bellefield Dwellings has one HUD Property ID 800018223, but two
 # LIHTC Project ID values, one from 1988 and one from 2011.
 # It also has two different state IDs and two different federal
@@ -361,15 +381,20 @@ for record in master_list:
 # [ ] PAA19890620 and PAA19910435 are two different LIHTC Project IDs for the same location (HIGHLAND AVE APARTMENTS).
 # The funding was for 3 units and then 1 unit, respectively. But it's not clear if the 1 is part of the 3.
 
+
+
 #lihtc_project_id,PAA19890620,funded,house_cat_id,15145-highland-ave-apartments,Highland Ave Apartments
 #lihtc_project_id,PAA19910435,funded,house_cat_id,15145-highland-ave-apartments,Highland Ave Apartments
 
 # [ ] We need our own ID to associate with this, I guess, and we need it to show up in the master lists.
 
-house_cat_id_name = 'house_cat_id'
+# 1) Add house_cat_id to a record with a given ID.
+# 2) Merge multiple records linked with 
+
 for dup_key, dups in duplicates_to_merge.items():
     merged_record = {}
     if len(dups) != 2:
+        ic(dup_key)
         ic(dups)
         assert False
     for key, value in dups[0].items():
@@ -400,7 +425,7 @@ for dup_key, dups in duplicates_to_merge.items():
     deduplicated_master_list.append(merged_record)
 
 
-write_to_csv('deduplicated_master_list.csv', deduplicated_master_list, fields_to_get + possible_keys + ['source_file'])
+write_to_csv('deduplicated_master_list.csv', deduplicated_master_list, fields_to_get + possible_keys + [house_cat_id_name, 'source_file'])
 #ic(all_ids_by)
 #deduplicated_master_list = []
 #duplicates_to_merge = defaultdict(list)
