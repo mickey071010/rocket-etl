@@ -87,7 +87,7 @@ for f in files:
 # Examine the breakdown of records containing property_id values based on which files each property_id appears in.
 pa_files_by_property_id = defaultdict(list)
 for property_id, file_list in files_by_property_id.items():
-#    if file_list[0] == 'mf_8_contracts_us.csv' and len(set(file_list)) == 1:
+#    if file_list[0] == 'mf_8_contracts_pa.csv' and len(set(file_list)) == 1:
 #        pass
 #    else:
         pa_files_by_property_id[property_id] = '|'.join(sorted(list(set(file_list))))
@@ -108,7 +108,7 @@ write_to_csv('files_by_property_id.csv', prop_id_files_list, ['property_id', 'fi
 # seems legitimate, yielding 250 property_id values (143 in Pittsburgh).
 
 
-# [ ] Combine mf_subsidy_ac, mf_subsidy_loans_ac, and mf_loans_ac, join with mf_8_contracts_us
+# [ ] Combine mf_subsidy_ac, mf_subsidy_loans_ac, and mf_loans_ac, join with mf_8_contracts_pa
 
 fields_to_get = ['hud_property_name',
         'property_street_address', 'municipality_name', 'city', 'zip_code',
@@ -126,7 +126,7 @@ for a in ac_property_id_files:
     assert a in files
 
 for f in files:
-    if f in ac_property_id_files:# mf_inspections_pa.csv and mf_8_contracts_us COULD
+    if f in ac_property_id_files:# mf_inspections_pa.csv and mf_8_contracts_pa COULD
     # BE added here if there are other fields we want to extract (that is, beyond constructing a master list).
         with open(f'{path}/{f}', 'r') as g:
             reader = csv.DictReader(g)
