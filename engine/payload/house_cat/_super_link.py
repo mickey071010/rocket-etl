@@ -164,28 +164,42 @@ write_to_csv('files_by_fha_loan_id.csv', fha_loan_id_files_list, [id_field, 'fil
 # that are not in mf_loans_ac), so basically we can use mf_loans_ac to join to the other
 # files. This is great because mf_loans_ac already has the property_id value.
 # The only exception was one of the eight records in the intersection of mf_init_commit_pa
-# (which itself only has 8 records): River Vue Apartments, which is listed in both files
-# as having the city name "Pittsburg" and the ZIP code "51212".
+# and mf_mortgages_pa.csv (which itself only has 8 records): River Vue Apartments,
+# which is listed in both files as having the city name "Pittsburg" and the ZIP code "51212".
+# (This record initally caused problems downstream as the deduplication code in _plink.py assumed
+# that no key value occurred in more than one record, and there are instances of River Vue
+# Apartments with its fha_loan_id in both mf_loans_ac.csv|mf_subsidy_loans_ac.csv and
+# mf_mortgages_pa.csv|mf_init_commit_pa.csv. It's actually easier to just not add this one at
+# all (since it adds a duplicate record with incorrectly typed city name and ZIP code
+# and adds no obvious value). The only thing worth noting is that it CAN be looked up in
+# those other two files.)
 
 # IMPORTANT NOTE: In 91% of records, fha_loan_id == associated_fha_laon_id
 
 # Add fha_loan_id-based properties to master list.
 
-ac_by_id = defaultdict(dict)
-id_field = 'fha_loan_id'
+###ac_by_id = defaultdict(dict)
+###id_field = 'fha_loan_id'
+###
+###fha_files = ['mf_init_commit_pa.csv', 'mf_mortgages_pa.csv']
+###for f in fha_files:
+###    assert f in files
+###
+###for f in fha_files:
+###    with open(f'{path}/{f}', 'r') as g:
+###        reader = csv.DictReader(g)
+###        for row in reader:
+###            if row[id_field] == '03332013': # River Vue Apartments
+###                add_row_to_linking_dict(f, row, id_field, fields_to_get, ac_by_id)
+###
+###master_list += [v for k, v in ac_by_id.items()]
 
-fha_files = ['mf_init_commit_pa.csv', 'mf_mortgages_pa.csv']
-for f in fha_files:
-    assert f in files
+# Instead of adding this, let's just tack on the filenames to the associate record.
 
-for f in fha_files:
-    with open(f'{path}/{f}', 'r') as g:
-        reader = csv.DictReader(g)
-        for row in reader:
-            if row[id_field] == '03332013':
-                add_row_to_linking_dict(f, row, id_field, fields_to_get, ac_by_id)
+for r in master_list:
+    if r.get('fha_loan_id', None) == '03332013': # River Vue Apartments
+        r['source_file'] += '|mf_mortgages_pa.csv|mf_init_commit_pa.csv'
 
-master_list += [v for k, v in ac_by_id.items()]
 #########################
 # Add LIHTC to master_list
 
