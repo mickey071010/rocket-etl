@@ -95,7 +95,7 @@ class HFADemographics(pl.BaseSchema):
     state = fields.String(dump_to='state')
     zip_code = fields.String(dump_to='zip_code')
     legal_owner_entity = fields.String(load_from='Legal Owner Entity'.lower(), dump_to='owner_organization_name', allow_none=True)
-    units = fields.Integer(load_from='Units'.lower(), dump_to='units')
+    assisted_units = fields.Integer(load_from='Units'.lower(), dump_to='assisted_units') # This has been checked to match up with our "assisted_units" field for a few cases.
     individuals_with_a_occ_type = fields.String(load_from='individuals_with_a:_occtype', dump_to='demographic')
     physical = fields.Boolean(load_from='Physical'.lower(), dump_to='physical', allow_none=False)
     mental = fields.Boolean(load_from='Mental'.lower(), dump_to='mental', allow_none=False)
