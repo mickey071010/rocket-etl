@@ -14,6 +14,12 @@ def merge(record_1, record_2):
     merged_record = {}
     for key, value in record_1.items():
         other_value = record_2.get(key, None)
+        # Remove extra spaces
+        if type(value) == str:
+            value = re.sub('\s+', ' ', value)
+        if type(other_value) == str:
+            other_value = re.sub('\s+', ' ', other_value)
+
         if key == 'index':
             merged_record[key] = min(value, other_value)
         elif other_value is None:
