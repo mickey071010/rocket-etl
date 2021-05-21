@@ -111,7 +111,8 @@ write_to_csv('files_by_property_id.csv', prop_id_files_list, ['property_id', 'fi
 # [ ] Combine mf_subsidy_ac, mf_subsidy_loans_ac, and mf_loans_ac, join with mf_8_contracts_pa
 
 fields_to_get = ['hud_property_name',
-        'property_street_address', 'municipality_name', 'city', 'zip_code',
+        'property_street_address', 'municipality_name', 'city', 'zip_code', 'units',
+        'latitude', 'longitude',
         'contract_id', # mf_subsidy_ac
         'fha_loan_id',
         'state_id',
