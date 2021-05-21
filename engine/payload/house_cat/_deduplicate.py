@@ -11,6 +11,7 @@ def write_to_csv(filename, list_of_dicts, keys):
 
 
 def merge(record_1, record_2):
+    merged_record = {}
     for key, value in record_1.items():
         other_value = record_2.get(key, None)
         if key == 'index':
@@ -109,7 +110,6 @@ with open(f'unidirectional_links.csv', 'r') as g:
             assert index_1 not in eliminated_indices # This seems like it's necessary because ic(master_by['lihtc_project_id']['PAA20133006'])
             assert index_2 not in eliminated_indices # does not have the same information as ic(master_by['state_id']['TC20110313'])
                                                      # after the merging, though it should.
-            merged_record = {}
             record_1 = master_list[index_1]
             record_2 = master_list[index_2]
 
