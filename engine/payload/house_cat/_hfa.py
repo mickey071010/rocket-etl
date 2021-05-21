@@ -79,10 +79,12 @@ class HFALIHTCSchema(pl.BaseSchema):
             if f in data and data[f] == '0':
                 data[f] = None
 
+
 class HFADemographics(pl.BaseSchema):
     job_code = 'hfa_demographics'
     pmindx = fields.String(load_from='PMINDX'.lower(), dump_to='pmindx')
     application_number = fields.String(load_from='Application Number'.lower(), dump_to='application_number') # Sometimes this is the state_id, but other times it isn't.
+    state_id = fields.String(dump_only=True, dump_to='state_id', allow_none=True)
     s8cnid = fields.String(load_from='S8CNID'.lower(), dump_to='contract_id', allow_none=True)
     hud_rems = fields.String(load_from='HUD REMS'.lower(), dump_to='property_id', allow_none=True)
     fha_loan_id = fields.String(load_from='fha_#', dump_to='fha_loan_id', allow_none=True)
@@ -106,6 +108,18 @@ class HFADemographics(pl.BaseSchema):
 
     class Meta:
         ordered = True
+
+    @post_load
+    def fix_state_id(self, data):
+        f0 = 'application_number'
+        f = 'state_id'
+        if f0 in data and data[f0] not in ['', None]:
+            state_ids = data[f0].split('/')
+            state_id = None
+            for s in state_ids:
+                if s[:2] == 'TC':
+                    state_id = s
+            data[f] = state_id
 
     @pre_load
     def set_city_state_and_zip_code(self, data):
