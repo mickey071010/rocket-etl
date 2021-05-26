@@ -111,12 +111,13 @@ fields_to_get = ['hud_property_name',
         'property_street_address', 'municipality_name', 'city', 'zip_code',
         'contract_id', # mf_subsidy_ac
         'fha_loan_id',
-        'state_id',
+        'normalized_state_id',
+        'pmindx',
         'units',
         'latitude', 'longitude',
         ]
 
-possible_keys = ['property_id', 'lihtc_project_id', 'development_code', 'fha_loan_id', 'state_id'] # 'inspection_property_id_multiformat']
+possible_keys = ['property_id', 'lihtc_project_id', 'development_code', 'fha_loan_id', 'normalized_state_id', 'contract_id', 'pmindx'] # 'inspection_property_id_multiformat']
 
 ########################
 fields_to_write = fields_to_get
