@@ -8,7 +8,7 @@ DESTINATION_DIR = "/Users/drw/WPRDC/etl/rocket-etl/output_files/"
 
 path = DESTINATION_DIR + "house_cat"
 
-possible_keys = ['property_id', 'lihtc_project_id', 'development_code', 'fha_loan_id', 'state_id'] # 'inspection_property_id_multiformat']
+possible_keys = ['property_id', 'lihtc_project_id', 'development_code', 'fha_loan_id', 'normalized_state_id', 'contract_id', 'pmindx'] # 'inspection_property_id_multiformat']
 
 def write_to_csv(filename, list_of_dicts, keys):
     with open(filename, 'w') as output_file:
@@ -115,7 +115,8 @@ fields_to_get = ['hud_property_name',
         'latitude', 'longitude',
         'contract_id', # mf_subsidy_ac
         'fha_loan_id',
-        'state_id',
+        'normalized_state_id',
+        'pmindx',
         ]
 
 mf_ac_by_property_id = defaultdict(dict)
@@ -312,6 +313,21 @@ master_list += [v for k, v in ac_by_id.items()]
 # Two records that are in the statewide
 
 ########################
+# Add PHFA Demographics file.
+id_field = 'pmindx'
+ac_by_id = defaultdict(dict)
+
+phfa_files = ['phfa_pgh_demographics.csv']
+for f in phfa_files:
+    assert f in files
+
+for f in phfa_files:
+    with open(f'{path}/{f}', 'r') as g:
+        reader = csv.DictReader(g)
+        for row in reader:
+            add_row_to_linking_dict(f, row, id_field, fields_to_get, ac_by_id)
+################
+master_list += [v for k, v in ac_by_id.items()]
 fields_to_write = fields_to_get
 for f in possible_keys:
     if f not in fields_to_write:
