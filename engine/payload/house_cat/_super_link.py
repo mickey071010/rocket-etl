@@ -2,13 +2,14 @@ import re, csv, copy
 from pprint import pprint
 from icecream import ic
 from collections import defaultdict
+from _deduplicate import standardize_field
 
 #from parameters.local_parameters import DESTINATION_DIR
 DESTINATION_DIR = "/Users/drw/WPRDC/etl/rocket-etl/output_files/"
 
 path = DESTINATION_DIR + "house_cat"
 
-possible_keys = ['property_id', 'lihtc_project_id', 'development_code', 'fha_loan_id', 'normalized_state_id', 'contract_id', 'pmindx'] # 'inspection_property_id_multiformat']
+from _deduplicate import possible_keys
 
 def write_to_csv(filename, list_of_dicts, keys):
     with open(filename, 'w') as output_file:
@@ -337,7 +338,7 @@ for row in master_list:
     for fieldname, value in row.items():
         if type(value) == str:
             if fieldname not in ['source_file']:
-                row[fieldname] = re.sub('\s+', ' ', value.upper()).strip()
+                row[fieldname] = standardize_field(value, fieldname)
 
 #########################
 write_to_csv('master_list.csv', master_list, fields_to_write + ['source_file'])
