@@ -119,128 +119,128 @@ fields_to_get = ['hud_property_name',
 
 possible_keys = ['property_id', 'lihtc_project_id', 'development_code', 'fha_loan_id', 'normalized_state_id', 'contract_id', 'pmindx'] # 'inspection_property_id_multiformat']
 
-########################
-fields_to_write = fields_to_get
-for f in possible_keys:
-    if f not in fields_to_write:
-        fields_to_write.append(f)
-#########################
-# Load master list from file
-with open('master_list.csv', 'r') as f:
-    reader = csv.DictReader(f)
-    master_list = list(reader)
+if __name__ == '__main__':
+    fields_to_write = fields_to_get
+    for f in possible_keys:
+        if f not in fields_to_write:
+            fields_to_write.append(f)
+    #########################
+    # Load master list from file
+    with open('master_list.csv', 'r') as f:
+        reader = csv.DictReader(f)
+        master_list = list(reader)
 
-for k, record in enumerate(master_list):
-    record['index'] = k
+    for k, record in enumerate(master_list):
+        record['index'] = k
 
-house_cat_id_name = 'house_cat_id'
+    house_cat_id_name = 'house_cat_id'
 
-eliminated_indices = []
+    eliminated_indices = []
 
-# Index all records by all key fields
-master_by = defaultdict(lambda: defaultdict(int)) # master_by['property_id']['80000000'] = index of some record in master_list
-for n, record in enumerate(master_list):
-    for key in possible_keys:
-        if key in record:
-            if record[key] not in ['', None]:
-                if master_by[key][record[key]] != 0: # Sound COLLISION.
-                    print(f'Found another instance of key = {key}, value = {record[key]} already in the master list.')
-                    if True: # merging routine
-                        print(f'Attempting to merge these two records:')
-                        already_indexed_n = master_by[key][record[key]]
-                        record_1 = master_list[already_indexed_n]
-                        #pprint(record_1)
-                        #pprint(record)
-                        merged_record = merge(record_1, record)
+    # Index all records by all key fields
+    master_by = defaultdict(lambda: defaultdict(int)) # master_by['property_id']['80000000'] = index of some record in master_list
+    for n, record in enumerate(master_list):
+        for key in possible_keys:
+            if key in record:
+                if record[key] not in ['', None]:
+                    if master_by[key][record[key]] != 0: # Sound COLLISION.
+                        print(f'Found another instance of key = {key}, value = {record[key]} already in the master list.')
+                        if True: # merging routine
+                            print(f'Attempting to merge these two records:')
+                            already_indexed_n = master_by[key][record[key]]
+                            record_1 = master_list[already_indexed_n]
+                            #pprint(record_1)
+                            #pprint(record)
+                            merged_record = merge(record_1, record)
 
-                        ic(already_indexed_n)
-                        ic(master_list[already_indexed_n])
-                        master_list[already_indexed_n] = merged_record
-                        eliminated_indices.append(n)
-                        #ic(master_list[already_indexed_n])
-                        #ic(merged_record)
+                            ic(already_indexed_n)
+                            ic(master_list[already_indexed_n])
+                            master_list[already_indexed_n] = merged_record
+                            eliminated_indices.append(n)
+                            #ic(master_list[already_indexed_n])
+                            #ic(merged_record)
+                        else:
+                            already_indexed_n = master_by[key][record[key]]
+                            record_1 = master_list[already_indexed_n]
+                            pprint(record_1)
+                            pprint(record)
+                        #assert False
+                            raise ValueError("DO SOMETHING ABOUT THIS ONE! "*8)
+                    #assert master_by[key][record[key]] == 0 # I think this might be fairly critical actually.
                     else:
-                        already_indexed_n = master_by[key][record[key]]
-                        record_1 = master_list[already_indexed_n]
-                        pprint(record_1)
-                        pprint(record)
-                    #assert False
-                        raise ValueError("DO SOMETHING ABOUT THIS ONE! "*8)
-                #assert master_by[key][record[key]] == 0 # I think this might be fairly critical actually.
-                else:
-                    master_by[key][record[key]] = n # This is the row number in the master list.
-                #if record['fha_loan_id'] == '03332013' and record['zip_code'] == '51212':
-                #    print("JUST SKIPPING THIS COLLISION FOR NOW!!!")
-                #    pass
-                #else:
-                #    assert master_by[key][record[key]] == 0 # I think this might be fairly critical actually.
-                #    master_by[key][record[key]] = n # This is the row number in the master list.
+                        master_by[key][record[key]] = n # This is the row number in the master list.
+                    #if record['fha_loan_id'] == '03332013' and record['zip_code'] == '51212':
+                    #    print("JUST SKIPPING THIS COLLISION FOR NOW!!!")
+                    #    pass
+                    #else:
+                    #    assert master_by[key][record[key]] == 0 # I think this might be fairly critical actually.
+                    #    master_by[key][record[key]] = n # This is the row number in the master list.
 
-# Load file that gives instructions for linking records based on IDs
-with open(f'unidirectional_links.csv', 'r') as g:
-    reader = csv.DictReader(g)
-    for row in reader:
-        source_field = row['source_field']
-        source_value = row['source_value']
-        target_field = row['target_field']
-        target_value = row['target_value']
-        if source_field not in possible_keys + [house_cat_id_name]:
-            ic(source_field)
-            ic(possible_keys + [house_cat_id_name])
-        assert source_field in possible_keys + [house_cat_id_name]
-        if target_field not in possible_keys + [house_cat_id_name]:
-            ic(target_field)
-        assert target_field in possible_keys + [house_cat_id_name]
+    # Load file that gives instructions for linking records based on IDs
+    with open(f'unidirectional_links.csv', 'r') as g:
+        reader = csv.DictReader(g)
+        for row in reader:
+            source_field = row['source_field']
+            source_value = row['source_value']
+            target_field = row['target_field']
+            target_value = row['target_value']
+            if source_field not in possible_keys + [house_cat_id_name]:
+                ic(source_field)
+                ic(possible_keys + [house_cat_id_name])
+            assert source_field in possible_keys + [house_cat_id_name]
+            if target_field not in possible_keys + [house_cat_id_name]:
+                ic(target_field)
+            assert target_field in possible_keys + [house_cat_id_name]
 
-        assert source_value != ''
-        assert target_value != ''
+            assert source_value != ''
+            assert target_value != ''
 
-        if row['relationship'] == 'needs': # target_field == house_cat_id_name:
-            index = master_by[source_field][source_value]
-            source_record = master_list[index]
-            source_record[target_field] = target_value
-        else:
-            # Merge these two records
-            index_1 = master_by[source_field][source_value]
-            index_2 = master_by[target_field][target_value]
-            if index_1 in eliminated_indices:
-                ic(index_1, source_field, source_value)
-                ic(row)
-            #assert index_1 not in eliminated_indices # This seems like it's necessary because ic(master_by['lihtc_project_id']['PAA20133006'])
-            #assert index_2 not in eliminated_indices # does not have the same information as ic(master_by['state_id']['TC20110313'])
-                                                     # after the merging, though it should.
-
-            # Just try skipping these:
-            if index_1 in eliminated_indices:
-                print(f'index_1 = {index_1} has already been taken care of.')
-            if index_2 in eliminated_indices:
-                print(f'index_2 = {index_2} has already been taken care of.')
-            if index_1 in eliminated_indices or index_2 in eliminated_indices:
-                ic(row)
+            if row['relationship'] == 'needs': # target_field == house_cat_id_name:
+                index = master_by[source_field][source_value]
+                source_record = master_list[index]
+                source_record[target_field] = target_value
             else:
-                record_1 = master_list[index_1]
-                record_2 = master_list[index_2]
+                # Merge these two records
+                index_1 = master_by[source_field][source_value]
+                index_2 = master_by[target_field][target_value]
+                if index_1 in eliminated_indices:
+                    ic(index_1, source_field, source_value)
+                    ic(row)
+                #assert index_1 not in eliminated_indices # This seems like it's necessary because ic(master_by['lihtc_project_id']['PAA20133006'])
+                #assert index_2 not in eliminated_indices # does not have the same information as ic(master_by['state_id']['TC20110313'])
+                                                         # after the merging, though it should.
 
-                merged_record = merge(record_1, record_2)
+                # Just try skipping these:
+                if index_1 in eliminated_indices:
+                    print(f'index_1 = {index_1} has already been taken care of.')
+                if index_2 in eliminated_indices:
+                    print(f'index_2 = {index_2} has already been taken care of.')
+                if index_1 in eliminated_indices or index_2 in eliminated_indices:
+                    ic(row)
+                else:
+                    record_1 = master_list[index_1]
+                    record_2 = master_list[index_2]
 
-                master_list[index_1] = master_list[index_2] = merged_record
-                master_by[source_field][source_value] = min(index_1, index_2)
-                master_by[target_field][target_value] = min(index_1, index_2)
-                eliminated_indices.append(max(index_1, index_2))
-            print("============")
+                    merged_record = merge(record_1, record_2)
+
+                    master_list[index_1] = master_list[index_2] = merged_record
+                    master_by[source_field][source_value] = min(index_1, index_2)
+                    master_by[target_field][target_value] = min(index_1, index_2)
+                    eliminated_indices.append(max(index_1, index_2))
+                print("============")
 
 
-deduplicated_master_list = []
-added = []
-for field, remainder in master_by.items():
-    for value, index in remainder.items():
-        if index not in added and index not in eliminated_indices:
-            added.append(index)
-            deduplicated_master_list.append(master_list[index])
+    deduplicated_master_list = []
+    added = []
+    for field, remainder in master_by.items():
+        for value, index in remainder.items():
+            if index not in added and index not in eliminated_indices:
+                added.append(index)
+                deduplicated_master_list.append(master_list[index])
 
-write_to_csv('deduplicated_master_list.csv', deduplicated_master_list, fields_to_write + [house_cat_id_name, 'source_file', 'index'])
-ic(len(master_list))
-ic(len(deduplicated_master_list))
+    write_to_csv('deduplicated_master_list.csv', deduplicated_master_list, fields_to_write + [house_cat_id_name, 'source_file', 'index'])
+    ic(len(master_list))
+    ic(len(deduplicated_master_list))
 # Bellefield Dwellings has one HUD Property ID 800018223, but two
 # LIHTC Project ID values, one from 1988 and one from 2011.
 # It also has two different state IDs and two different federal
