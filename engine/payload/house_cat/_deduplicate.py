@@ -9,6 +9,68 @@ def write_to_csv(filename, list_of_dicts, keys):
         dict_writer.writeheader()
         dict_writer.writerows(list_of_dicts)
 
+def standardize_string(x):
+    return re.sub('\s+', ' ', x).upper()
+
+def standardize_address(x):
+    x = re.sub('\.', '', x)
+    abbreviation_by_street_designator = {'Avenue': 'Ave',
+            'Court': 'Ct',
+            'Drive': 'Dr',
+            'Road': 'Rd',
+            'Street': 'St',
+            'Way': 'Wy',
+            ' Eighth ': ' 8th ',
+            ' N SECOND': ' NORTH SECOND',
+            'CRUCIBLE CT': 'CRUCIBLE ST',
+            '5 PALISADES PLZ': '5 PALISADES PLAZA, SUITE A-3',
+            }
+    for designator, abbreviation in abbreviation_by_street_designator.items():
+        x = re.sub(designator, abbreviation, x, flags=re.IGNORECASE)
+    return standardize_string(x)
+
+def standardize_name(x):
+    x = re.sub('\.$', '', x)
+    abbreviation_by_designator = {'Apartments': 'Apts',
+            'APARTMNENTS': 'Apts',
+            'Avenue': 'Ave',
+            ' & ': ' AND ',
+            ' PHSE ': ' PHASE ',
+            ' PH ': ' PHASE ',
+            'PHASE 1': 'PHASE I',
+            'PHASE 2': 'PHASE II',
+            'PHASE 3': 'PHASE III',
+            'PHASE 4': 'PHASE IV',
+            ' HTS ': ' HEIGHTS',
+            'BEDFORD IB': 'BEDFORD PHASE IB',
+            'NORTH HILLS HIGHLANDS II': 'NORTH HILLS HIGHLANDS PHASE II',
+            'OAK HILL APT PHASE II': 'OAK HILL PHASE II',
+            'HOMESTEAD APTS II': 'HOMESTEAD APTS PHASE II',
+            }
+    for designator, abbreviation in abbreviation_by_designator.items():
+        x = re.sub(designator, abbreviation, x, flags=re.IGNORECASE)
+    return standardize_string(x)
+
+def standardize_city(x):
+    x = re.sub('\.$', '', x)
+    substitutions = {'UPPER SAINTE CLAIR': 'UPPER SAINT CLAIR',
+            'MC KEES ROCKS': 'MCKEES ROCKS',
+            'MC KEESPORT': 'MCKEESPORT',
+            }
+    for target, replacement in substitutions.items():
+        x = re.sub(target, replacement, x, flags=re.IGNORECASE)
+    return standardize_string(x)
+
+def standardize_field(x, fieldname):
+    if fieldname == 'source_file':
+        return x
+    if fieldname == 'hud_property_name':
+        return standardize_name(x)
+    if fieldname == 'property_street_address':
+        return standardize_address(x)
+    if fieldname in ['municipality_name', 'city']:
+        return standardize_city(x)
+    return standardize_string(x)
 
 def merge(record_1, record_2):
     merged_record = {}
@@ -16,9 +78,9 @@ def merge(record_1, record_2):
         other_value = record_2.get(key, None)
         # Remove extra spaces
         if type(value) == str:
-            value = re.sub('\s+', ' ', value)
+            value = standardize_field(value, key)
         if type(other_value) == str:
-            other_value = re.sub('\s+', ' ', other_value)
+            other_value = standardize_field(other_value, key)
 
         if key == 'index':
             merged_record[key] = min(value, other_value)
