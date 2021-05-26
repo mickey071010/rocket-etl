@@ -317,6 +317,13 @@ for f in possible_keys:
     if f not in fields_to_write:
         fields_to_write.append(f)
 #########################
+for row in master_list:
+    for fieldname, value in row.items():
+        if type(value) == str:
+            if fieldname not in ['source_file']:
+                row[fieldname] = re.sub('\s+', ' ', value.upper()).strip()
+
+#########################
 write_to_csv('master_list.csv', master_list, fields_to_write + ['source_file'])
 
 # Bellefield Dwellings has one HUD Property ID 800018223, but two
