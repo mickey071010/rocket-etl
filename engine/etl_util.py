@@ -466,6 +466,7 @@ class Job:
         self.source_full_url = job_dict['source_full_url'] if 'source_full_url' in job_dict else None
         self.source_file = job_dict['source_file'] if 'source_file' in job_dict else job_dict['source_full_url'].split('/')[-1] if 'source_full_url' in job_dict else None
         self.source_dir = job_dict['source_dir'] if 'source_dir' in job_dict else ''
+        self.source_site = job_dict['source_site'] if 'source_site' in job_dict else None
         self.verify_requests = not job_dict['ignore_certificate_errors'] if 'ignore_certificate_errors' in job_dict else True
         self.encoding = job_dict['encoding'] if 'encoding' in job_dict else 'utf-8' # wprdc-etl/pipeline/connectors.py also uses UTF-8 as the default encoding.
         self.rows_to_skip = job_dict['rows_to_skip'] if 'rows_to_skip' in job_dict else 0 # Necessary when extracting from poorly formatted Excel files.
@@ -558,6 +559,9 @@ class Job:
             elif self.source_type == 'sftp':
                 self.target = ftp_target(self)
                 self.source_connector = pl.SFTPConnector
+            elif self.source_type == 'ftp':
+                self.target = ftp_target(self)
+                self.source_connector = pl.FTPConnector
             elif self.source_type == 'gcp':
                 self.target = self.source_file
                 self.source_connector = pl.GoogleCloudStorageFileConnector
@@ -736,7 +740,7 @@ class Job:
 
         try:
             curr_pipeline = pl.Pipeline(self.job_code + ' pipeline', self.job_code + ' Pipeline', log_status=False, chunk_size=1000, settings_file=SETTINGS_FILE, retry_without_last_line = retry_without_last_line, ignore_empty_rows = ignore_empty_rows, filters = self.filters) \
-                .connect(self.source_connector, self.target, config_string=self.connector_config_string, encoding=self.encoding, local_cache_filepath=self.local_cache_filepath, verify_requests=self.verify_requests) \
+                .connect(self.source_connector, self.target, config_string=self.connector_config_string, encoding=self.encoding, local_cache_filepath=self.local_cache_filepath, verify_requests=self.verify_requests, fallback_host=self.source_site)
                 .extract(self.extractor, firstline_headers=True, rows_to_skip=self.rows_to_skip, compressed_file_to_extract=self.compressed_file_to_extract) \
                 .schema(self.schema) \
                 .load(self.loader, self.loader_config_string,

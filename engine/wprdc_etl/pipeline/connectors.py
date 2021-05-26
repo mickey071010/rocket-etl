@@ -231,8 +231,10 @@ class FTPConnector(FileConnector):
     def __init__(self, *args, **kwargs):
         super(FTPConnector, self).__init__(*args, **kwargs)
         self.host = kwargs.get('host', None)
-        self.username = kwargs.get('username', '')
-        self.password = kwargs.get('password', '')
+        if self.host is None: # self.host comes from settings.json
+            self.host = kwargs.get('fallback_host', None) # fallback_host comes from source_site from the job_dict.
+        self.username = kwargs.get('username', 'anonymous')
+        self.password = kwargs.get('password', 'anonymous')
         self.passive = kwargs.get('passive', False)
         self.ftp = None
         self.file_text = ''
@@ -242,11 +244,16 @@ class FTPConnector(FileConnector):
             self.ftp = ftplib.FTP(self.host)
             self.ftp.login(self.username, self.password)
             self.ftp.set_pasv(self.passive)
-            self.ftp.retrlines('RETR ' + target, self.add_to_file)
-            if 'latin-sig' in self.encoding:
-                b = self.file_text.encode('latin-1')
-                self.file_text = b.decode('utf-8-sig')
-            self._file = io.StringIO(self.file_text)
+            if self.encoding != 'binary':
+                self.ftp.retrlines('RETR ' + target, self.add_to_file)
+                if 'latin-sig' in self.encoding:
+                    b = self.file_text.encode('latin-1')
+                    self.file_text = b.decode('utf-8-sig')
+                self._file = io.StringIO(self.file_text)
+            else:
+                self._file = io.BytesIO()
+                self.ftp.retrbinary('RETR ' + target, self._file.write)
+                self._file.seek(0)
 
         except IOError as e:
             raise e
