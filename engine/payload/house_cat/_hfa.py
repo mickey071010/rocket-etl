@@ -109,6 +109,12 @@ class HFADemographics(pl.BaseSchema):
     class Meta:
         ordered = True
 
+    @pre_load
+    def standardize_fha_loan_id(self, data):
+        f = 'fha_#'
+        if f in data and data[f] is not None and re.search('-', data[f]) is not None:
+            data[f] = re.sub('-', '', data[f])
+
     @post_load
     def fix_state_id(self, data):
         f0 = 'application_number'

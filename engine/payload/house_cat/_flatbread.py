@@ -82,6 +82,12 @@ class MultifamilyInsuredMortgagesSchema(pl.BaseSchema):
         ordered = True
 
     @pre_load
+    def standardize_fha_loan_id(self, data):
+        f = 'hud_project_number'
+        if f in data and re.search('-', data[f]) is not None:
+            data[f] = re.sub('-', '', data[f])
+
+    @pre_load
     def fix_dates(self, data):
         """Marshmallow doesn't know how to handle a datetime as input. It can only
         take strings that represent datetimes and convert them to datetimes.:
@@ -116,6 +122,12 @@ class MultifamilyProductionInitialCommitmentSchema(pl.BaseSchema):
 
     class Meta:
         ordered = True
+
+    @pre_load
+    def standardize_fha_loan_id(self, data):
+        f = 'fha_number'
+        if f in data and re.search('-', data[f]) is not None:
+            data[f] = re.sub('-', '', data[f])
 
     @pre_load
     def fix_dates(self, data):
@@ -509,6 +521,13 @@ class MultifamilyGuaranteedLoansSchema(pl.BaseSchema):
 
     class Meta:
         ordered = True
+
+    @pre_load
+    def standardize_fha_loan_id(self, data):
+        fs = ['primary_fha_number', 'associated_fha_number']
+        for f in fs:
+            if f in data and re.search('-', data[f]) is not None:
+                data[f] = re.sub('-', '', data[f])
 
 class LIHTCSchema(pl.BaseSchema):
     # Changes to the LIHTCPUB.csv schema between the 2018/2019 version of the data and the May 2021 update:
