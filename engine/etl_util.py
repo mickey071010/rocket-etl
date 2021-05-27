@@ -740,7 +740,7 @@ class Job:
 
         try:
             curr_pipeline = pl.Pipeline(self.job_code + ' pipeline', self.job_code + ' Pipeline', log_status=False, chunk_size=1000, settings_file=SETTINGS_FILE, retry_without_last_line = retry_without_last_line, ignore_empty_rows = ignore_empty_rows, filters = self.filters) \
-                .connect(self.source_connector, self.target, config_string=self.connector_config_string, encoding=self.encoding, local_cache_filepath=self.local_cache_filepath, verify_requests=self.verify_requests, fallback_host=self.source_site)
+                .connect(self.source_connector, self.target, config_string=self.connector_config_string, encoding=self.encoding, local_cache_filepath=self.local_cache_filepath, verify_requests=self.verify_requests, fallback_host=self.source_site) \
                 .extract(self.extractor, firstline_headers=True, rows_to_skip=self.rows_to_skip, compressed_file_to_extract=self.compressed_file_to_extract) \
                 .schema(self.schema) \
                 .load(self.loader, self.loader_config_string,
