@@ -85,6 +85,7 @@ class HFADemographics(pl.BaseSchema):
     pmindx = fields.String(load_from='PMINDX'.lower(), dump_to='pmindx')
     application_number = fields.String(load_from='Application Number'.lower(), dump_to='application_number') # Sometimes this is the state_id, but other times it isn't.
     state_id = fields.String(dump_only=True, dump_to='state_id', allow_none=True)
+    normalized_state_id = fields.String(dump_only=True, dump_to='normalized_state_id', allow_none=True)
     s8cnid = fields.String(load_from='S8CNID'.lower(), dump_to='contract_id', allow_none=True)
     hud_rems = fields.String(load_from='HUD REMS'.lower(), dump_to='property_id', allow_none=True)
     fha_loan_id = fields.String(load_from='fha_#', dump_to='fha_loan_id', allow_none=True)
@@ -126,6 +127,7 @@ class HFADemographics(pl.BaseSchema):
                 if s[:2] == 'TC':
                     state_id = s
             data[f] = state_id
+            data['normalized_state_id'] = state_id
 
     @pre_load
     def set_city_state_and_zip_code(self, data):
