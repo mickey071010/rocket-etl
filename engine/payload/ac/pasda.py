@@ -43,7 +43,7 @@ job_dicts += [
 #    {
 #        'job_code': f'{base_job_code}_api',
 #        'source_type': 'http',
-#        'source_full_url': # Should be 'https://maps.pasda.psu.edu/ArcGIS/rest/services/pasda/AlleghenyCounty/MapServer'
+#        'source_full_url': # Should be 'https://maps.pasda.psu.edu/ArcGIS/rest/services/pasda/AlleghenyCounty/MapServer/25'
 #        'encoding': 'utf-8',
 #        'destination': 'ckan_link',
 #        'package': package_id,
@@ -104,4 +104,179 @@ job_dicts += [
 #        'package': package_id,
 #        'resource_name': f'Shapefile',
 #    },
+]
+
+########################3
+class AddressPointsSchema(pl.BaseSchema):
+    feature_key = fields.String(load_from='FEATURE_KE'.lower(), dump_to='feature_key')
+    address_id = fields.String(load_from='ADDRESS_ID'.lower(), dump_to='address_id')
+    parent_id = fields.String(load_from='PARENT_ID'.lower(), dump_to='parent_id')
+    street_id = fields.String(load_from='STREET_ID'.lower(), dump_to='street_id')
+    address_ty = fields.Integer(load_from='ADDRESS_TY'.lower(), dump_to='address_type')
+    status = fields.String(load_from='STATUS'.lower(), dump_to='status')
+    addr_num_p = fields.String(load_from='ADDR_NUM_P'.lower(), dump_to='addr_num_prefix')
+    addr_num = fields.Integer(load_from='ADDR_NUM'.lower(), dump_to='addr_num')
+    addr_num_s = fields.String(load_from='ADDR_NUM_S'.lower(), dump_to='addr_num_suffix')
+    st_premodi = fields.String(load_from='ST_PREMODI'.lower(), dump_to='st_premodifier')
+    st_prefix = fields.String(load_from='ST_PREFIX'.lower(), dump_to='st_prefix')
+    st_pretype = fields.String(load_from='ST_PRETYPE'.lower(), dump_to='st_pretype')
+    st_name = fields.String(load_from='ST_NAME'.lower(), dump_to='st_name')
+    st_type = fields.String(load_from='ST_TYPE'.lower(), dump_to='st_type')
+    st_postmod = fields.String(load_from='ST_POSTMOD'.lower(), dump_to='st_postmodifier')
+    unit_type = fields.String(load_from='UNIT_TYPE'.lower(), dump_to='unit_type')
+    unit = fields.String(load_from='UNIT'.lower(), dump_to='unit')
+    floor = fields.String(load_from='FLOOR'.lower(), dump_to='floor')
+    municipali = fields.String(load_from='MUNICIPALI'.lower(), dump_to='municipality')
+    county = fields.String(load_from='COUNTY'.lower(), dump_to='county')
+    state = fields.String(load_from='STATE'.lower(), dump_to='state')
+    zip_code = fields.String(load_from='ZIP_CODE'.lower(), dump_to='zip_code')
+    comment = fields.String(load_from='COMMENT'.lower(), dump_to='comment')
+    edit_date = fields.Date(load_from='EDIT_DATE'.lower(), dump_to='edit_date')
+    edit_user = fields.String(load_from='EDIT_USER'.lower(), dump_to='edit_user')
+    source = fields.String(load_from='SOURCE'.lower(), dump_to='source')
+    exp_flag = fields.String(load_from='EXP_FLAG'.lower(), dump_to='exp_flag')
+    full_addre = fields.String(load_from='FULL_ADDRE'.lower(), dump_to='full_address')
+    st_suffix = fields.String(load_from='ST_SUFFIX'.lower(), dump_to='st_suffix')
+    point_x = fields.Float(load_from='POINT_X'.lower(), dump_to='point_x')
+    point_y = fields.Float(load_from='POINT_Y'.lower(), dump_to='point_y')
+    lat = fields.Float(load_from='LAT'.lower(), dump_to='latitude')
+    lng = fields.Float(load_from='LNG'.lower(), dump_to='longitude')
+
+    class Meta:
+        ordered = True
+
+schema = AddressPointsSchema
+base_job_code = 'address_points' # 'Allegheny County Address Points'
+package_id = '4988ae5c-a677-4a7f-9bd0-e735c19a8ff3'
+
+
+job_dicts += [
+#    {
+#        'job_code': f'{base_job_code}_web',
+#        'source_type': 'http',
+#        'source_full_url': # Should be 'https://www.pasda.psu.edu/uci/DataSummary.aspx?dataset=1219'
+#        'encoding': 'utf-8',
+#        'destination': 'ckan_link',
+#        'package': package_id,
+#        'resource_name': f'ArcGIS Hub Dataset',
+#    },
+#    {
+#        'job_code': f'{base_job_code}_api',
+#        'source_type': 'http',
+#        'source_full_url': # Should be 'https://maps.pasda.psu.edu/ArcGIS/rest/services/pasda/AlleghenyCounty/MapServer/32'
+#        'encoding': 'utf-8',
+#        'destination': 'ckan_link',
+#        'package': package_id,
+#        'resource_name': f'Esri Rest API',
+#    },
+    {
+        'job_code': f'{base_job_code}_geojson',
+        'source_type': 'http',
+        'source_full_url': f'https://www.pasda.psu.edu/json/AlleghenyCounty_AddressPoints{year_month}.geojson',
+        'encoding': 'utf-8',
+        'destination': 'ckan_filestore',
+        'package': package_id,
+        'resource_name': f'GeoJSON',
+    },
+    {
+        'job_code': f'{base_job_code}_csv',
+        'source_type': 'http',
+        'source_full_url': f'https://www.pasda.psu.edu/spreadsheet/AlleghenyCounty_AddressPoints{year_month}.csv',
+        'encoding': 'utf-8',
+        'schema': schema,
+        'always_wipe_data': True,
+        #'primary_key_fields': ['\ufeffobjectid', 'id_no', 'oid', 'id']
+        'destination': 'ckan',
+        'package': package_id,
+        'resource_name': f'CSV',
+        'upload_method': 'insert',
+    },
+    {
+        'job_code': f'{base_job_code}_kml',
+        'source_type': 'http',
+        'source_full_url': f'https://www.pasda.psu.edu/kmz/AlleghenyCounty_AddressPoints{year_month}.kmz',
+        'encoding': 'binary',
+        'destination': 'ckan_filestore',
+        'package': package_id,
+        'resource_name': f'KMZ',
+    },
+    {
+        'job_code': f'{base_job_code}_shapefile',
+        'source_type': 'ftp',
+        'source_site': 'ftp.pasda.psu.edu',
+        'source_dir': 'pub/pasda/alleghenycounty',
+        'source_file': f'AlleghenyCounty_AddressPoints{year_month}.zip',
+        'encoding': 'binary',
+        'destination': 'ckan_filestore',
+        'package': package_id,
+        'resource_name': f'Shapefile',
+    }
+]
+
+########################3
+base_job_code = 'centerlines' # 'Allegheny County Address Points'
+package_id = '34f6668d-130d-4e10-b49b-598c43b83d27'
+
+
+job_dicts += [
+#    {
+#        'job_code': f'{base_job_code}_web',
+#        'source_type': 'http',
+#        'source_full_url': # Should be 'https://www.pasda.psu.edu/uci/DataSummary.aspx?dataset=1224'
+#        'encoding': 'utf-8',
+#        'destination': 'ckan_link',
+#        'package': package_id,
+#        'resource_name': f'ArcGIS Hub Dataset',
+#    },
+#    {
+#        'job_code': f'{base_job_code}_api',
+#        'source_type': 'http',
+#        'source_full_url': # Should be 'https://maps.pasda.psu.edu/ArcGIS/rest/services/pasda/AlleghenyCounty/MapServer/7'
+#        'encoding': 'utf-8',
+#        'destination': 'ckan_link',
+#        'package': package_id,
+#        'resource_name': f'Esri Rest API',
+#    },
+    {
+        'job_code': f'{base_job_code}_geojson',
+        'source_type': 'http',
+        'source_full_url': f'https://www.pasda.psu.edu/json/AlleghenyCounty_StreetCenterlines{year_month}.geojson',
+        'encoding': 'utf-8',
+        'destination': 'ckan_filestore',
+        'package': package_id,
+        'resource_name': f'GeoJSON',
+    },
+#    {
+#        'job_code': f'{base_job_code}_csv',
+#        'source_type': 'http',
+#        'source_full_url': f'https://www.pasda.psu.edu/spreadsheet/AlleghenyCounty_StreetCenterlines{year_month}.csv', # not supported
+#        'encoding': 'utf-8',
+#        'schema': schema,
+#        'always_wipe_data': True,
+#        #'primary_key_fields': ['\ufeffobjectid', 'id_no', 'oid', 'id']
+#        'destination': 'ckan',
+#        'package': package_id,
+#        'resource_name': f'CSV',
+#        'upload_method': 'insert',
+#    },
+    {
+        'job_code': f'{base_job_code}_kml',
+        'source_type': 'http',
+        'source_full_url': f'https://www.pasda.psu.edu/kmz/AlleghenyCounty_StreetCenterlines{year_month}.kmz',
+        'encoding': 'binary',
+        'destination': 'ckan_filestore',
+        'package': package_id,
+        'resource_name': f'KML',
+    },
+    {
+        'job_code': f'{base_job_code}_shapefile',
+        'source_type': 'ftp',
+        'source_site': 'ftp.pasda.psu.edu',
+        'source_dir': 'pub/pasda/alleghenycounty',
+        'source_file': f'AlleghenyCounty_StreetCenterlines{year_month}.zip',
+        'encoding': 'binary',
+        'destination': 'ckan_filestore',
+        'package': package_id,
+        'resource_name': f'Shapefile',
+    }
 ]
