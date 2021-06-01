@@ -65,7 +65,7 @@ A number of options can be set using command-line parameters:
 > python launchpad.py pgh/smart_trash.py wake_me_when_found
 ```
 
-Any other command-line parameters will be interpreted as candidate job codes (which are the filename of the source file as configured in the job WITHOUT the extension).  So if `pgh_smart_trash.py` contained three jobs and two of them had source files named `oscar.csv` and `grouch.xlsx`, running
+Any other command-line parameters will be interpreted as candidate job codes, and launchpad will attempt to run just those jobs (as opposed to the default of running all jobs in the specified script). While new jobs are being written to include an explicit definition of the job code (in the `job_code` parameter), rocket-etl still supports the old method of deriving job codes from the source filenames (by just removing the file extensions). So if `pgh_smart_trash.py` contained three jobs and two of them had source files named `oscar.csv` and `grouch.xlsx`, running
 
 ```bash
 > python launchpad.py pgh/smart_trash.py oscar grouch
