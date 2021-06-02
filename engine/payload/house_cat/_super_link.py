@@ -39,8 +39,10 @@ def add_row_to_linking_dict(f, row, id_field, fields_to_get, ac_by_id):
         ac_by_id[row[id_field]]['source_file'] = f
     else:
         xs = ac_by_id[row[id_field]]['source_file'].split('|')
-        ac_by_id[row[id_field]]['source_file'] = '|'.join(list(set(xs + [f])))
-
+        ac_by_id[row[id_field]]['source_file'] = '|'.join(sorted(list(set(xs + [f]))))
+        # The above line includes "sorted" to ensure that the source_files are always
+        # listed in alphabetical order, for consistency across multiple generations
+        # of this file (allowing easy comparisons).
     for field in fields_to_get:
         if field in row and row[field] not in [None, '']:
             ac_by_id[row[id_field]][field] = row[field]
