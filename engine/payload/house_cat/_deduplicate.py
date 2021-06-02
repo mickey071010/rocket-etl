@@ -72,7 +72,7 @@ def standardize_field(x, fieldname):
         return standardize_city(x)
     return standardize_string(x)
 
-def merge(record_1, record_2):
+def merge(record_1, record_2, verbose):
     merged_record = {}
     for key, value in record_1.items():
         other_value = record_2.get(key, None)
@@ -96,7 +96,8 @@ def merge(record_1, record_2):
         elif re.match(other_value.upper(), value.upper()) is not None:
             merged_record[key] = value
         else:
-            print(f"Since this code doesn't know how to merge key = {key}, value = {value}, other value = {record_2[key]}, it's just going to list both.")
+            if verbose:
+                print(f"Since this code doesn't know how to merge key = {key}, value = {value}, other value = {record_2[key]}, it's just going to list both.")
             merged_record[key] = f'{value}|{other_value}'
 
             #raise ValueError(f'What should we do with key = {key}, value = {value}, other value = {dups[1][key]}?')
@@ -121,7 +122,7 @@ possible_keys = ['property_id', 'lihtc_project_id', 'development_code', 'fha_loa
 
 index_filename = 'master_list.csv'
 
-def deduplicate_records():
+def deduplicate_records(verbose=False):
     fields_to_write = fields_to_get
     for f in possible_keys:
         if f not in fields_to_write:
@@ -146,17 +147,20 @@ def deduplicate_records():
             if key in record:
                 if record[key] not in ['', None]:
                     if master_by[key][record[key]] != 0: # Sound COLLISION.
-                        print(f'Found another instance of key = {key}, value = {record[key]} already in the master list.')
+                        if verbose:
+                            print(f'Found another instance of key = {key}, value = {record[key]} already in the master list.')
                         if True: # merging routine
-                            print(f'Attempting to merge these two records:')
+                            if verbose:
+                                print(f'Attempting to merge these two records:')
                             already_indexed_n = master_by[key][record[key]]
                             record_1 = master_list[already_indexed_n]
                             #pprint(record_1)
                             #pprint(record)
-                            merged_record = merge(record_1, record)
+                            merged_record = merge(record_1, record, verbose)
 
-                            ic(already_indexed_n)
-                            ic(master_list[already_indexed_n])
+                            if verbose:
+                                ic(already_indexed_n)
+                                ic(master_list[already_indexed_n])
                             master_list[already_indexed_n] = merged_record
                             eliminated_indices.append(n)
                             #ic(master_list[already_indexed_n])
@@ -164,8 +168,9 @@ def deduplicate_records():
                         else:
                             already_indexed_n = master_by[key][record[key]]
                             record_1 = master_list[already_indexed_n]
-                            pprint(record_1)
-                            pprint(record)
+                            if verbose:
+                                pprint(record_1)
+                                pprint(record)
                         #assert False
                             raise ValueError("DO SOMETHING ABOUT THIS ONE! "*8)
                     #assert master_by[key][record[key]] == 0 # I think this might be fairly critical actually.
@@ -187,11 +192,13 @@ def deduplicate_records():
             target_field = row['target_field']
             target_value = row['target_value']
             if source_field not in possible_keys + [house_cat_id_name]:
-                ic(source_field)
-                ic(possible_keys + [house_cat_id_name])
+                if verbose:
+                    ic(source_field)
+                    ic(possible_keys + [house_cat_id_name])
             assert source_field in possible_keys + [house_cat_id_name]
             if target_field not in possible_keys + [house_cat_id_name]:
-                ic(target_field)
+                if verbose:
+                    ic(target_field)
             assert target_field in possible_keys + [house_cat_id_name]
 
             assert source_value != ''
@@ -206,30 +213,35 @@ def deduplicate_records():
                 index_1 = master_by[source_field][source_value]
                 index_2 = master_by[target_field][target_value]
                 if index_1 in eliminated_indices:
-                    ic(index_1, source_field, source_value)
-                    ic(row)
+                    if verbose:
+                        ic(index_1, source_field, source_value)
+                        ic(row)
                 #assert index_1 not in eliminated_indices # This seems like it's necessary because ic(master_by['lihtc_project_id']['PAA20133006'])
                 #assert index_2 not in eliminated_indices # does not have the same information as ic(master_by['state_id']['TC20110313'])
                                                          # after the merging, though it should.
 
                 # Just try skipping these:
                 if index_1 in eliminated_indices:
-                    print(f'index_1 = {index_1} has already been taken care of.')
+                    if verbose:
+                        print(f'index_1 = {index_1} has already been taken care of.')
                 if index_2 in eliminated_indices:
-                    print(f'index_2 = {index_2} has already been taken care of.')
+                    if verbose:
+                        print(f'index_2 = {index_2} has already been taken care of.')
                 if index_1 in eliminated_indices or index_2 in eliminated_indices:
-                    ic(row)
+                    if verbose:
+                        ic(row)
                 else:
                     record_1 = master_list[index_1]
                     record_2 = master_list[index_2]
 
-                    merged_record = merge(record_1, record_2)
+                    merged_record = merge(record_1, record_2, verbose)
 
                     master_list[index_1] = master_list[index_2] = merged_record
                     master_by[source_field][source_value] = min(index_1, index_2)
                     master_by[target_field][target_value] = min(index_1, index_2)
                     eliminated_indices.append(max(index_1, index_2))
-                print("============")
+                if verbose:
+                    print("============")
 
 
     deduplicated_master_list = []
@@ -244,7 +256,8 @@ def deduplicate_records():
     return master_list, deduplicated_master_list
 
 if __name__ == '__main__':
-    index_list, deduplicated_index = deduplicate_records()
+    verbose = True
+    index_list, deduplicated_index = deduplicate_records(verbose)
     ic(len(index_list))
     ic(len(deduplicated_index))
 
