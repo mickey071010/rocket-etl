@@ -3,6 +3,7 @@ from pprint import pprint
 from icecream import ic
 from collections import defaultdict
 from _deduplicate import standardize_field
+from _util import multikeysort
 
 #from parameters.local_parameters import DESTINATION_DIR
 DESTINATION_DIR = "/Users/drw/WPRDC/etl/rocket-etl/output_files/"
@@ -196,7 +197,7 @@ write_to_csv('files_by_fha_loan_id.csv', fha_loan_id_files_list, [id_field, 'fil
 ###
 ###master_list += [v for k, v in ac_by_id.items()]
 
-# Instead of adding this, let's just tack on the filenames to the associate record.
+# Instead of adding this, let's just tack on the filenames to the associated record.
 
 for r in master_list:
     if r.get('fha_loan_id', None) == '03332013': # River Vue Apartments
@@ -341,7 +342,11 @@ for row in master_list:
                 row[fieldname] = standardize_field(value, fieldname)
 
 #########################
-write_to_csv('master_list.csv', master_list, fields_to_write + ['source_file'])
+# Sort master_list to make it easier to compare files.
+sorted_master_list =  multikeysort(master_list, ['pmindx', 'development_code', 'normalized_state_id', 'property_id'])
+
+#########################
+write_to_csv('master_list.csv', sorted_master_list, fields_to_write + ['source_file'])
 
 # Bellefield Dwellings has one HUD Property ID 800018223, but two
 # LIHTC Project ID values, one from 1988 and one from 2011.
