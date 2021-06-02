@@ -121,7 +121,7 @@ possible_keys = ['property_id', 'lihtc_project_id', 'development_code', 'fha_loa
 
 index_filename = 'master_list.csv'
 
-if __name__ == '__main__':
+def deduplicate_records():
     fields_to_write = fields_to_get
     for f in possible_keys:
         if f not in fields_to_write:
@@ -241,8 +241,13 @@ if __name__ == '__main__':
                 deduplicated_master_list.append(master_list[index])
 
     write_to_csv('deduplicated_master_list.csv', deduplicated_master_list, fields_to_write + [house_cat_id_name, 'source_file', 'index'])
-    ic(len(master_list))
-    ic(len(deduplicated_master_list))
+    return master_list, deduplicated_master_list
+
+if __name__ == '__main__':
+    index_list, deduplicated_index = deduplicate_records()
+    ic(len(index_list))
+    ic(len(deduplicated_index))
+
 # Bellefield Dwellings has one HUD Property ID 800018223, but two
 # LIHTC Project ID values, one from 1988 and one from 2011.
 # It also has two different state IDs and two different federal
