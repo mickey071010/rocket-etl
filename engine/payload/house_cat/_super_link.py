@@ -2,7 +2,7 @@ import re, csv, copy
 from pprint import pprint
 from icecream import ic
 from collections import defaultdict
-from _deduplicate import standardize_field
+from _deduplicate import standardize_field, index_filename
 from _util import multikeysort
 
 #from parameters.local_parameters import DESTINATION_DIR
@@ -349,7 +349,7 @@ def link_records_into_index():
     sorted_master_list =  multikeysort(master_list, ['pmindx', 'development_code', 'normalized_state_id', 'property_id'])
 
     #########################
-    write_to_csv('master_list.csv', sorted_master_list, fields_to_write + ['source_file'])
+    write_to_csv(index_filename, sorted_master_list, fields_to_write + ['source_file'])
 
 if __name__ == '__main__':
     link_records_into_index() # Generate the index of records, making

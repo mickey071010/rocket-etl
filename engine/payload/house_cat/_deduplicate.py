@@ -119,6 +119,8 @@ fields_to_get = ['hud_property_name',
 
 possible_keys = ['property_id', 'lihtc_project_id', 'development_code', 'fha_loan_id', 'normalized_state_id', 'contract_id', 'pmindx'] # 'inspection_property_id_multiformat']
 
+index_filename = 'master_list.csv'
+
 if __name__ == '__main__':
     fields_to_write = fields_to_get
     for f in possible_keys:
@@ -126,7 +128,7 @@ if __name__ == '__main__':
             fields_to_write.append(f)
     #########################
     # Load master list from file
-    with open('master_list.csv', 'r') as f:
+    with open(index_filename, 'r') as f:
         reader = csv.DictReader(f)
         master_list = list(reader)
 
