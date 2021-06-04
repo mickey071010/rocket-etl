@@ -159,7 +159,7 @@ class CovidData:
                     facility['Second Doses Adminstered'] = fpp['Second Doses Adminstered']
                     facility['Total Resident Doses Administered'] = fpp['Total Resident Doses Administered']
                     facility['Total Staff Doses Administered'] = fpp['Total Staff Doses Administered']
-                    self.fields = list(set(list(facility.keys()) + self.fields))
+                    self.fields = set(facility.keys()) | self.fields
                     break
     
         #  self.ltcfdf['FPP_Data_Last_Updated'] = self.fpp_last_updated
@@ -169,7 +169,7 @@ class CovidData:
         #self.ltcfdf.drop('GEOCODING_', inplace=True, axis=1) # We don't need to drop any columns
         #self.ltcfdf.drop('LAT', inplace=True, axis=1) # since the ETL schema will just pluck out
         #self.ltcfdf.drop('LNG', inplace=True, axis=1) # the columns it needs and ignore the others.
-        write_to_csv(output_path, self.ltcfdf, self.fields)
+        write_to_csv(output_path, self.ltcfdf, list(self.fields))
         print("output file: "),
         print(output_path)
 
