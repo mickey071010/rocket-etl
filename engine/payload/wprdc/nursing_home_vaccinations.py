@@ -28,7 +28,7 @@ def write_to_csv(filename, list_of_dicts, keys):
         dict_writer.writerows(list_of_dicts)
 
 class NursingHomeVaccinationsSchema(pl.BaseSchema):
-    job_code = 'vaccinations'
+    job_code = 'nursing_homes'
     #survey_id_ = fields.Integer(load_from='SURVEY_ID_'.lower(), dump_to='survey_id_')
     facility_n = fields.String(load_from='FACILITY_N'.lower(), dump_to='facility_name')
     facility_i = fields.String(load_from='FACILITY_I'.lower(), dump_to='facility_id')
@@ -48,7 +48,6 @@ class NursingHomeVaccinationsSchema(pl.BaseSchema):
     #contact_em = fields.String(load_from='CONTACT_EM'.lower(), dump_to='contact_em')
     #lat = fields.Float(load_from='LAT'.lower(), dump_to='lat')
     #lng = fields.Float(load_from='LNG'.lower(), dump_to='long')
-
     all_beds = fields.Integer(load_from='ALL_BEDS'.lower(), dump_to='all_beds', allow_none=True)
     current_census = fields.Integer(load_from='CURRENT_CENSUS'.lower(), dump_to='current_census', allow_none=True)
     resident_cases_to_display = fields.String(load_from='Resident_Cases_to_Display'.lower(), dump_to='resident_cases_to_display', allow_none=True)
@@ -81,49 +80,31 @@ class NursingHomeVaccinationsSchema(pl.BaseSchema):
 # dfg
 
 class CovidData:
-    pasdaData = ""
-    dohfile = ""
-    fppfile = ''
-    global ltcfdf
-    global dohdf
-    global fppdf
-    global dohColumnName
-    global doh_last_updated
-    global fpp_last_updated
-
     def __init__(self, pasdaData, dohData, fppData, soup):
         self.ltcfdf = list(csv.DictReader(open(pasdaData, 'r')))
         self.dohdf = list(csv.DictReader(open(dohData, 'r')))
         self.fppdf = list(csv.DictReader(open(fppData, 'r')))
         self.soup = soup
-        self.fields = []
-        # doc_urls = []
+        self.fields = set()
         doh_dates = []
         for link in self.soup.find_all('a'):
             url = link.get('href', 'No Link Found')
             if re.search('xlsx', url) is not None:
                 doh_dates.append(link.next_sibling)
-            # doc_urls.append(url)
 
         doh_last_updated = doh_dates[0]
         a = doh_last_updated.split()
         self.doh_last_updated = a[1]
-        self.addDOHData()
+        if dohData is not None:
+            self.addDOHData()
         self.addFPPData()
-
-    def isNaN(string):
-        return string != string
 
     def addDOHData(self):
         print("\nAdding DOH COVID Data\n")
 
-        def isNaN(string):
-            return string != string
-
         for facility in self.ltcfdf:
             for index, doh_row in enumerate(self.dohdf):
                 if doh_row['FACID'] == facility['FACILITY_I']:
-                    # print "match"
                     facility['ALL_BEDS'] = doh_row['ALL_BEDS']
                     facility['CURRENT_CENSUS'] = doh_row['CURRENT_CENSUS']
                     facility['Resident_Cases_to_Display'] = doh_row['Resident Cases to Display']
@@ -185,15 +166,9 @@ def get_raw_data_and_save_to_local_csv_file(jobject, **kwparameters):
                 if re.search('xlsx', url) is not None:
                         doh_dates.append(link.next_sibling)
                         doc_urls.append(url)
-                        #print(url)
 
         assert len(doc_urls) == 4  # Verify that the web site only lists four XSLX files.
-        #doh_last_updated = doh_dates[0]
-        #a = doh_last_updated.split()
-        #doh_last_updated = a[1]
-        #print(doh_last_updated)
         fullurl = "https://www.health.pa.gov" + doc_urls[0]
-
 
         r = requests.get("https://data.pa.gov/api/views/iwiy-rwzp/rows.csv?accessType=DOWNLOAD&api_foundry=true")
         open('FPP_Data.csv', 'wb').write(r.content)
@@ -216,7 +191,7 @@ def get_raw_data_and_save_to_local_csv_file(jobject, **kwparameters):
         a.writeToFile(jobject.target)
 
 
-nursing_home_vaccinations_package_id = 'f89d5dd8-5dd3-46a3-9a17-8671f26153ae'
+vaccinations_package_id = 'f89d5dd8-5dd3-46a3-9a17-8671f26153ae'
 
 job_dicts = [
     {
@@ -229,7 +204,7 @@ job_dicts = [
         #'always_wipe_data': True,
         'primary_key_fields': ['facility_i'],
         'destination': 'ckan',
-        'package': nursing_home_vaccinations_package_id,
+        'package': vaccinations_package_id,
         'resource_name': ' Long-Term Care Facilites COVID-19 Cases and Vaccinations Data',
         'upload_method': 'upsert',
         'resource_description': f'Derived from https://data.pa.gov/api/views/iwiy-rwzp/rows.csv?accessType=DOWNLOAD&api_foundry=true and https://www.pasda.psu.edu/spreadsheet/DOH_NursingHome201806.csv',
