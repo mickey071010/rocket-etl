@@ -20,7 +20,16 @@ from engine.ckan_util import (set_resource_parameters_to_values,
 
 BASE_URL = 'https://data.wprdc.org/api/3/action/'
 
-def write_to_csv(filename, list_of_dicts, keys):
+def write_to_csv(filename, list_of_dicts, keys=None):
+    if keys is None: # Extract fieldnames if none were passed.
+        print(f'Since keys == None, write_to_csv is inferring the fields to write from the list of dicts.')
+        keys = set()
+        for row in list_of_dicts:
+            keys = set(row.keys()) | keys
+        keys = sorted(list(keys)) # Sort them alphabetically, in the absence of any better idea.
+        # [One other option would be to extract the field names from the schema and send that
+        # list as the third argument to write_to_csv.]
+        print(f'Extracted keys: {keys}')
     with open(filename, 'w') as output_file:
         dict_writer = csv.DictWriter(output_file, keys, extrasaction='ignore', lineterminator='\n')
         dict_writer.writeheader()
