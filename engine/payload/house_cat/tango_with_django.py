@@ -31,7 +31,7 @@ def form_keychain(data):
     return ':'.join(zs)
 
 id_value = 0
-ID_FIELD_NAME = 'the_id'
+ID_FIELD_NAME = 'id'
 source_filename_by_project_id = {
         'contract_id': 'house_cat_projectindex_contract_id.csv',
         'development_code': 'house_cat_projectindex_development_code.csv',
