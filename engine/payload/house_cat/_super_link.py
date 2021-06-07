@@ -18,6 +18,15 @@ def write_to_csv(filename, list_of_dicts, keys):
         dict_writer.writeheader()
         dict_writer.writerows(list_of_dicts)
 
+def check_uniqueness_of_ids(f, id_field):
+    with open(f'{path}/{f}', 'r') as g:
+        reader = csv.DictReader(g)
+        id_values = []
+        for row in reader:
+            id_values.append(row[id_field])
+        if len(id_values) != len(set(id_values)):
+            raise ValueError(f"There are some duplicate {id_field} values in {f}!")
+
 def get_files_in_folder(path):
     from os import listdir
     from os.path import isfile, join
