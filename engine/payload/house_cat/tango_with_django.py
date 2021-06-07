@@ -18,7 +18,7 @@ except ImportError:  # Graceful fallback if IceCream isn't installed.
     ic = lambda *a: None if not a else (a[0] if len(a) == 1 else a)  # noqa
 
 key_project_identifiers = ['property_id', 'normalized_state_id', 'development_code', 'pmindx'] # This is
-# the minimal set of project identifiers needed to uniquely identify a project. This may expand as 
+# the minimal set of project identifiers needed to uniquely identify a project. This may expand as
 # we add other data sources.
 
 def string_or_blank(x):
@@ -97,7 +97,7 @@ def generate_deduplicated_index(job, **kwparameters):
     from engine.payload.house_cat._deduplicate import deduplicate_records
     link_records_into_index()
     deduplicate_records()
-    # Now save the deduplicated index to the expected source_file location? 
+    # Now save the deduplicated index to the expected source_file location?
 
 def hunt_and_peck_update_index(job, **kwparameters):
     # 1) Get existing index from CKAN
@@ -125,7 +125,7 @@ def hunt_and_peck_update_index(job, **kwparameters):
     lookups_by_project_identifier = defaultdict(list)
 
     projectidentifier_ids = set()
-    
+
     property_id_records = []
     keychain_records = []
     with open(job.target, 'r') as f:
@@ -138,8 +138,8 @@ def hunt_and_peck_update_index(job, **kwparameters):
             if 'property_id' in row and row['property_id'] not in ['', None]:
                 # Look up the _id value based on the project_id value.
                 that_id = records_by_property_id[row['property_id']][ID_FIELD_NAME]
-            else: # This is going to be easier if we can just inspect a concatenated 
-                # list of property IDs in a new index table column (rather than 
+            else: # This is going to be easier if we can just inspect a concatenated
+                # list of property IDs in a new index table column (rather than
                 # having to link through to other tables).
                 keychain = form_keychain(row)
                 if keychain in records_by_keychain:
@@ -204,9 +204,9 @@ job_dicts = [
         'package': housecat_tango_with_django_package_id,
         'resource_name': 'house_cat_projectindex',
         'upload_method': 'upsert',
-        # This all seemed great until I realized that we can't upsert PropertyIndex 
-        # records because there is no consistent key. In the absence of such a key, we have to search the 
-        # existing table to find matching records and update them; when no matches are found, we must 
+        # This all seemed great until I realized that we can't upsert PropertyIndex
+        # records because there is no consistent key. In the absence of such a key, we have to search the
+        # existing table to find matching records and update them; when no matches are found, we must
         # insert the records. The only alternative is to keep wiping the table and then regenerating all
         # the little lookup tables with the new _id values.
 
@@ -238,8 +238,8 @@ job_dicts = [
         # housing project only had one LIHTC project ID, the new version will have two:
         # the original erroneous one and the corrected one.
         # So consider wiping all tables and then regenerating all the lookup support tables.
-        # This means that whenever this ETL job is run, another one, which adds the 
-        # crowdsourced records must also be run. This suggestes that the simplest 
+        # This means that whenever this ETL job is run, another one, which adds the
+        # crowdsourced records must also be run. This suggestes that the simplest
         # solution is to integrate the crowdsourced table into these jobs. Specifically,
         # the crowdsourced data should get integrated into the synthesis of the index,
         # even before the deduplication.
@@ -248,7 +248,7 @@ job_dicts = [
         'updates': 'Monthly',
         'schema': PropertyIndexSchema,
         'custom_processing': hunt_and_peck_update_index, # Weird new ETL job:
-        # Everything happens in the custom_processing part because this 
+        # Everything happens in the custom_processing part because this
         # one is so weird. Make 'destination' local so nothing else
         # happens to the data portal.
 
@@ -262,9 +262,9 @@ job_dicts = [
         'destination': 'local',
         'package': housecat_tango_with_django_package_id,
         'resource_name': 'house_cat_projectindex',
-        'upload_method': 'insert', # This all seemed great until I realized that we can't upsert PropertyIndex 
-        # records because there is no consistent key. In the absence of such a key, we have to search the 
-        # existing table to find matching records and update them; when no matches are found, we must 
+        'upload_method': 'insert', # This all seemed great until I realized that we can't upsert PropertyIndex
+        # records because there is no consistent key. In the absence of such a key, we have to search the
+        # existing table to find matching records and update them; when no matches are found, we must
         # insert the records. The only alternative is to keep wiping the table and then regenerating all
         # the little lookup tables with the new _id values.
 
@@ -287,7 +287,7 @@ job_dict_template = \
         'schema': LookupSchema,
         #'filters': [['property_id', '!=', None]], # Might it be necessary to iterate through all the property fields
         # like this, upserting on each one?
-        'always_wipe_data': True, # The current strategy is to try to regenerate 
+        'always_wipe_data': True, # The current strategy is to try to regenerate
         # everything but the id values whenever there's an update.
         #'primary_key_fields': ['projectindex_id', 'projectidentifier_id'], # Wiping the data
         # lets us insert the records and not use primary keys.
