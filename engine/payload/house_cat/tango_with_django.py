@@ -156,9 +156,12 @@ def hunt_and_peck_update_index(job, **kwparameters):
             #       b) Add id, <project_identifier_value> to a crosswalk table.
             #   Then upsert those crosswalk records to house_cat_projectindex_<project_identifier>.
             for p_id in project_identifiers:
-                lookups_by_project_identifier[p_id].append({'projectindex_id': that_id, 'projectidentifier_id': row[p_id]})
-                # These fields need to be made into those tiny lookup tables AND added to house_cat_projectidentifier:
-                projectidentifier_ids.add(row[p_id])
+                if row[p_id] != '':
+                    id_values = row[p_id].split('|')
+                    for id_value in id_values:
+                        lookups_by_project_identifier[p_id].append({'projectindex_id': that_id, 'projectidentifier_id': id_value})
+                        # These fields need to be made into those tiny lookup tables AND added to house_cat_projectidentifier:
+                        projectidentifier_ids.add(id_value)
 
         # Write property index updates
         job.target += '.csv' # Sneaky way to change the job.target value without bothering to decompose the original file name.
