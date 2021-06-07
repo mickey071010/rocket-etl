@@ -340,8 +340,26 @@ def link_records_into_index():
             reader = csv.DictReader(g)
             for row in reader:
                 add_row_to_linking_dict(f, row, id_field, fields_to_get, ac_by_id)
-    ################
+
     master_list += [v for k, v in ac_by_id.items()]
+    ########################
+    # Add crowdsourced_records file.
+    id_field = 'crowdsourced_id'
+    ac_by_id = defaultdict(dict)
+
+    sources = ['crowdsourced_records.csv']
+    for f in sources:
+        assert f in files
+        check_uniqueness_of_ids(f, id_field)
+
+    for f in sources:
+        with open(f'{path}/{f}', 'r') as g:
+            reader = csv.DictReader(g)
+            for row in reader:
+                add_row_to_linking_dict(f, row, id_field, fields_to_get, ac_by_id)
+
+    master_list += [v for k, v in ac_by_id.items()]
+    ################
     fields_to_write = fields_to_get
     for f in possible_keys:
         if f not in fields_to_write:
