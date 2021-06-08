@@ -98,7 +98,7 @@ def merge(record_1, record_2, verbose):
         else:
             if verbose:
                 print(f"Since this code doesn't know how to merge key = {key}, value = {value}, other value = {record_2[key]}, it's just going to list both.")
-            merged_record[key] = f'{value}|{other_value}'
+            merged_record[key] = '|'.join(sorted([value, other_value]))
 
             #raise ValueError(f'What should we do with key = {key}, value = {value}, other value = {dups[1][key]}?')
 
