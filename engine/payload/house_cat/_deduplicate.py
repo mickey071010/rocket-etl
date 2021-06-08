@@ -123,7 +123,7 @@ possible_keys = ['property_id', 'lihtc_project_id', 'development_code', 'fha_loa
 index_filename = 'master_list.csv'
 deduplicated_index_filename = 'deduplicated_index.csv'
 
-def deduplicate_records(verbose=False):
+def deduplicate_records(deduplicated_index_filepath, verbose=False):
     fields_to_write = fields_to_get
     for f in possible_keys:
         if f not in fields_to_write:
@@ -253,12 +253,12 @@ def deduplicate_records(verbose=False):
                 added.append(index)
                 deduplicated_master_list.append(master_list[index])
 
-    write_to_csv(deduplicated_index_filename, deduplicated_master_list, fields_to_write + [house_cat_id_name, 'source_file', 'index'])
+    write_to_csv(deduplicated_index_filepath, deduplicated_master_list, fields_to_write + [house_cat_id_name, 'source_file', 'index'])
     return master_list, deduplicated_master_list
 
 if __name__ == '__main__':
     verbose = True
-    index_list, deduplicated_index = deduplicate_records(verbose)
+    index_list, deduplicated_index = deduplicate_records(deduplicated_index_filename, verbose)
     ic(len(index_list))
     ic(len(deduplicated_index))
 

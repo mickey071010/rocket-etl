@@ -96,9 +96,9 @@ def generate_deduplicated_index(job, **kwparameters):
 
     # Or else download the tables from CKAN.
     from engine.payload.house_cat._super_link import link_records_into_index
-    from engine.payload.house_cat._deduplicate import deduplicate_records
+    from engine.payload.house_cat._deduplicate import deduplicate_records, deduplicated_index_filename
     link_records_into_index()
-    deduplicate_records()
+    deduplicate_records(f'{job.local_directory}{deduplicated_index_filename}', False)
     # Now save the deduplicated index to the expected source_file location?
 
 def hunt_and_peck_update_index(job, **kwparameters):
