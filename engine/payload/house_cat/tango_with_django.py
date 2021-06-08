@@ -42,6 +42,9 @@ source_filename_by_project_id = {
         'pmindx': 'house_cat_projectindex_pmindx.csv'
         }
 
+class ProjectIdentifiersSchema(pl.BaseSchema):
+    projectidentifier_id = fields.String(load_from='projectidentifier_id', dump_to='projectidentifier_id')
+
 class LookupSchema(pl.BaseSchema):
     projectindex_id = fields.Integer(load_from='projectindex_id', dump_to='projectindex_id')
     projectidentifier_id = fields.String(load_from='projectidentifier_id', dump_to='projectidentifier_id')
@@ -318,6 +321,12 @@ for p_id in project_identifiers:
     job_dict['resource_name'] = job_dict['source_file'].split('.')[0]
     job_dicts.append(job_dict)
 
-# [ ] Add total list of project identifiers.
+# Add total list of project identifiers.
+job_dict = dict(job_dict_template)
+job_dict['job_code'] = 'project_identifiers'
+job_dict['schema'] = ProjectIdentifiersSchema
+job_dict['source_file'] = 'house_cat_projectidentifier.csv'
+job_dict['resource_name'] = job_dict['source_file'].split('.')[0]
+job_dicts.append(job_dict)
 
 assert len(job_dicts) == len({d['job_code'] for d in job_dicts}) # Verify that all job codes are unique.
