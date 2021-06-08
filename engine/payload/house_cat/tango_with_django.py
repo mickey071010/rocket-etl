@@ -19,7 +19,8 @@ except ImportError:  # Graceful fallback if IceCream isn't installed.
 
 key_project_identifiers = ['property_id', 'normalized_state_id', 'development_code', 'pmindx'] # This is
 # the minimal set of project identifiers needed to uniquely identify a project. This may expand as
-# we add other data sources.
+# we add other data sources. Any expansion will require a migration be run (which could happen in
+# hunt_and_peck_update).
 
 def string_or_blank(x):
     if x in [None, '']:
@@ -91,8 +92,8 @@ housecat_tango_with_django_package_id = '3f6411c8-d03d-45b2-8225-673841e5c2b3'
 from engine.payload.house_cat._deduplicate import deduplicated_index_filename
 
 def generate_deduplicated_index(job, **kwparameters):
-    # Run _flatbread.py in local output mode (python launchpad.py house_cat/_flatbread.py to_file)
-    # Then use those files to run _super_link.py. (This process takes a while (~20-30 minutes?).)
+    # Run _flatbread.py in local output mode (python launchpad.py house_cat/_flatbread.py to_file).
+    # (This process takes a while (~20-30 minutes?). Then use those files to run _super_link.py.
 
     # Or else download the tables from CKAN.
     from engine.payload.house_cat._super_link import link_records_into_index
@@ -101,7 +102,21 @@ def generate_deduplicated_index(job, **kwparameters):
     deduplicate_records(f'{job.local_directory}{deduplicated_index_filename}', False)
     # Now save the deduplicated index to the expected source_file location?
 
-def hunt_and_peck_update_index(job, **kwparameters):
+def hunt_and_peck_update(job, **kwparameters):
+    """This function gets the existing housing-project index table from CKAN
+    and combines its 'id' values with the deduplicated index assembled by
+    1) _flatbread.py and either 2a) running the generate_deduplicated_index()
+    function above or 2b) running _super_link.py and _deduplicate.py.
+
+    The reason is that the deduplicated index file has all the information
+    it needs except for the 'id' value from the CKAN table. These acrobatics
+    are employed to ensure that that value stays consistent across updates.
+
+    Also in this function, all the tiny lookup tables needed to allow Django
+    to handle the ManyToManyFields are generated and written to files
+    for use in ETL jobs defined at the bottom of this script."""
+
+
     # 1) Get existing index from CKAN
     from engine.credentials import site, API_key
     resource_id = find_resource_id(job.production_package_id, job.resource_name)
@@ -121,7 +136,7 @@ def hunt_and_peck_update_index(job, **kwparameters):
         records_by_keychain[record['house_cat_id']] = dict(record)
         ids.append(record[ID_FIELD_NAME])
 
-   # 2) Get incoming index
+   # 2) Get incoming index (deduplicated_index.csv)
     assert job.source_type == 'local'
 
     lookups_by_project_identifier = defaultdict(list)
@@ -143,7 +158,7 @@ def hunt_and_peck_update_index(job, **kwparameters):
             else: # This is going to be easier if we can just inspect a concatenated
                 # list of property IDs in a new index table column (rather than
                 # having to link through to other tables).
-                keychain = form_keychain(row)
+                keychain = form_keychain(row) # Lazy caching of the critical project IDs.
                 if keychain in records_by_keychain:
                     that_id = records_by_keychain[keychain][ID_FIELD_NAME]
                 else:
@@ -165,24 +180,20 @@ def hunt_and_peck_update_index(job, **kwparameters):
                         # These fields need to be made into those tiny lookup tables AND added to house_cat_projectidentifier:
                         projectidentifier_ids.add(id_value)
 
-        # Write property index updates
+        # Write property index updates.
         job.target += '.csv' # Sneaky way to change the job.target value without bothering to decompose the original file name.
         write_to_csv(job.target, rows_with_id)
 
         l_of_ds = [{'projectidentifier_id': pi_id} for pi_id in projectidentifier_ids]
-        # Write project identifiers update.
+        # Write project identifiers updates.
         write_to_csv(f'{job.local_directory}house_cat_projectidentifier.csv', l_of_ds)
         # Write lookup tables.
         for p_id in project_identifiers:
             write_to_csv(f'{job.local_directory}house_cat_projectindex_{p_id}.csv', lookups_by_project_identifier[p_id])
 
-def make_little_lookup_tables(job, **kwparameters):
-    #it_takes_two_to_tango() # Generate all these little lookup tables.
-    pass
-
-# Jobs
-# 1) Update the property index (might require one pass per property identifier).
-# 2) Upsert all project identifiers to house_cat_projectidentifier.
+# Overview of ETL Jobs
+# 1) Update the property index.
+# 2) Replace all project identifiers in house_cat_projectidentifier.
 # 3) Link property identifiers to row ID in house_cat_projectindex table...
 #       For each record in deduplicated_index.csv AND each project identifier column,
 #           a) Look up the _id value in the CKAN Project Index table.
@@ -224,12 +235,12 @@ job_dicts = [
     {
         'job_code': PropertyIndexSchema().job_code, # 'update_index'
         #From the house_cat data architecture plan: CROWDSOURCED HOUSING PROJECTS
-        #User-contributed records can be dumped in a separate table with basically the same
+        #"User-contributed records can be dumped in a separate table with basically the same
         #schema as the Property Information table, and the id field from that table can serve
         #as a fifth project identifier. Once we approve one of those records (maybe by
         #switching an "approved" boolean to True), it can show up in search results
         #(either by the query querying the crowdsourced table or by the approved records
-        #being copied to the Property Information table).
+        #being copied to the Property Information table)."
         # This means that we can't wipe the index, and maybe we can't wipe any of the other
         # tables because they might wind up getting populated by those crowdsourced
         # results. But for any table we can't wipe, we need to think about what happens
