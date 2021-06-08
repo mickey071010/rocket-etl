@@ -306,7 +306,8 @@ job_dict_template = \
     }
 
 from engine.payload.house_cat._deduplicate import possible_keys as project_identifiers
-project_identifiers.remove('property_id')
+project_identifiers.remove('property_id') # These get removed because they are NOT
+project_identifiers.remove('crowdsourced_id') # represented as ManyToManyFields.
 for p_id in project_identifiers:
     job_dict = dict(job_dict_template)
     job_dict['job_code'] = p_id
