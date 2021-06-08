@@ -344,9 +344,12 @@ def link_records_into_index():
     ########################
     # Add crowdsourced_records file.
     id_field = 'crowdsourced_id'
+    sources = ['crowdsourced_records.csv']
+    # Add all new id_field values to possible_keys in _deduplicate.py.
+    # Those get added to fields_to_write below.
+    ### Template for adding new data sources ###
     ac_by_id = defaultdict(dict)
 
-    sources = ['crowdsourced_records.csv']
     for f in sources:
         assert f in files
         check_uniqueness_of_ids(f, id_field)
@@ -358,7 +361,7 @@ def link_records_into_index():
                 add_row_to_linking_dict(f, row, id_field, fields_to_get, ac_by_id)
 
     master_list += [v for k, v in ac_by_id.items()]
-    ################
+    #########################
     fields_to_write = fields_to_get
     for f in possible_keys:
         if f not in fields_to_write:
