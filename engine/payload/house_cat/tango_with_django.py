@@ -204,39 +204,25 @@ def hunt_and_peck_update(job, **kwparameters):
 #       Then upsert those crosswalk records to house_cat_projectindex_<project_identifier>.
 
 job_dicts = [
+#    { # We generally don't want to run this unless we're starting over.
+#        'job_code': 'wipe_and_replace_index', #PropertyIndexSchema().job_code, # 'index'
+#        'source_type': 'local',
+#        'source_file': deduplicated_index_filename,
+#        'updates': 'Monthly',
+#        'schema': PropertyIndexSchema,
+#        #'filters': [['property_id', '!=', None]], # Might it be necessary to iterate through all the property fields
+#        # like this, upserting on each one?
+#        'always_wipe_data': False, # We'd like to keep the records to try to preserve the _id values
+#        # to maintain links through the little lookup tables.
+#
+#        'primary_key_fields': [ID_FIELD_NAME],
+#        'destination': 'ckan',
+#        'package': housecat_tango_with_django_package_id,
+#        'resource_name': 'house_cat_projectindex',
+#        'upload_method': 'upsert',
+#    },
     {
-        'job_code': 'wipe_and_replace_index', #PropertyIndexSchema().job_code, # 'index'
-        'source_type': 'local',
-        'source_file': deduplicated_index_filename,
-        'updates': 'Monthly',
-        'schema': PropertyIndexSchema,
-        #'filters': [['property_id', '!=', None]], # Might it be necessary to iterate through all the property fields
-        # like this, upserting on each one?
-        'always_wipe_data': False, # We'd like to keep the records to try to preserve the _id values
-        # to maintain links through the little lookup tables.
-
-        'primary_key_fields': [ID_FIELD_NAME],
-        'destination': 'ckan',
-        'package': housecat_tango_with_django_package_id,
-        'resource_name': 'house_cat_projectindex',
-        'upload_method': 'upsert',
-        # This all seemed great until I realized that we can't upsert PropertyIndex
-        # records because there is no consistent key. In the absence of such a key, we have to search the
-        # existing table to find matching records and update them; when no matches are found, we must
-        # insert the records. The only alternative is to keep wiping the table and then regenerating all
-        # the little lookup tables with the new _id values.
-
-        # Try the approach with hunt-and-peck-style upserts (which would find the record
-        # to overwrite and then update maybe based on the _id value).
-
-        # If it's too complex, give up on maintaining consistent id values (or enforce them through
-        # unidirectional_links.csv) and just wipe the tables and regenerate them every time.
-
-        #'resource_description': f'Derived from https://www.hud.gov/program_offices/housing/mfh/mfdata/mfproduction', #\n\njob code: {MultifamilyProductionInitialCommitmentSchema().job_code},'
-        #'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
-    },
-    {
-        'job_code': PropertyIndexSchema().job_code, # 'update_index'
+        'job_code': 'hunt_and_peck',
         #From the house_cat data architecture plan: CROWDSOURCED HOUSING PROJECTS
         #"User-contributed records can be dumped in a separate table with basically the same
         #schema as the Property Information table, and the id field from that table can serve
@@ -263,7 +249,7 @@ job_dicts = [
         'source_file': deduplicated_index_filename,
         'updates': 'Monthly',
         'schema': PropertyIndexSchema,
-        'custom_processing': hunt_and_peck_update_index, # Weird new ETL job:
+        'custom_processing': hunt_and_peck_update, # Weird new ETL job:
         # Everything happens in the custom_processing part because this
         # one is so weird. Make 'destination' local so nothing else
         # happens to the data portal.
@@ -275,22 +261,16 @@ job_dicts = [
 
         #'primary_key_fields': ['property_id'], # This doesn't work because of the many projects that
         # have no property_id.
-        'destination': 'local',
+        'destination': 'file',
         'package': housecat_tango_with_django_package_id,
         'resource_name': 'house_cat_projectindex',
-        'upload_method': 'insert', # This all seemed great until I realized that we can't upsert PropertyIndex
-        # records because there is no consistent key. In the absence of such a key, we have to search the
-        # existing table to find matching records and update them; when no matches are found, we must
-        # insert the records. The only alternative is to keep wiping the table and then regenerating all
-        # the little lookup tables with the new _id values.
-
-        # Try the approach with hunt-and-peck-style upserts (which would find the record
-        # to overwrite and then update maybe based on the _id value).
-
-        # If it's too complex, give up on maintaining consistent id values (or enforce them through
-        # unidirectional_links.csv) and just wipe the tables and regenerate them every time.
-
-
+        'upload_method': 'insert', # We can't just upsert PropertyIndex records because there is no
+        # consistent key. In the absence of such a key, we have to search the existing table to
+        # find matching records and update them; when no matches are found, we must insert the
+        # records. The only alternative is to keep wiping the table, but this would result
+        # in no consistent 'id' value, which might be a problem if there's any caching involved
+        # in queries using those 'id' values.
+    },
 
         #'resource_description': f'Derived from https://www.hud.gov/program_offices/housing/mfh/mfdata/mfproduction', #\n\njob code: {MultifamilyProductionInitialCommitmentSchema().job_code},'
         #'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
