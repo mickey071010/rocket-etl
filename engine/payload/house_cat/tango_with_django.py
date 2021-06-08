@@ -271,9 +271,22 @@ job_dicts = [
         # in no consistent 'id' value, which might be a problem if there's any caching involved
         # in queries using those 'id' values.
     },
+    {
+        'job_code': PropertyIndexSchema().job_code, # 'update_index'
+        'source_type': 'local',
+        'source_file': deduplicated_index_filename+'.csv',
+        'updates': 'Monthly',
+        'schema': PropertyIndexSchema,
+        #'filters': [['property_id', '!=', None]], # Might it be necessary to iterate through all the property fields
+        # like this, upserting on each one?
+        'always_wipe_data': False, # We'd like to keep the records to try to preserve the _id values
+        # to maintain links through the little lookup tables.
 
-        #'resource_description': f'Derived from https://www.hud.gov/program_offices/housing/mfh/mfdata/mfproduction', #\n\njob code: {MultifamilyProductionInitialCommitmentSchema().job_code},'
-        #'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
+        'primary_key_fields': ['id'],
+        'destination': 'ckan',
+        'package': housecat_tango_with_django_package_id,
+        'resource_name': 'house_cat_projectindex',
+        'upload_method': 'upsert',
     },
 ]
 
