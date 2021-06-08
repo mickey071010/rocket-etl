@@ -39,7 +39,7 @@ source_filename_by_project_id = {
         'fha_loan_id': 'house_cat_projectindex_fha_loan_id.csv',
         'lihtc_project_id': 'house_cat_projectindex_lihtc_project_id.csv',
         'normalized_state_id': 'house_cat_projectindex_normalized_state_id.csv',
-        'pmindx': 'house_cat_projectindex_pmindx'
+        'pmindx': 'house_cat_projectindex_pmindx.csv'
         }
 
 class LookupSchema(pl.BaseSchema):
