@@ -121,6 +121,7 @@ fields_to_get = ['hud_property_name',
 possible_keys = ['property_id', 'lihtc_project_id', 'development_code', 'fha_loan_id', 'normalized_state_id', 'contract_id', 'pmindx'] # 'inspection_property_id_multiformat']
 
 index_filename = 'master_list.csv'
+deduplicated_index_filename = 'deduplicated_index.csv'
 
 def deduplicate_records(verbose=False):
     fields_to_write = fields_to_get
@@ -252,7 +253,7 @@ def deduplicate_records(verbose=False):
                 added.append(index)
                 deduplicated_master_list.append(master_list[index])
 
-    write_to_csv('deduplicated_master_list.csv', deduplicated_master_list, fields_to_write + [house_cat_id_name, 'source_file', 'index'])
+    write_to_csv(deduplicated_index_filename, deduplicated_master_list, fields_to_write + [house_cat_id_name, 'source_file', 'index'])
     return master_list, deduplicated_master_list
 
 if __name__ == '__main__':
