@@ -59,6 +59,8 @@ class PropertyIndexSchema(pl.BaseSchema):
     #index = fields.Integer(load_from='index'.lower(), dump_to='index')
     latitude = fields.String(load_from='latitude'.lower(), dump_to='latitude', allow_none=True)
     longitude = fields.String(load_from='longitude'.lower(), dump_to='longitude', allow_none=True)
+    crowdsourced_id = fields.String(load_from='crowdsourced_id'.lower(), dump_to='crowdsourced_id', allow_none=True) # This is designed to
+    # NOT be an ID that can be used in a ManyToManyField. There should either be zero or one crowdsourced_id values for each project.
 
     house_cat_id = fields.String(dump_only=True, dump_to='house_cat_id', allow_none=False)
     # These are the project identifiers that get shuffled off into little tiny side tables.

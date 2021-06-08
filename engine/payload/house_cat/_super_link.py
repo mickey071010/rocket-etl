@@ -245,7 +245,6 @@ def link_records_into_index():
 
     lihtc_projects = [v for k, v in ac_by_id.items()]
     master_list += lihtc_projects
-    ic(len(lihtc_projects))
     write_to_csv('lihtc_projects_ac.csv', lihtc_projects, fields_to_get + possible_keys + ['source_file'])
     # LIHTC collisions:
     # LIHTC has about 4 collisions, like the two records at the property_street_address == '110 MCINTYRE RD'
@@ -373,9 +372,9 @@ def link_records_into_index():
 
     #########################
     # Sort master_list to make it easier to compare files.
-    sorted_master_list =  multikeysort(master_list, ['pmindx', 'development_code', 'normalized_state_id', 'property_id'])
-
-    #########################
+    sorted_master_list = multikeysort(master_list, ['crowdsourced_id', 'pmindx', 'development_code', 'normalized_state_id', 'property_id'])
+    ic(len(sorted_master_list))
+    ########################
     write_to_csv(index_filename, sorted_master_list, fields_to_write + ['source_file'])
 
 if __name__ == '__main__':

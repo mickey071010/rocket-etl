@@ -118,7 +118,7 @@ fields_to_get = ['hud_property_name',
         'latitude', 'longitude',
         ]
 
-possible_keys = ['property_id', 'lihtc_project_id', 'development_code', 'fha_loan_id', 'normalized_state_id', 'contract_id', 'pmindx'] # 'inspection_property_id_multiformat']
+possible_keys = ['property_id', 'lihtc_project_id', 'development_code', 'fha_loan_id', 'normalized_state_id', 'contract_id', 'pmindx', 'crowdsourced_id'] # 'inspection_property_id_multiformat']
 
 index_filename = 'master_list.csv'
 deduplicated_index_filename = 'deduplicated_index.csv'
