@@ -470,6 +470,20 @@ class MultifamilyProjectsSubsidyLoansSchema(pl.BaseSchema):
     class Meta:
         ordered = True
 
+class SubsidiesLoansSchema(pl.BaseSchema): # From MultifamilyProjectsSubsidyLoansSchema
+    # This schema is applied to the same file as mf_loans.
+    job_code = 'subsidies_loans'
+    property_id = fields.String(load_from='property_id'.lower(), dump_to='property_id')
+    subsidy_data_source = fields.String(dump_only=True, default="Multifamily Assistance and Section 8 contracts")
+    property_name_text = fields.String(load_from='property_name_text'.lower(), dump_to='hud_property_name')
+    #property_category_name = fields.String(load_from='property_category_name'.lower(), dump_to='property_category_name') # In subsidies_section_8, this
+    # field could only be obtained by linking to another table.
+    program_type1 = fields.String(load_from='PROGRAM_TYPE1'.lower(), dump_to='program_type', allow_none=True)
+    expiration_date1 = fields.Date(load_from='EXPIRATION_DATE1'.lower(), dump_to='subsidy_expiration_date', allow_none=True)
+
+    class Meta:
+        ordered = True
+
 class MultifamilyGuaranteedLoansSchema(pl.BaseSchema):
     job_code = 'mf_loans'
     property_id = fields.String(load_from='property_id'.lower(), dump_to='property_id')
@@ -858,6 +872,7 @@ class MultifamilyInspectionsSchema3(BaseMultifamilyInspectionsSchema):
 
 fips2020_notified = False
 housecat_package_id = 'bb77b955-b7c3-4a05-ac10-448e4857ade4'
+from engine.payload.house_cat.tango_with_django import housecat_tango_with_django_package_id
 
 job_dicts = [
     {
@@ -1084,6 +1099,24 @@ job_dicts = [
         'resource_name': 'Subsidy extract from HUD Insured Multifamily Properties (Allegheny County)',
         'upload_method': 'insert',
         'resource_description': f'Derived from https://hudgis-hud.opendata.arcgis.com/datasets/hud-insured-multifamily-properties', # \nnjob code: {MultifamilyGuaranteedLoansSchema().job_code}', # 'mf_subsidy_loans'
+        'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
+    },
+    {
+        'job_code': SubsidiesLoansSchema().job_code, # 'subsidies_loans'
+        'source_type': 'http',
+        'source_full_url': get_arcgis_data_url('https://hudgis-hud.opendata.arcgis.com/data.json', 'HUD Insured Multifamily Properties', 'CSV')[0], # HUD_Insured_Multifamily_Properties.csv
+        # The downside to pulling the filename from the data.json file is that there is currently no support for offline caching
+        # for testing purposes, but this could be remedied.
+        'encoding': 'utf-8',
+        'schema': SubsidiesLoansSchema,
+        'filters': [['std_st', '==', 'PA'], ['cnty_nm2kx', '==', 'Allegheny']], # cnty2kx could be used to filter to Allegheny County.
+        'always_wipe_data': False,
+        'primary_key_fields': ['property_id'], #'PRIMARY_FHA_NUMBER', 'ASSOCIATED_FHA_NUMBER', 'FHA_NUM1']
+        'destination': 'ckan',
+        'destination_file': 'subsidies_ac.csv',
+        'package': housecat_tango_with_django_package_id,
+        'resource_name': 'house_cat_subsidy',
+        'upload_method': 'upsert',
         'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
     },
     {
