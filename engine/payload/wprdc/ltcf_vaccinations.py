@@ -203,7 +203,7 @@ job_dicts = [
         'custom_processing': get_raw_data_and_save_to_local_csv_file,
         'schema': NursingHomeVaccinationsSchema,
         #'always_wipe_data': True,
-        'primary_key_fields': ['facility_i'],
+        'primary_key_fields': ['facility_id'],
         'destination': 'ckan',
         'package': vaccinations_package_id,
         'resource_name': ' Long-Term Care Facilites COVID-19 Cases and Vaccinations Data',
