@@ -191,7 +191,7 @@ def get_raw_data_and_save_to_local_csv_file(jobject, **kwparameters):
         a.writeToFile(jobject.target)
 
 
-vaccinations_package_id = 'f89d5dd8-5dd3-46a3-9a17-8671f26153ae'
+vaccinations_package_id = 'b0ecab9a-d056-4855-9992-bdfca608632b'
 
 job_dicts = [
     {
