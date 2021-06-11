@@ -56,7 +56,6 @@ class GreenInfrastructureSchema(pl.BaseSchema):
 
 data_json_url = 'https://data-3rww.opendata.arcgis.com/data.json'
 package_id = '097c70b6-d5d3-434b-af90-23c8b1a99bfb'
-package_id = TEST_PACKAGE_ID
 arcgis_dataset_title = '3RWW Green Infrastructure Inventory'
 gi_dataset, _ = get_arcgis_dataset(arcgis_dataset_title, data_json_url, None) # Cache data.json
 # to avoid looking it up for each job in this file.
