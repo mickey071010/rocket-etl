@@ -11,6 +11,41 @@ try:
 except ImportError:  # Graceful fallback if IceCream isn't installed.
     ic = lambda *a: None if not a else (a[0] if len(a) == 1 else a)  # noqa
 
+def get_resource_data(site, resource_id, API_key=None, count=50, offset=0, fields=None):
+    # Use the datastore_search API endpoint to get <count> records from
+    # a CKAN resource starting at the given offset and only returning the
+    # specified fields in the given order (defaults to all fields in the
+    # default datastore order).
+    ckan = ckanapi.RemoteCKAN(site, apikey=API_key)
+    if fields is None:
+        response = ckan.action.datastore_search(id=resource_id, limit=count, offset=offset)
+    else:
+        response = ckan.action.datastore_search(id=resource_id, limit=count, offset=offset, fields=fields)
+    # A typical response is a dictionary like this
+    #{u'_links': {u'next': u'/api/action/datastore_search?offset=3',
+    #             u'start': u'/api/action/datastore_search'},
+    # u'fields': [{u'id': u'_id', u'type': u'int4'},
+    #             {u'id': u'pin', u'type': u'text'},
+    #             {u'id': u'number', u'type': u'int4'},
+    #             {u'id': u'total_amount', u'type': u'float8'}],
+    # u'limit': 3,
+    # u'records': [{u'_id': 1,
+    #               u'number': 11,
+    #               u'pin': u'0001B00010000000',
+    #               u'total_amount': 13585.47},
+    #              {u'_id': 2,
+    #               u'number': 2,
+    #               u'pin': u'0001C00058000000',
+    #               u'total_amount': 7827.64},
+    #              {u'_id': 3,
+    #               u'number': 1,
+    #               u'pin': u'0001C01661006700',
+    #               u'total_amount': 3233.59}],
+    # u'resource_id': u'd1e80180-5b2e-4dab-8ec3-be621628649e',
+    # u'total': 88232}
+    data = response['records']
+    return data
+
 def find_resource_id(package_id, resource_name):
     # Get the resource ID given the package ID and resource name.
     from engine.credentials import site, API_key
