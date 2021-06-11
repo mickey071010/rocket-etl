@@ -118,16 +118,17 @@ class RestaurantsSchema(pl.BaseSchema):
 
     @pre_load
     def geocode(self,data):
-        if 'address' in data:
-            address_string = data['address']
-            longitude, latitude = geocode_address_string(address_string)
-            if longitude is None:
-                corrected_addresses = correct_address(address_string)
-                if len(corrected_addresses) > 0:
-                    # For now just try the first of the proposed corrections:
-                    longitude, latitude = geocode_address_string(corrected_addresses[0])
-            data['x'] = longitude
-            data['y'] = latitude
+        if 'x' in data and data['x'] in ['', 'NA']: # Only geocode if necessary
+            if 'address' in data:
+                address_string = data['address']
+                longitude, latitude = geocode_address_string(address_string)
+                if longitude is None:
+                    corrected_addresses = correct_address(address_string)
+                    if len(corrected_addresses) > 0:
+                        # For now just try the first of the proposed corrections:
+                        longitude, latitude = geocode_address_string(corrected_addresses[0])
+                data['x'] = longitude
+                data['y'] = latitude
 
     @pre_load
     def convert_dates(self,data):
