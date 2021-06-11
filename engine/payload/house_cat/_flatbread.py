@@ -474,7 +474,7 @@ class SubsidiesLoansSchema(pl.BaseSchema): # From MultifamilyProjectsSubsidyLoan
     # This schema is applied to the same file as mf_loans.
     job_code = 'subsidies_loans'
     property_id = fields.String(load_from='property_id'.lower(), dump_to='property_id')
-    subsidy_data_source = fields.String(dump_only=True, default="Multifamily Assistance and Section 8 contracts")
+    subsidy_data_source = fields.String(dump_only=True, default="HUD Insured Multifamily Properties")
     property_name_text = fields.String(load_from='property_name_text'.lower(), dump_to='hud_property_name')
     #property_category_name = fields.String(load_from='property_category_name'.lower(), dump_to='property_category_name') # In subsidies_section_8, this
     # field could only be obtained by linking to another table.
@@ -1111,7 +1111,7 @@ job_dicts = [
         'schema': SubsidiesLoansSchema,
         'filters': [['std_st', '==', 'PA'], ['cnty_nm2kx', '==', 'Allegheny']], # cnty2kx could be used to filter to Allegheny County.
         'always_wipe_data': False,
-        'primary_key_fields': ['property_id'], #'PRIMARY_FHA_NUMBER', 'ASSOCIATED_FHA_NUMBER', 'FHA_NUM1']
+        'primary_key_fields': ['property_id', 'program_type', 'subsidy_expiration_date'], #'PRIMARY_FHA_NUMBER', 'ASSOCIATED_FHA_NUMBER', 'FHA_NUM1']
         'destination': 'ckan',
         'destination_file': 'subsidies_ac.csv',
         'package': housecat_tango_with_django_package_id,
