@@ -100,7 +100,7 @@ def main(**kwargs):
                 # to be reset if it's a ckan_filestore Express Loader operation.
                 resource_id = table_locator
                 if clear_first or migrate_schema: # [ ] Should the data dictionary definitely be restored if clear_first = True?
-                    results = set_data_dictionary(resource_id, data_dictionary)
+                    results = set_data_dictionary(resource_id, job.saved_data_dictionary)
                     # Attempt to restore data dictionary, taking into account the deletion and addition of fields, and ignoring any changes in type.
 
 if __name__ == '__main__':
