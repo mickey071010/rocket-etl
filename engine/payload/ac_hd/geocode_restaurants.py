@@ -46,7 +46,9 @@ def geocode_address_string(address):
     r = requests.get(url)
     result = r.json()
     time.sleep(0.1)
-    if result['data']['status'] == "OK":
+    if result['data']['status'] == "OK" or result['data']['status'][:9] == "There are":
+        # Another possible status is something like
+        # "There are 2 parcels that contain the point (-79.9300408497384, 40.4382315401933)."
         longitude, latitude = result['data']['geom']['coordinates']
         return longitude, latitude
     print("Unable to geocode {}, failing with status code {}.".format(address,result['data']['status']))
