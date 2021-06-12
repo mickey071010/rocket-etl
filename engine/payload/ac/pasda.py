@@ -7,6 +7,7 @@ from marshmallow import fields, pre_load, post_load
 from engine.wprdc_etl import pipeline as pl
 from engine.notify import send_to_slack
 from engine.parameters.remote_parameters import TEST_PACKAGE_ID
+from engine.geojson2csv import convert_big_destination_geojson_file_to_source_csv
 
 try:
     from icecream import ic
@@ -177,19 +178,19 @@ job_dicts += [
         'package': package_id,
         'resource_name': f'GeoJSON',
     },
-    {
-        'job_code': f'{base_job_code}_csv',
-        'source_type': 'http',
-        'source_full_url': f'https://www.pasda.psu.edu/spreadsheet/AlleghenyCounty_AddressPoints{year_month}.csv',
-        'encoding': 'utf-8',
-        'schema': schema,
-        'always_wipe_data': True,
-        #'primary_key_fields': ['\ufeffobjectid', 'id_no', 'oid', 'id']
-        'destination': 'ckan',
-        'package': package_id,
-        'resource_name': f'CSV',
-        'upload_method': 'insert',
-    },
+#    { # There is a PASDA version of this file, but it's currently incomplete.
+#        'job_code': f'{base_job_code}_csv',
+#        'source_type': 'http',
+#        'source_full_url': f'https://www.pasda.psu.edu/spreadsheet/AlleghenyCounty_AddressPoints{year_month}.csv',
+#        'encoding': 'utf-8',
+#        'schema': schema,
+#        'always_wipe_data': True,
+#        #'primary_key_fields': ['\ufeffobjectid', 'id_no', 'oid', 'id']
+#        'destination': 'ckan',
+#        'package': package_id,
+#        'resource_name': f'CSV',
+#        'upload_method': 'insert',
+#    },
     {
         'job_code': f'{base_job_code}_kml',
         'source_type': 'http',
@@ -209,7 +210,29 @@ job_dicts += [
         'destination': 'ckan_filestore',
         'package': package_id,
         'resource_name': f'Shapefile',
-    }
+    },
+    { # Because the PASDA CSV file was incomplete once, download the GeoJSON file
+    # and generate a CSV verson of it.
+        'job_code': f'{base_job_code}_geojson_download',
+        'source_type': 'http',
+        'source_full_url': f'https://www.pasda.psu.edu/json/AlleghenyCounty_AddressPoints{year_month}.geojson',
+        'encoding': 'utf-8',
+        'destination': 'file',
+        'custom_post_processing': convert_big_destination_geojson_file_to_source_csv,
+    },
+    {
+        'job_code': f'{base_job_code}_csv_converted',
+        'source_type': 'local',
+        'source_file': f'AlleghenyCounty_AddressPoints{year_month}.csv',
+        'encoding': 'utf-8',
+        'schema': schema,
+        'always_wipe_data': True,
+        #'primary_key_fields': ['\ufeffobjectid', 'id_no', 'oid', 'id']
+        'destination': 'ckan',
+        'package': package_id,
+        'resource_name': f'CSV',
+        'upload_method': 'insert',
+    },
 ]
 
 ########################3
