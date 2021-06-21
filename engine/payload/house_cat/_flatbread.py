@@ -476,8 +476,8 @@ class SubsidiesLoansSchema(pl.BaseSchema): # From MultifamilyProjectsSubsidyLoan
     property_id = fields.String(load_from='property_id'.lower(), dump_to='property_id')
     subsidy_data_source = fields.String(dump_only=True, default="HUD Insured Multifamily Properties")
     property_name_text = fields.String(load_from='property_name_text'.lower(), dump_to='hud_property_name')
-    #property_category_name = fields.String(load_from='property_category_name'.lower(), dump_to='property_category_name') # In subsidies_section_8, this
-    # field could only be obtained by linking to another table.
+    #property_category_name = fields.String(load_from='property_category_name'.lower(), dump_to='property_category_name') # In
+    # subsidies_section_8 (now in tango_with_django.py), this field could only be obtained by linking to another table.
     program_type1 = fields.String(load_from='PROGRAM_TYPE1'.lower(), dump_to='program_type', allow_none=True)
     expiration_date1 = fields.Date(load_from='EXPIRATION_DATE1'.lower(), dump_to='subsidy_expiration_date', allow_none=True)
 

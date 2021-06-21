@@ -9,6 +9,7 @@ from engine.wprdc_etl import pipeline as pl
 from engine.ckan_util import find_resource_id, get_resource_data
 from engine.etl_util import write_to_csv
 from engine.notify import send_to_slack
+from engine.scraping_util import scrape_nth_link
 from engine.parameters.local_parameters import SOURCE_DIR, PRODUCTION
 from engine.post_processors import check_for_empty_table
 
@@ -118,7 +119,6 @@ def hunt_and_peck_update(job, **kwparameters):
     Also in this function, all the tiny lookup tables needed to allow Django
     to handle the ManyToManyFields are generated and written to files
     for use in ETL jobs defined at the bottom of this script."""
-
 
     # 1) Get existing index from CKAN
     from engine.credentials import site, API_key
@@ -321,6 +321,80 @@ job_dict['job_code'] = 'project_identifiers'
 job_dict['schema'] = ProjectIdentifiersSchema
 job_dict['source_file'] = 'house_cat_projectidentifier.csv'
 job_dict['resource_name'] = job_dict['source_file'].split('.')[0]
+job_dicts.append(job_dict)
+
+### Add to house_cat_subsidy table ###
+# Add one of the subsidies extractions here:
+# This approach won't work because the source file is state-wide. We need to filter this down to Allegheny County somehow. Maybe this
+# needs to happen in tango_with_django.py and use the contract_id values from deduplicated_index.csv.
+class SubsidiesSection8Schema(pl.BaseSchema): # This schema is based on
+    # MultifamilyProjectsSection8ContractsSchema. This is just for building the subsidies table.
+    job_code = 'subsidies_section_8'
+    property_id = fields.String(load_from='property_id'.lower(), dump_to='property_id')
+    subsidy_data_source = fields.String(dump_only=True, dump_to='subsidy_data_source', default="Multifamily Assistance and Section 8 contracts")
+    property_name_text = fields.String(load_from='property_name_text'.lower(), dump_to='hud_property_name')
+    #property_category_name = fields.String(load_from='property_category_name'.lower(), dump_to='property_category_name') # This would need to be obtained from mf_subsidy_8 rather than mf_contracts_8.csv.
+    program_type_name = fields.String(load_from='program_type_name'.lower(), dump_to='program_type', allow_none=True)
+    tracs_overall_expiration_date = fields.String(load_from='tracs_overall_expiration_date'.lower(), dump_to='subsidy_expiration_date', allow_none=True)
+
+    contract_number = fields.String(load_from='contract_number'.lower(), load_only=True)
+
+    class Meta:
+        ordered = True
+
+    @pre_load
+    def fix_dates(self, data):
+        """Marshmallow doesn't know how to handle a datetime as input. It can only
+        take strings that represent datetimes and convert them to datetimes.:
+        https://github.com/marshmallow-code/marshmallow/issues/656
+        So this is a workaround.
+        """
+        date_fields = ['tracs_effective_date',
+                'tracs_overall_expiration_date']
+        for f in date_fields:
+            if data[f] is not None:
+                data[f] = data[f].date().isoformat()
+
+    @pre_load
+    def transform_ints_to_strings(self, data):
+        fields = ['property_id']
+        for f in fields:
+            if data[f] is not None:
+                data[f] = str(data[f])
+
+def get_local_contract_ids():
+    from engine.payload.house_cat._deduplicate import deduplicate_records, deduplicated_index_filename
+    with open(deduplicated_index_filename, 'r') as f:
+        reader = csv.DictReader(f)
+        contract_ids_with_pipe_delimitation = [row['contract_id'] for row in reader if row['contract_id'] != '']
+        contract_ids = []
+        for batch in contract_ids_with_pipe_delimitation:
+            c_ids = batch.split('|')
+            contract_ids += c_ids
+        return contract_ids
+
+allegheny_county_contract_ids = get_local_contract_ids()
+
+job_dict = \
+    {
+        'job_code': SubsidiesSection8Schema.job_code, # 'subsidies_section_8'
+        'source_type': 'http',
+        'source_file': 'MF_Assistance_&_Sec8_Contracts.xlsx',
+        'source_full_url': scrape_nth_link('https://www.hud.gov/program_offices/housing/mfh/exp/mfhdiscl', 'xlsx', 1, 2, 'ontracts'),
+        'encoding': 'binary',
+        'rows_to_skip': 0,
+        'schema': SubsidiesSection8Schema,
+        'filters': [['contract_number', 'in', allegheny_county_contract_ids]],
+        'always_wipe_data': False,
+        'primary_key_fields': ['property_id', 'program_type', 'subsidy_expiration_date'],
+        'destination': 'ckan',
+        'destination_file': 'subsidies_ac.csv',
+        'package': housecat_tango_with_django_package_id,
+        'resource_name': 'house_cat_subsidy',
+        'upload_method': 'upsert',
+        'resource_description': f'Derived from https://www.hud.gov/program_offices/housing/mfh/exp/mfhdiscl\n\n', #job code: {MultifamilyProjectsSection8ContractsSchema().job_code}',
+        'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
+    }
 job_dicts.append(job_dict)
 
 assert len(job_dicts) == len({d['job_code'] for d in job_dicts}) # Verify that all job codes are unique.
