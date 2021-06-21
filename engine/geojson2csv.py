@@ -58,6 +58,7 @@ def convert_big_destination_geojson_file_to_source_csv(job, **kwparameters):
                 write_or_append_to_csv(output_filepath, csv_rows, keys)
                 csv_rows = []
                 print(f"{count} rows have been written.")
-        # Delete input_filepath.
+
+    os.remove(input_filepath)
 
 
