@@ -8,6 +8,7 @@ from engine.wprdc_etl import pipeline as pl
 from engine.notify import send_to_slack
 from engine.parameters.remote_parameters import TEST_PACKAGE_ID
 from engine.geojson2csv import convert_big_destination_geojson_file_to_source_csv
+from engine.post_processors import delete_source_file
 
 try:
     from icecream import ic
@@ -232,6 +233,8 @@ job_dicts += [
         'package': package_id,
         'resource_name': f'CSV',
         'upload_method': 'insert',
+        'custom_post_processing': delete_source_file, # Without this, the source file grows longer on each run
+        # and also files with different yearmonths start to accumulate in that directory.
     },
 ]
 

@@ -4,6 +4,15 @@ from engine.etl_util import post_process
 from engine.credentials import site, API_key
 from engine.ckan_util import get_number_of_rows
 
+def delete_source_file(job, **kwparameters):
+    assert job.source_type == 'local'
+    source_filepath = job.target # Maybe self.local_cache_filepath could be used instead.
+    if os.path.exists(source_filepath):
+        print(f"Attempting to delete {source_filepath}...")
+        os.remove(source_filepath)
+    else:
+        print(f"{source_filepath} does not exist.")
+
 def express_load_then_delete_file(job, **kwparameters):
     """The basic idea is that the job processes with a 'file' destination,
     so the ETL job loads the file into destination_file_path. Then as a
