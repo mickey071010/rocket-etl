@@ -9,6 +9,7 @@ from engine.credentials import site, API_key
 from engine.parameters.local_parameters import SOURCE_DIR
 from engine.etl_util import fetch_city_file, query_resource, Job
 from engine.notify import send_to_slack
+from engine.post_processors import verify_update_backup_source_file_and_then_delete_the_gcp_blob
 
 from dateutil import parser
 from icecream import ic
@@ -111,6 +112,7 @@ if package_id == "812527ad-befc-4214-a4d3-e621d8230563":
 
 job_dicts = [
     {
+        'job_code': 'right_of_way',
         'source_type': 'gcp',
         'source_dir': '',
         'source_file': 'accela_permits.csv',
@@ -121,6 +123,6 @@ job_dicts = [
         'upload_method': 'upsert',
         'package': package_id,
         'resource_name': 'Right of Way Permits',
-#        #'custom_post_processing': verify_update_backup_source_file_and_then_delete_the_gcp_blob,
+        'custom_post_processing': verify_update_backup_source_file_and_then_delete_the_gcp_blob,
     }
 ]

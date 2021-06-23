@@ -1,8 +1,10 @@
 import os, ckanapi
+from datetime import datetime, timedelta
+from dateutil import parser
 from engine.parameters.remote_parameters import TEST_PACKAGE_ID
 from engine.etl_util import post_process
 from engine.credentials import site, API_key
-from engine.ckan_util import get_number_of_rows
+from engine.ckan_util import get_number_of_rows, get_resource_parameter
 
 def delete_source_file(job, **kwparameters):
     assert job.source_type == 'local'
@@ -85,3 +87,30 @@ def check_for_empty_table(job, **kwparameters):
             raise ValueError(msg)
     else:
         raise ValueError(f'check_for_empty_table is not yet checking job.destination == {job.destination}.')
+
+def verify_update_backup_source_file_and_then_delete_the_gcp_blob(job, **kwparameters):
+    from engine.parameters.google_api_credentials import PATH_TO_SERVICE_ACCOUNT_JSON_FILE, GCP_BUCKET_NAME
+    from google.cloud import storage
+    from engine.parameters.local_parameters import PRODUCTION
+
+    if not kwparameters['use_local_output_file'] and job.destination in ['ckan', 'ckan_filestore']:
+        # VERIFY THAT THE UPDATE HAPPENED (This only works when data is pushed to CKAN.)
+        resource_last_modified = get_resource_parameter(site, job.locators_by_destination[job.destination], 'last_modified', API_key)
+        if (datetime.now() - parser.parse(resource_last_modified)).seconds < 300: # The update happened in the last 5 minutes.
+            # BACKUP SOURCE FILE
+            storage_client = storage.Client.from_service_account_json(PATH_TO_SERVICE_ACCOUNT_JSON_FILE)
+            blobs = list(storage_client.list_blobs(GCP_BUCKET_NAME))
+            possible_blobs = [b for b in blobs if b.name == job.target]
+            if len(possible_blobs) != 1:
+                raise RuntimeError(f'{len(possible_blobs)} blobs found with the file name {target}.')
+
+            blob = possible_blobs[0]
+            backup_path = job.local_directory + job.source_file
+            blob.download_to_filename(backup_path) # This can be used to download a local copy of the file.
+
+            if os.path.exists(backup_path) and PRODUCTION and not job.test_mode: # We're only deleting
+                # the blob on a machine where PRODUCTION == True and test_mode == False to ensure that
+                # the run was from a production server and pushed to the production dataset.
+                # DELETE THE GCP BLOB
+                print(f"Deleting the {job.target} blob.")
+                blob.delete()
