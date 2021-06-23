@@ -92,7 +92,7 @@ class PropertyIndexSchema(pl.BaseSchema):
         data['house_cat_id'] = form_keychain(data)
 
 # dfg
-housecat_tango_with_django_package_id = '3f6411c8-d03d-45b2-8225-673841e5c2b3'
+from engine.payload.house_cat.util import housecat_tango_with_django_package_id #'3f6411c8-d03d-45b2-8225-673841e5c2b3'
 from engine.payload.house_cat._deduplicate import deduplicated_index_filename
 
 def generate_deduplicated_index(job, **kwparameters):
