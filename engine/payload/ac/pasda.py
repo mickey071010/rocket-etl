@@ -239,9 +239,55 @@ job_dicts += [
 ]
 
 ########################3
-base_job_code = 'centerlines' # 'Allegheny County Address Points'
+base_job_code = 'centerlines' # 'Allegheny County Centerlines'
 package_id = '34f6668d-130d-4e10-b49b-598c43b83d27'
 
+class CenterlinesSchema(pl.BaseSchema):
+    objectid = fields.Integer(load_from='\ufeffOBJECTID'.lower(), dump_to='object_id')
+    feature_key = fields.String(load_from='FEATURE_KE'.lower(), dump_to='feature_key')
+    l_street_id = fields.String(load_from='L_STREET_I'.lower(), dump_to='l_street_id')
+    r_street_id = fields.String(load_from='R_STREET_I'.lower(), dump_to='r_street_id')
+    cad_llo = fields.Integer(load_from='CAD_LLO'.lower(), dump_to='cad_llo')
+    cad_lhi = fields.Integer(load_from='CAD_LHI'.lower(), dump_to='cad_lhi')
+    cad_rlo = fields.Integer(load_from='CAD_RLO'.lower(), dump_to='cad_rlo')
+    cad_rhi = fields.Integer(load_from='CAD_RHI'.lower(), dump_to='cad_rhi')
+    llo = fields.Integer(load_from='LLO'.lower(), dump_to='llo')
+    lhi = fields.Integer(load_from='LHI'.lower(), dump_to='lhi')
+    rlo = fields.Integer(load_from='RLO'.lower(), dump_to='rlo')
+    rhi = fields.Integer(load_from='RHI'.lower(), dump_to='rhi')
+    #st_premodifier = fields.String(load_from='ST_PREMODIFIER'.lower(), dump_to='st_premodifier', allow_none=True)
+    st_prefix = fields.String(load_from='ST_PREFIX'.lower(), dump_to='st_prefix', allow_none=True)
+    #st_pretype = fields.String(load_from='ST_PRETYPE'.lower(), dump_to='st_pretype', allow_none=True)
+    st_name = fields.String(load_from='ST_NAME'.lower(), dump_to='st_name')
+    st_type = fields.String(load_from='ST_TYPE'.lower(), dump_to='st_type', allow_none=True)
+    st_suffix = fields.String(load_from='ST_SUFFIX'.lower(), dump_to='st_suffix', allow_none=True)
+    st_postmodifier = fields.String(load_from='ST_POSTMOD'.lower(), dump_to='st_postmodifier', allow_none=True)
+    lmuni = fields.String(load_from='LMUNI'.lower(), dump_to='lmuni')
+    rmuni = fields.String(load_from='RMUNI'.lower(), dump_to='rmuni')
+    lcounty = fields.String(load_from='LCOUNTY'.lower(), dump_to='lcounty')
+    rcounty = fields.String(load_from='RCOUNTY'.lower(), dump_to='rcounty')
+    lstate = fields.String(load_from='LSTATE'.lower(), dump_to='lstate')
+    rstate = fields.String(load_from='RSTATE'.lower(), dump_to='rstate')
+    l_zip = fields.String(load_from='L_ZIP'.lower(), dump_to='l_zip', allow_none=True)
+    r_zip = fields.String(load_from='R_ZIP'.lower(), dump_to='r_zip', allow_none=True)
+    fcc = fields.String(load_from='FCC'.lower(), dump_to='fcc')
+    speed = fields.Integer(load_from='SPEED'.lower(), dump_to='speed', allow_none=True)
+    source_id = fields.String(load_from='SOURCE_ID'.lower(), dump_to='source_id', allow_none=True)
+    oneway = fields.String(load_from='ONEWAY'.lower(), dump_to='oneway', allow_none=True)
+    lardir = fields.String(load_from='LARDIR'.lower(), dump_to='lardir', allow_none=True)
+    a1 = fields.String(load_from='A1'.lower(), dump_to='a1', allow_none=True)
+    a2 = fields.String(load_from='A2'.lower(), dump_to='a2', allow_none=True)
+    source = fields.String(load_from='SOURCE'.lower(), dump_to='source', allow_none=True)
+    full_name = fields.String(load_from='FULL_NAME'.lower(), dump_to='full_name')
+    edit_user = fields.String(load_from='EDIT_USER'.lower(), dump_to='edit_user', allow_none=True)
+    edit_date = fields.String(load_from='EDIT_DATE'.lower(), dump_to='edit_date')
+    #global_id = fields.String(load_from='GlobalID'.lower(), dump_to='global_id')
+    wkt = fields.String(load_from='wkt', dump_to='wkt')
+
+    class Meta:
+        ordered = True
+
+schema = CenterlinesSchema
 
 job_dicts += [
 #    {
@@ -303,5 +349,29 @@ job_dicts += [
         'destination': 'ckan_filestore',
         'package': package_id,
         'resource_name': f'Shapefile',
-    }
+    },
+    { # Because PASDA is not providing a CSV version of this data,
+    # download the GeoJSON file and generate a CSV verson of it.
+        'job_code': f'{base_job_code}_geojson_download',
+        'source_type': 'http',
+        'source_full_url': f'https://www.pasda.psu.edu/json/AlleghenyCounty_StreetCenterlines{year_month}.geojson',
+        'encoding': 'utf-8',
+        'destination': 'file',
+        'custom_post_processing': convert_big_destination_geojson_file_to_source_csv,
+    },
+    {
+        'job_code': f'{base_job_code}_csv_converted',
+        'source_type': 'local',
+        'source_file': f'AlleghenyCounty_StreetCenterlines{year_month}.csv',
+        'encoding': 'utf-8',
+        'schema': schema,
+        'always_wipe_data': True,
+        #'primary_key_fields': ['\ufeffobjectid', 'feature_key', 'golobal_id']
+        'destination': 'ckan',
+        'package': package_id,
+        'resource_name': f'CSV',
+        'upload_method': 'insert',
+        'custom_post_processing': delete_source_file, # Without this, the source file grows longer on each run
+        # and also files with different yearmonths start to accumulate in that directory.
+    },
 ]
