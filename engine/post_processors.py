@@ -108,7 +108,7 @@ def verify_update_backup_source_file_and_then_delete_the_gcp_blob(job, **kwparam
             backup_path = job.local_directory + job.source_file
             blob.download_to_filename(backup_path) # This can be used to download a local copy of the file.
 
-            if os.path.exists(backup_path) and PRODUCTION and not job.test_mode: # We're only deleting
+            if os.path.exists(backup_path) and PRODUCTION and not kwparameters['test_mode']: # We're only deleting
                 # the blob on a machine where PRODUCTION == True and test_mode == False to ensure that
                 # the run was from a production server and pushed to the production dataset.
                 # DELETE THE GCP BLOB
