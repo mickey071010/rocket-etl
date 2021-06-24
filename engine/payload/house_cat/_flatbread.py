@@ -872,7 +872,7 @@ class MultifamilyInspectionsSchema3(BaseMultifamilyInspectionsSchema):
 
 fips2020_notified = False
 housecat_package_id = 'bb77b955-b7c3-4a05-ac10-448e4857ade4'
-from engine.payload.house_cat.util import housecat_tango_with_django_package_id
+from engine.payload.house_cat._parameters import housecat_tango_with_django_package_id
 
 job_dicts = [
     {
