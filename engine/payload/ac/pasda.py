@@ -7,8 +7,8 @@ from marshmallow import fields, pre_load, post_load
 from engine.wprdc_etl import pipeline as pl
 from engine.notify import send_to_slack
 from engine.parameters.remote_parameters import TEST_PACKAGE_ID
-from engine.geojson2csv import convert_big_destination_geojson_file_to_source_csv
-from engine.post_processors import delete_source_file
+from engine.geojson2csv import convert_big_destination_geojson_file_to_source_csv, convert_big_destination_geojson_file_to_source_csv_with_wkt
+from engine.post_processors import express_load_then_delete_file
 
 try:
     from icecream import ic
@@ -229,11 +229,12 @@ job_dicts += [
         'schema': schema,
         'always_wipe_data': True,
         #'primary_key_fields': ['\ufeffobjectid', 'id_no', 'oid', 'id']
-        'destination': 'ckan',
+        'destination': 'local',
         'package': package_id,
         'resource_name': f'CSV',
         'upload_method': 'insert',
-        'custom_post_processing': delete_source_file, # Without this, the source file grows longer on each run
+        'custom_post_processing': express_load_then_delete_file, # requires 'destination' to be set to 'file'
+        #delete_source_file, # Without this, the source file grows longer on each run
         # and also files with different yearmonths start to accumulate in that directory.
     },
 ]
@@ -352,26 +353,25 @@ job_dicts += [
     },
     { # Because PASDA is not providing a CSV version of this data,
     # download the GeoJSON file and generate a CSV verson of it.
-        'job_code': f'{base_job_code}_geojson_download',
+        'job_code': f'{base_job_code}_geojson_dl_and_convert',
         'source_type': 'http',
         'source_full_url': f'https://www.pasda.psu.edu/json/AlleghenyCounty_StreetCenterlines{year_month}.geojson',
         'encoding': 'utf-8',
         'destination': 'file',
-        'custom_post_processing': convert_big_destination_geojson_file_to_source_csv,
+        'custom_post_processing': convert_big_destination_geojson_file_to_source_csv_with_wkt,
     },
     {
-        'job_code': f'{base_job_code}_csv_converted',
+        'job_code': f'{base_job_code}_csv_preconverted',
         'source_type': 'local',
         'source_file': f'AlleghenyCounty_StreetCenterlines{year_month}.csv',
         'encoding': 'utf-8',
         'schema': schema,
         'always_wipe_data': True,
         #'primary_key_fields': ['\ufeffobjectid', 'feature_key', 'golobal_id']
-        'destination': 'ckan',
+        'destination': 'file',
         'package': package_id,
         'resource_name': f'CSV',
         'upload_method': 'insert',
-        'custom_post_processing': delete_source_file, # Without this, the source file grows longer on each run
-        # and also files with different yearmonths start to accumulate in that directory.
+        'custom_post_processing': express_load_then_delete_file, # requires 'destination' to be set to 'file'
     },
 ]
