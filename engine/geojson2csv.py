@@ -1,11 +1,13 @@
 import bigjson
 import os, csv, re
+from shapely.geometry import shape
 from engine.etl_util import write_or_append_to_csv
+from icecream import ic
 # For a GeoJSON file that starts like this:
 #{"type":"FeatureCollection",
 # "features":
 #       [{"geometry": {"type": "Point", "coordinates": [-79.81167781195305, 40.5421828403599]},
-#         "type": "Feature", 
+#         "type": "Feature",
 #         "id": 0,
 #         "properties": {"STATUS": "ACTIVE", "ADDRESS_ID": 1, "EDIT_DATE": "2013-06-13", "PARENT_ID": 0, "MUNICIPALI": "HARMAR", "STATE": "PA", "COUNTY": "ALLEGHENY", "SOURCE": "GDR", "FULL_ADDRE": "118 ORR AVE", "ADDR_NUM": "118", "POINT_Y": 447055.300166, "STREET_ID": 17808, "FEATURE_KE": 1, "ADDRESS_TY": 0, "POINT_X": 1395563.70007, "ST_TYPE": "AVE", "ST_NAME": "ORR", "ZIP_CODE": "15024"}
 #         },
@@ -29,18 +31,32 @@ def detect_keys(list_of_dicts):
     print(f'Extracted keys: {keys}')
     return keys
 
-def convert_geojson_row_to_dict(row):
+def convert_geometry_to_wkt(geometry):
+    """Return the well-known text representation of
+    the geometry from the GeoJSON element."""
+    g_shape = shape(geometry)
+    return g_shape.wkt
+
+def convert_geojson_row_to_dict(row, add_wkt):
     d = dict(row['properties'])
     geometry = row['geometry']
-    assert geometry['type'] == "Point"
-    d['LNG'], d['LAT'] = geometry['coordinates']
+    if geometry['type'] == 'Point':
+        d['LNG'], d['LAT'] = geometry['coordinates']
+    if add_wkt:
+        d['wkt'] = convert_geometry_to_wkt(geometry)
     return d
 
-def convert_big_destination_geojson_file_to_source_csv(job, **kwparameters):
+def convert_big_destination_geojson_file_to_source_csv(job, add_wkt=False, **kwparameters):
     input_filepath = job.destination_file_path
     filename = input_filepath.split('/')[-1]
     basename, extension = filename.split('.')
     output_filepath = job.local_directory + basename + '.csv'
+
+    if not os.path.exists(input_filepath):
+        raise ValueError(f"Unable to find file at {job.destination_file_path} to convert.")
+
+    if os.path.exists(output_filepath):
+        os.remove(output_filepath)
 
     with open(input_filepath, 'rb') as f:
         j = bigjson.load(f)
@@ -57,13 +73,16 @@ def convert_big_destination_geojson_file_to_source_csv(job, **kwparameters):
         # list as the third argument to write_to_csv.]
         print(f'Extracted keys: {keys}')
 
+    if add_wkt:
+        keys.append('wkt')
+
     with open(input_filepath, 'rb') as f:
         j = bigjson.load(f)
         features = j['features']
         csv_rows = []
         count = 0
         for feature in features:
-            csv_row = convert_geojson_row_to_dict(feature.to_python())
+            csv_row = convert_geojson_row_to_dict(feature.to_python(), add_wkt)
             csv_rows.append(csv_row)
             if len(csv_rows) == 1000:
                 count += len(csv_rows)
@@ -78,3 +97,5 @@ def convert_big_destination_geojson_file_to_source_csv(job, **kwparameters):
     os.remove(input_filepath)
 
 
+def convert_big_destination_geojson_file_to_source_csv_with_wkt(job, **kwparameters):
+    convert_big_destination_geojson_file_to_source_csv(job, add_wkt=True, **kwparameters)
