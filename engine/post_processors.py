@@ -4,7 +4,7 @@ from dateutil import parser
 from engine.parameters.remote_parameters import TEST_PACKAGE_ID
 from engine.etl_util import post_process
 from engine.credentials import site, API_key
-from engine.ckan_util import get_number_of_rows, get_resource_parameter
+from engine.ckan_util import get_number_of_rows, get_resource_parameter, find_resource_id
 
 def delete_source_file(job, **kwparameters):
     assert job.source_type == 'local'
@@ -31,7 +31,10 @@ def express_load_then_delete_file(job, **kwparameters):
         job.package_id = TEST_PACKAGE_ID
     ckan = ckanapi.RemoteCKAN(site, apikey=API_key)
     csv_file_path = job.destination_file_path
+    #resource_id = job.locators_by_destination[job.destination] # This gives a file path here
+    # like .../rocket-etl/output_files/ac/AlleghenyCounty_StreetCenterlines202106.csv
     resource_id = find_resource_id(job.package_id, job.resource_name)
+
     if resource_id is None:
         # If the resource does not already exist, create it.
         print(f"Unable to find a resource with name '{job.resource_name}' in package with ID {job.package_id}.")
