@@ -260,7 +260,7 @@ job_dicts += [
         'schema': schema,
         'always_wipe_data': True,
         #'primary_key_fields': ['\ufeffobjectid', 'id_no', 'oid', 'id']
-        'destination': 'local',
+        'destination': 'file',
         'package': package_id,
         'resource_name': f'CSV',
         'upload_method': 'insert',
