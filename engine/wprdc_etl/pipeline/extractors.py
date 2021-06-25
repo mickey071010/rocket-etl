@@ -1,4 +1,3 @@
-import csv
 import datetime
 import io
 import json
@@ -6,6 +5,11 @@ from collections import OrderedDict
 from engine.wprdc_etl.pipeline.exceptions import IsHeaderException
 from xlrd import open_workbook, xldate_as_tuple, XL_CELL_DATE
 from openpyxl import load_workbook
+
+import csv, sys
+csv.field_size_limit(sys.maxsize) # This is designed to overcome this error:
+#_csv.Error: field larger than field limit (131072)
+# https://stackoverflow.com/questions/15063936/csv-error-field-larger-than-field-limit-131072
 
 class Extractor(object):
     def __init__(self, connection):
