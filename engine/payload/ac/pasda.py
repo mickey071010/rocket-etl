@@ -28,9 +28,29 @@ year_month = today.strftime("%Y%m")
 # On 05-26, the May version of the Shapefile is available...
 
 ########################3
-base_job_code = 'ac_parcels' # 'Allegheny County Parcel Boundaries'
+base_job_code = 'parcels' # 'Allegheny County Parcel Boundaries'
 package_id = '709e4e52-6f82-4cd0-a848-f3e2b3f5d22b'
 
+class ParcelsSchema(pl.BaseSchema):
+    pin = fields.String(load_from='PIN'.lower(), dump_to='pin', allow_none=True)
+    mapblocklo = fields.String(load_from='MAPBLOCKLO'.lower(), dump_to='map_block_lot', allow_none=True)
+    municode = fields.String(load_from='MUNICODE'.lower(), dump_to='municode')
+    calcacreag = fields.Float(load_from='CALCACREAG'.lower(), dump_to='calc_acreage')
+    comments = fields.String(load_from='COMMENTS'.lower(), dump_to='comments', allow_none=True)
+    notes = fields.String(load_from='NOTES'.lower(), dump_to='notes', allow_none=True)
+    pseudono = fields.String(load_from='PSEUDONO'.lower(), dump_to='pseudono', allow_none=True)
+    shape_leng = fields.Float(load_from='Shape_Leng'.lower(), dump_to='shape_length')
+    wkt = fields.String(load_from='wkt', dump_to='wkt', allow_none=True)
+
+    # There are a lot of Multipolygons among the parcel bounadries, throwing those out and just looking at
+    # polygons, quadrilaterals are by far the most common making up 40% of plain polygons. Pentagons are
+    # next at 16%. Triangles are way down at 0.5%. The pure polygon boundary with the most vertices
+    # is a yet-unsubdivided stretch of land with 7,887 vertices. It's also the longest by character count
+    # with 298047 characters. It's been confirmed to be loadable into the datastore.
+    class Meta:
+        ordered = True
+
+schema = ParcelsSchema
 
 job_dicts += [
 #    {
@@ -94,18 +114,29 @@ job_dicts += [
         'package': package_id,
         'resource_name': f'Shapefile',
     },
-#    {
-#        'job_code': f'tornados',
-#        'source_type': 'ftp',
-#        #'source_full_url': f'ftp://ftp.pasda.psu.edu/pub/pasda/alleghenycounty/AlleghenyCounty_Parcels{year_month}.zip'
-#        'source_site': 'ftp.pasda.psu.edu',
-#        'source_dir': 'pub/pasda/noaa',
-#        'source_file': f'Tornados_PA.zip', # A small (35k) file for testing the FTP connection.
-#        'encoding': 'binary',
-#        'destination': 'ckan_filestore',
-#        'package': package_id,
-#        'resource_name': f'Shapefile',
-#    },
+    { # Because PASDA is not providing a CSV version of this data,
+    # download the GeoJSON file and generate a CSV verson of it.
+        'job_code': f'{base_job_code}_geojson_dl_and_convert',
+        'source_type': 'http',
+        'source_full_url': f'https://www.pasda.psu.edu/json/AlleghenyCounty_Parcels{year_month}.geojson',
+        'encoding': 'utf-8',
+        'destination': 'file',
+        'custom_post_processing': convert_big_destination_geojson_file_to_source_csv_with_wkt,
+    },
+    {
+        'job_code': f'{base_job_code}_csv_preconverted',
+        'source_type': 'local',
+        'source_file': f'AlleghenyCounty_Parcels{year_month}.csv',
+        'encoding': 'utf-8',
+        'schema': schema,
+        'always_wipe_data': True,
+        #'primary_key_fields': ['\ufeffobjectid', 'feature_key', 'golobal_id']
+        'destination': 'file',
+        'package': package_id,
+        'resource_name': f'CSV',
+        'upload_method': 'insert',
+        'custom_post_processing': express_load_then_delete_file, # requires 'destination' to be set to 'file'
+    },
 ]
 
 ########################3
