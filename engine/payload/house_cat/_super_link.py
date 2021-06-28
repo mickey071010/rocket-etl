@@ -56,7 +56,22 @@ def add_row_to_linking_dict(f, row, id_field, fields_to_get, ac_by_id):
         if field in row and row[field] not in [None, '']:
             ac_by_id[row[id_field]][field] = row[field]
 
+def add_to_master_list(id_field, sources, available_files, fields_to_get, master_list):
+    ac_by_id = defaultdict(dict)
+
+    for f in sources:
+        assert f in available_files
+
+    for f in sources:
+        with open(f'{path}/{f}', 'r') as g:
+            reader = csv.DictReader(g)
+            for row in reader:
+                add_row_to_linking_dict(f, row, id_field, fields_to_get, ac_by_id)
+
+    master_list += [v for k, v in ac_by_id.items()]
+
 def link_records_into_index():
+    generate_intermediate_files = False
     all_files = get_files_in_folder(path)
     files = [f for f in all_files if f[-3:].lower() == 'csv']
     keys_by_file = defaultdict(list)
@@ -98,20 +113,21 @@ def link_records_into_index():
                                 city_by_fha_loan_id[row[field]] = row['city']
                         files_by[field][row[field]].append(f)
 
-    # Examine the breakdown of records containing property_id values based on which files each property_id appears in.
-    pa_files_by_property_id = defaultdict(list)
-    for property_id, file_list in files_by_property_id.items():
-    #    if file_list[0] == 'mf_8_contracts_pa.csv' and len(set(file_list)) == 1:
-    #        pass
-    #    else:
-            pa_files_by_property_id[property_id] = '|'.join(sorted(list(set(file_list))))
-    # Some files like mf_8_contracts and mf_inspections can have multiple records for a single property_id
+    if generate_intermediate_files:
+        # Examine the breakdown of records containing property_id values based on which files each property_id appears in.
+        pa_files_by_property_id = defaultdict(list)
+        for property_id, file_list in files_by_property_id.items():
+        #    if file_list[0] == 'mf_8_contracts_pa.csv' and len(set(file_list)) == 1:
+        #        pass
+        #    else:
+                pa_files_by_property_id[property_id] = '|'.join(sorted(list(set(file_list))))
+        # Some files like mf_8_contracts and mf_inspections can have multiple records for a single property_id
 
-    prop_id_files_list = [{'property_id': p_id, 'file_list': v} for p_id, v in pa_files_by_property_id.items()]
-    for d in prop_id_files_list:
-        d['city'] = city_by_property_id[d['property_id']]
+        prop_id_files_list = [{'property_id': p_id, 'file_list': v} for p_id, v in pa_files_by_property_id.items()]
+        for d in prop_id_files_list:
+            d['city'] = city_by_property_id[d['property_id']]
 
-    write_to_csv('files_by_property_id.csv', prop_id_files_list, ['property_id', 'file_list', 'city'])
+        write_to_csv('files_by_property_id.csv', prop_id_files_list, ['property_id', 'file_list', 'city'])
 
     # property_id
     # Out of the 794 property_id values in mf_inspections_pa that are not in any of the 3 mf*ac.csv files,
@@ -157,16 +173,17 @@ def link_records_into_index():
 
     #########################
     # Examine the breakdown of records containing fha_loan_id values based on which files each fha_loan_id appears in.
-    id_field = 'fha_loan_id'
-    pa_files_by_fha_loan_id = defaultdict(list)
-    for fha_loan_id, file_list in files_by[id_field].items():
-        pa_files_by_fha_loan_id[fha_loan_id] = '|'.join(sorted(list(set(file_list))))
+    if generate_intermediate_files:
+        id_field = 'fha_loan_id'
+        pa_files_by_fha_loan_id = defaultdict(list)
+        for fha_loan_id, file_list in files_by[id_field].items():
+            pa_files_by_fha_loan_id[fha_loan_id] = '|'.join(sorted(list(set(file_list))))
 
-    fha_loan_id_files_list = [{'fha_loan_id': fha_loan_id, 'file_list': v} for fha_loan_id, v in pa_files_by_fha_loan_id.items()]
-    for d in fha_loan_id_files_list:
-        d['city'] = city_by_fha_loan_id[d[id_field]]
+        fha_loan_id_files_list = [{'fha_loan_id': fha_loan_id, 'file_list': v} for fha_loan_id, v in pa_files_by_fha_loan_id.items()]
+        for d in fha_loan_id_files_list:
+            d['city'] = city_by_fha_loan_id[d[id_field]]
 
-    write_to_csv('files_by_fha_loan_id.csv', fha_loan_id_files_list, [id_field, 'file_list', 'city'])
+        write_to_csv('files_by_fha_loan_id.csv', fha_loan_id_files_list, [id_field, 'file_list', 'city'])
 
     # The results look like this:
     #file_list                                  count   percent
@@ -245,7 +262,10 @@ def link_records_into_index():
 
     lihtc_projects = [v for k, v in ac_by_id.items()]
     master_list += lihtc_projects
-    write_to_csv('lihtc_projects_ac.csv', lihtc_projects, fields_to_get + possible_keys + ['source_file'])
+
+
+    if generate_intermediate_files:
+        write_to_csv('lihtc_projects_ac.csv', lihtc_projects, fields_to_get + possible_keys + ['source_file'])
     # LIHTC collisions:
     # LIHTC has about 4 collisions, like the two records at the property_street_address == '110 MCINTYRE RD'
 
@@ -261,16 +281,18 @@ def link_records_into_index():
     #########################
     # Examine the breakdown of records containing development_code.
     id_field = 'development_code'
-    pa_files_by_id = {}
-    for dev_code, flist in files_by_development_code.items():
-        unique_files = list(set(flist))
-        pa_files_by_id[dev_code] = '|'.join(sorted(unique_files))
 
-    list_of_dicts = [{id_field: k, 'file_list': v} for k, v in pa_files_by_id.items()]
-    for d in list_of_dicts:
-        d['city'] = city_by_dev_code[d[id_field]]
+    if generate_intermediate_files:
+        pa_files_by_id = {}
+        for dev_code, flist in files_by_development_code.items():
+            unique_files = list(set(flist))
+            pa_files_by_id[dev_code] = '|'.join(sorted(unique_files))
 
-    write_to_csv('files_by_development_code.csv', list_of_dicts, [id_field, 'file_list', 'city'])
+        list_of_dicts = [{id_field: k, 'file_list': v} for k, v in pa_files_by_id.items()]
+        for d in list_of_dicts:
+            d['city'] = city_by_dev_code[d[id_field]]
+
+        write_to_csv('files_by_development_code.csv', list_of_dicts, [id_field, 'file_list', 'city'])
     # Presently, all development codes are in both
 
     ac_by_id = defaultdict(dict)
