@@ -56,11 +56,13 @@ def add_row_to_linking_dict(f, row, id_field, fields_to_get, ac_by_id):
         if field in row and row[field] not in [None, '']:
             ac_by_id[row[id_field]][field] = row[field]
 
-def add_to_master_list(id_field, sources, available_files, fields_to_get, master_list):
+def add_to_master_list(id_field, sources, available_files, fields_to_get, master_list, check_uniqueness=False):
     ac_by_id = defaultdict(dict)
 
     for f in sources:
         assert f in available_files
+        if check_uniqueness:
+            check_uniqueness_of_ids(f, id_field)
 
     for f in sources:
         with open(f'{path}/{f}', 'r') as g:
@@ -147,30 +149,19 @@ def link_records_into_index():
             'fha_loan_id',
             'normalized_state_id',
             'pmindx',
+#            'property_id',
             ]
+    master_list = []
 
     mf_ac_by_property_id = defaultdict(dict)
     id_field = 'property_id'
-    ac_fha_loan_ids = []
 
-    ac_property_id_files = ['mf_subsidy_8_ac.csv', 'mf_subsidy_loans_ac.csv', 'mf_loans_ac.csv']
-    for a in ac_property_id_files:
-        assert a in files
+    sources = ac_property_id_files = ['mf_subsidy_8_ac.csv', 'mf_subsidy_loans_ac.csv', 'mf_loans_ac.csv'] # mf_inspections_pa.csv
+    # and mf_8_contracts_pa COULD BE added here if there are other fields we want to extract (that
+    # is, beyond constructing a master list). # These are Allegheny County files where the
+    # property_id identifies the projects.
 
-    for f in files:
-        if f in ac_property_id_files:# mf_inspections_pa.csv and mf_8_contracts_pa COULD
-        # BE added here if there are other fields we want to extract (that is, beyond constructing a master list).
-            with open(f'{path}/{f}', 'r') as g:
-                reader = csv.DictReader(g)
-                for row in reader:
-                    add_row_to_linking_dict(f, row, id_field, fields_to_get, mf_ac_by_property_id)
-                    if f == 'mf_loans_ac.csv':
-                        if 'fha_loan_id' in row and row['fha_loan_id'] not in [None, '']:
-                            ac_fha_loan_ids.append(row['fha_loan_id'])
-
-
-    master_list = [v for k, v in mf_ac_by_property_id.items()]
-
+    add_to_master_list(id_field, sources, files, fields_to_get, master_list, check_uniqueness=False)
     #########################
     # Examine the breakdown of records containing fha_loan_id values based on which files each fha_loan_id appears in.
     if generate_intermediate_files:
@@ -297,17 +288,8 @@ def link_records_into_index():
 
     ac_by_id = defaultdict(dict)
 
-    dev_code_files = ['housing_inspections_ac.csv', 'public_housing_projects_ac.csv'] #, 'public_housing_buildings_ac.csv']
-    for f in dev_code_files:
-        assert f in files
-
-    for f in dev_code_files:
-        with open(f'{path}/{f}', 'r') as g:
-            reader = csv.DictReader(g)
-            for row in reader:
-                add_row_to_linking_dict(f, row, id_field, fields_to_get, ac_by_id)
-
-    master_list += [v for k, v in ac_by_id.items()]
+    sources = ['housing_inspections_ac.csv', 'public_housing_projects_ac.csv'] #, 'public_housing_buildings_ac.csv'] # dev_code_files
+    add_to_master_list(id_field, sources, files, fields_to_get, master_list, check_uniqueness=False)
 
     #########################
     # Examine the breakdown of records containing development_code values based on which files each development_code appears in.
@@ -326,19 +308,9 @@ def link_records_into_index():
     ########################
     # Add PHFA Demographics file.
     id_field = 'pmindx'
-    ac_by_id = defaultdict(dict)
+    sources = ['phfa_pgh_demographics.csv']
+    add_to_master_list(id_field, sources, files, fields_to_get, master_list, check_uniqueness=False)
 
-    phfa_files = ['phfa_pgh_demographics.csv']
-    for f in phfa_files:
-        assert f in files
-
-    for f in phfa_files:
-        with open(f'{path}/{f}', 'r') as g:
-            reader = csv.DictReader(g)
-            for row in reader:
-                add_row_to_linking_dict(f, row, id_field, fields_to_get, ac_by_id)
-
-    master_list += [v for k, v in ac_by_id.items()]
     ########################
     # Add crowdsourced_records file.
     id_field = 'crowdsourced_id'
@@ -346,19 +318,7 @@ def link_records_into_index():
     # Add all new id_field values to possible_keys in _deduplicate.py.
     # Those get added to fields_to_write below.
     ### Template for adding new data sources ###
-    ac_by_id = defaultdict(dict)
-
-    for f in sources:
-        assert f in files
-        check_uniqueness_of_ids(f, id_field)
-
-    for f in sources:
-        with open(f'{path}/{f}', 'r') as g:
-            reader = csv.DictReader(g)
-            for row in reader:
-                add_row_to_linking_dict(f, row, id_field, fields_to_get, ac_by_id)
-
-    master_list += [v for k, v in ac_by_id.items()]
+    add_to_master_list(id_field, sources, files, fields_to_get, master_list, check_uniqueness=True)
     #########################
     fields_to_write = fields_to_get
     for f in possible_keys:
