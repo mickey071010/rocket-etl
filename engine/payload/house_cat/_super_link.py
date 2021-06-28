@@ -258,30 +258,6 @@ def link_records_into_index():
 
     # I'm skipping this for now.
 
-
-    f = 'lihtc_projects_pa.csv'
-    assert f in files
-
-    id_field = 'lihtc_project_id'
-    ac_by_id = defaultdict(dict)
-    with open(f'{path}/{f}', 'r') as g:
-        reader = csv.DictReader(g)
-        for row in reader:
-            in_allegheny_county = row['county_fips_code'] == '42003' or row['fips2000'][:5] == '42003'
-            # Whitelist known exceptions
-            in_allegheny_county = in_allegheny_county or (row[id_field] in ['PAA19890800', 'PAA19900328', 'PAA19910120'])
-            # Additional inclusions could be made based on latitude+longitude or city or zip_code
-            if in_allegheny_county:
-                ac_by_id[row[id_field]][id_field] = row[id_field]
-                if 'source_file' not in ac_by_id[row[id_field]]:
-                    ac_by_id[row[id_field]]['source_file'] = f
-                else:
-                    ac_by_id[row[id_field]]['source_file'] += '|' + f
-
-                for field in fields_to_get:
-                    if field in row and row[field] not in [None, '']:
-                        ac_by_id[row[id_field]][field] = row[field]
-
     #########################
     # Examine the breakdown of records containing development_code.
     id_field = 'development_code'
