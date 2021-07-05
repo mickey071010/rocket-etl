@@ -90,18 +90,22 @@ def main(**kwargs):
 
     # [ ] Add in script-level post-processing here, allowing the data.json file of an ArcGIS
     # server to be searched for unharvested tables.
-    for job in selected_jobs:
-        kwparameters = dict(kwargs)
-        locators_by_destination = job.process_job(**kwparameters)
-        for destination, table_locator in locators_by_destination.items():
-            if destination in ['ckan', 'ckan_filestore']: # [ ] So far all post-processing is CKAN-specific.
-                post_process(locators_by_destination[destination], job, **kwparameters)
-            if destination == 'ckan': # The data dictionary seemingly doesn't need
-                # to be reset if it's a ckan_filestore Express Loader operation.
-                resource_id = table_locator
-                if clear_first or migrate_schema: # [ ] Should the data dictionary definitely be restored if clear_first = True?
-                    results = set_data_dictionary(resource_id, job.saved_data_dictionary)
-                    # Attempt to restore data dictionary, taking into account the deletion and addition of fields, and ignoring any changes in type.
+    try:
+        for job in selected_jobs:
+            kwparameters = dict(kwargs)
+            locators_by_destination = job.process_job(**kwparameters)
+            for destination, table_locator in locators_by_destination.items():
+                if destination in ['ckan', 'ckan_filestore']: # [ ] So far all post-processing is CKAN-specific.
+                    post_process(locators_by_destination[destination], job, **kwparameters)
+                if destination == 'ckan': # The data dictionary seemingly doesn't need
+                    # to be reset if it's a ckan_filestore Express Loader operation.
+                    resource_id = table_locator
+                    if clear_first or migrate_schema: # [ ] Should the data dictionary definitely be restored if clear_first = True?
+                        results = set_data_dictionary(resource_id, job.saved_data_dictionary)
+                        # Attempt to restore data dictionary, taking into account the deletion and addition of fields, and ignoring any changes in type.
+    except Exception as e:
+        import sys
+        raise type(e)(f'{e} [for job_code == "{job.job_code}"]').with_traceback(sys.exc_info()[2])
 
 if __name__ == '__main__':
     if len(sys.argv) == 2 and sys.argv[1] == 'test_all':
