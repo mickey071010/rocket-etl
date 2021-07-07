@@ -161,7 +161,7 @@ def deduplicate_records(deduplicated_index_filepath, verbose=False):
 
                             if verbose:
                                 ic(already_indexed_n)
-                                ic(master_list[already_indexed_n])
+                                #ic(master_list[already_indexed_n])
                             master_list[already_indexed_n] = merged_record
                             eliminated_indices.append(n)
                             #ic(master_list[already_indexed_n])

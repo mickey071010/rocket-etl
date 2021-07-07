@@ -2,15 +2,17 @@ import re, csv, copy
 from pprint import pprint
 from icecream import ic
 from collections import defaultdict
-from _deduplicate import standardize_field, index_filename
-from _util import multikeysort
+try:
+    from _deduplicate import standardize_field, index_filename, possible_keys # These calls can't be made
+    from _util import multikeysort # from tango_with_django.
+except ModuleNotFoundError:
+    from engine.payload.house_cat._deduplicate import standardize_field, index_filename, possible_keys
+    from engine.payload.house_cat._util import multikeysort
 
 #from parameters.local_parameters import DESTINATION_DIR
 DESTINATION_DIR = "/Users/drw/WPRDC/etl/rocket-etl/output_files/"
 
 path = DESTINATION_DIR + "house_cat"
-
-from _deduplicate import possible_keys
 
 def write_to_csv(filename, list_of_dicts, keys):
     with open(filename, 'w') as output_file:

@@ -305,7 +305,11 @@ job_dict_template = \
         'upload_method': 'insert',
     }
 
-from engine.payload.house_cat._deduplicate import possible_keys as project_identifiers
+from engine.payload.house_cat._deduplicate import possible_keys
+project_identifiers = list(possible_keys) # This is necessary, to make a copy of
+# possible_keys without modifying it. "import possible_keys as project_identifiers"
+# and then modifying the project_identifiers variable will change the value of
+# possible_keys when other _deduplicate.py functions are called above. This is a sneaky bug.
 project_identifiers.remove('property_id') # These get removed because they are NOT
 project_identifiers.remove('crowdsourced_id') # represented as ManyToManyFields.
 for p_id in project_identifiers:
