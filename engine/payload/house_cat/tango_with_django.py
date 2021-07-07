@@ -90,21 +90,49 @@ class PropertyIndexSchema(pl.BaseSchema):
     @post_load
     def synthesize_house_cat_id(self, data):
         data['house_cat_id'] = form_keychain(data)
+        # [ ] What happens when a new key project ID is added and the keychain values all get updated?
+        # If executed naively, any row that hunt_and_peck tries to match based on the keychain
+        # value will get ignored and a bunch of duplicates will get added.
+        # Therefore, we need a migrate-to-new-keychain job which know the old keychain function
+        # and the new keychain function and can translate and make the fixes in the update.
+
+        # One option: Story the value of key_project_identifiers in the CKAN dataset
+        # metadata extras and check it on each run of tango_with_django. If the value in
+        # tango_with_django does not match the value in the CKAN dataset metadata,
+        # migrate the values as part of hunt_and_peck_update.
 
 # dfg
 from engine.payload.house_cat._parameters import housecat_tango_with_django_package_id #'3f6411c8-d03d-45b2-8225-673841e5c2b3'
 from engine.payload.house_cat._deduplicate import deduplicated_index_filename
 
-def generate_deduplicated_index(job, **kwparameters):
+def generate_deduplicated_index_from_existing_local_files(job, **kwparameters):
     # Run _flatbread.py in local output mode (python launchpad.py house_cat/_flatbread.py to_file).
     # (This process takes a while (~20-30 minutes?). Then use those files to run _super_link.py.
 
-    # Or else download the tables from CKAN.
+    # Look for files in output_files/house_cat/. If they're not present, download them from CKAN.
+
+    # Note that crowdsourced_records.csv has to be manually put into output_files for now.
+
+    # These imports don't work yet.
+    # Therefore, there's still not any code to put deduplicated_index.csv in
+    # source_files/house_cat/
     from engine.payload.house_cat._super_link import link_records_into_index
     from engine.payload.house_cat._deduplicate import deduplicate_records, deduplicated_index_filename
     link_records_into_index()
     deduplicate_records(f'{job.local_directory}{deduplicated_index_filename}', False)
     # Now save the deduplicated index to the expected source_file location?
+
+def generate_deduplicated_index_from_ckan_tables(job, **kwparameters):
+    # Get files that _flatbread.py would generate.
+    #    (Maybe run the _flatbread jobs before running tango_with_django.)
+    # To do this, we need to pull all the tables from the Affordable Housing Extracts dataset
+    # and then somehow assign those the correct filenames! (It's not clear the best way to do this...
+    # custom_post_processing scripts could post the individual table name-filename pairs
+    # to a dict in the package-level metadata extras field.)
+
+
+    # Store files in output_files/house_cat/.
+    generate_deduplicated_index_from_existing_local_files(job, **kwparameters)
 
 def hunt_and_peck_update(job, **kwparameters):
     """This function gets the existing housing-project index table from CKAN
@@ -221,6 +249,24 @@ job_dicts = [
 #        'resource_name': 'house_cat_projectindex',
 #        'upload_method': 'upsert',
 #    },
+    { # Really the simplest solution might be to modify _flatbread.py to first save the output locally
+        # and then in a second stage upload them to CKAN, but the flaw in this plan is that some of
+        # those jobs need CKAN's upsert capabilites (or at least a local SQLite database) to work correctly,
+        # so it's really not simple. Another option would be a post-processing step that pulls the table
+        # back down to the output directory, as that would take care of getting the file name right.
+        'job_code': 'synthesize_new_local_index',
+        'source_type': 'local',
+        'source_file': deduplicated_index_filename,
+        'updates': 'Monthly',
+        'schema': PropertyIndexSchema,
+        #'filters': [['property_id', '!=', None]], # Might it be necessary to iterate through all the property fields
+        # like this, upserting on each one?
+        'custom_processing': generate_deduplicated_index_from_existing_local_files, #generate_deduplicated_index_from_ckan_tables,
+        'always_wipe_data': True, # This can be wiped since this is a local-only job.
+        'destination': 'file',
+        'destination_file': deduplicated_index_filename,
+    },
+
     {
         'job_code': 'hunt_and_peck',
         #From the house_cat data architecture plan: CROWDSOURCED HOUSING PROJECTS
@@ -251,7 +297,7 @@ job_dicts = [
         'schema': PropertyIndexSchema,
         'custom_processing': hunt_and_peck_update, # Weird new ETL job:
         # Everything happens in the custom_processing part because this
-        # one is so weird. Make 'destination' local so nothing else
+        # one is so weird. Set 'destination' to 'file' so nothing else
         # happens to the data portal.
 
         #'filters': [['property_id', '!=', None]], # Might it be necessary to iterate through all the property fields
