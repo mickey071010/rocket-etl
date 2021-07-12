@@ -39,6 +39,30 @@ def import_module(path,name):
 #                destination_file (a file name that overrides just using the source_file name in the
 #                  output_files/ directory)
 
+def get_job_dicts(payload_path):
+    # Clean path 1: Remove optional ".py" extension
+    payload_path = re.sub('\.py$', '', payload_path)
+    # Clean path 2: Remove optional leading directories. This allows tab completion
+    # from the level of launchpad.py, the engine directory, or the payload subdirectory.
+    payload_path = re.sub('^payload\/', '', payload_path)
+    payload_path = re.sub('^engine\/payload\/', '', payload_path)
+    # Verify path.
+    payload_parts = payload_path.split('/')
+    payload_location = '/'.join(payload_parts[:-1])
+    module_name = payload_parts[-1]
+    full_payload_path = BASE_DIR + 'engine/payload/' + payload_location
+    if not os.path.exists(full_payload_path):
+        raise ValueError("Unable to find payload directory at {}".format(full_payload_path))
+    module_path = full_payload_path + '/' + module_name + '.py'
+    if not os.path.exists(module_path):
+        raise ValueError("Unable to find payload module at {}".format(module_path))
+
+    module = import_module(module_path, module_name) # We want to import job_dicts
+    job_dicts = module.job_dicts
+    for job_dict in job_dicts:
+        job_dict['job_directory'] = payload_parts[-2]
+    return job_dicts
+
 def code_is_in_job_dict(code, job_dict):
     """Identify jobs by a command-line-specified job code which could be 1) the full name of
     the source file, 2) the name of the source file without the extension, or 3) the
@@ -161,29 +185,7 @@ if __name__ == '__main__':
             test_mode = not PRODUCTION # Use PRODUCTION boolean from parameters/local_parameters.py to set whether test_mode defaults to True or False
             wake_me_when_found = False
 
-            payload_path = sys.argv[1]
-            # Clean path 1: Remove optional ".py" extension
-            payload_path = re.sub('\.py$','',payload_path)
-            # Clean path 2: Remove optional leading directories. This allows tab completion
-            # from the level of launchpad.py, the engine directory, or the payload subdirectory.
-            payload_path = re.sub('^payload\/','',payload_path)
-            payload_path = re.sub('^engine\/payload\/','',payload_path)
-            # Verify path.
-            payload_parts = payload_path.split('/')
-            payload_location = '/'.join(payload_parts[:-1])
-            module_name = payload_parts[-1]
-            full_payload_path = BASE_DIR + 'engine/payload/' + payload_location
-            if not os.path.exists(full_payload_path):
-                raise ValueError("Unable to find payload directory at {}".format(full_payload_path))
-            module_path = full_payload_path + '/' + module_name + '.py'
-            if not os.path.exists(module_path):
-                raise ValueError("Unable to find payload module at {}".format(module_path))
-
-            module = import_module(module_path, module_name) # We want to import job_dicts
-            job_dicts = module.job_dicts
-            for job_dict in job_dicts:
-                job_dict['job_directory'] = payload_parts[-2]
-
+            job_dicts = get_job_dicts(sys.argv[1])
             selected_job_codes = []
         except: # This is mainly to catch import_module errors and make sure
             # that they result in Slack notifications.

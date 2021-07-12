@@ -231,6 +231,14 @@ def hunt_and_peck_update(job, **kwparameters):
 #           b) Add _id, <project_identifier_value> to a crosswalk table.
 #       Then upsert those crosswalk records to house_cat_projectindex_<project_identifier>.
 
+
+# In production, it will be necessary to run
+# > python launchpad.py house_cat/_flatbread.py to_file
+# to populate the output_files/house_cat directory with the files needed by tango_with_django.py
+# Then run
+# > python launchpad.py house_cat/tango_with_django.py synthesize_new_local_index hunt_and_peck_update
+# to update the house_cat__projectindex CKAN table, preserving _id values.
+
 job_dicts = [
 #    { # We generally don't want to run this unless we're starting over.
 #        'job_code': 'wipe_and_replace_index', #PropertyIndexSchema().job_code, # 'index'
