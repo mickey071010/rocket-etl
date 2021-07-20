@@ -482,6 +482,21 @@ class MultifamilyProjectsSubsidyLoansSchema(pl.BaseSchema):
             else:
                 raise ValueError("Unable to standardize county_fips_code.")
 
+    @post_load
+    def standardize_census_tract(self, data):
+        """Add the leading state code and county code to the census
+        tract to match the format used in other files."""
+        county_field = 'cnty2kx'
+        tract_field = 'tract2kx'
+        if data[tract_field] is not None:
+            if len(data[tract_field]) <= 6:
+                if data[county_field] is not None and len(data[county_field]) == 3 and data['std_st'] == 'PA':
+                    data[tract_field] = f'42{data[county_field]}{data[tract_field]}'
+                else:
+                    raise ValueError("Unable to standardize census_tract.")
+            else:
+                raise ValueError("Unable to standardize census_tract.")
+
 class SubsidiesLoansSchema(pl.BaseSchema): # From MultifamilyProjectsSubsidyLoansSchema
     # This schema is applied to the same file as mf_loans.
     job_code = 'subsidies_loans'
@@ -566,6 +581,21 @@ class MultifamilyGuaranteedLoansSchema(pl.BaseSchema):
                 data[f] = f'42{data[f]}'
             else:
                 raise ValueError("Unable to standardize county_fips_code.")
+
+    @post_load
+    def standardize_census_tract(self, data):
+        """Add the leading state code and county code to the census
+        tract to match the format used in other files."""
+        county_field = 'cnty2kx'
+        tract_field = 'tract2kx'
+        if data[tract_field] is not None:
+            if len(data[tract_field]) <= 6:
+                if data[county_field] is not None and len(data[county_field]) == 3 and data['std_st'] == 'PA':
+                    data[tract_field] = f'42{data[county_field]}{data[tract_field]}'
+                else:
+                    raise ValueError("Unable to standardize census_tract.")
+            else:
+                raise ValueError("Unable to standardize census_tract.")
 
 class LIHTCSchema(pl.BaseSchema):
     # Changes to the LIHTCPUB.csv schema between the 2018/2019 version of the data and the May 2021 update:
