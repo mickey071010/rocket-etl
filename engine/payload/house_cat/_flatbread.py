@@ -470,6 +470,18 @@ class MultifamilyProjectsSubsidyLoansSchema(pl.BaseSchema):
     class Meta:
         ordered = True
 
+    @post_load
+    def standardize_fips_code(self, data):
+        """Add the leading state code to the county_fips_code to match
+        the format used in other files (and also used for important
+        data processing)."""
+        fields = ['cnty2kx']
+        for f in fields:
+            if data[f] is not None and len(data[f]) == 3 and data['std_st'] == 'PA':
+                data[f] = f'42{data[f]}'
+            else:
+                raise ValueError("Unable to standardize county_fips_code.")
+
 class SubsidiesLoansSchema(pl.BaseSchema): # From MultifamilyProjectsSubsidyLoansSchema
     # This schema is applied to the same file as mf_loans.
     job_code = 'subsidies_loans'
@@ -542,6 +554,18 @@ class MultifamilyGuaranteedLoansSchema(pl.BaseSchema):
         for f in fs:
             if f in data and re.search('-', data[f]) is not None:
                 data[f] = re.sub('-', '', data[f])
+
+    @post_load
+    def standardize_fips_code(self, data):
+        """Add the leading state code to the county_fips_code to match
+        the format used in other files (and also used for important
+        data processing)."""
+        fields = ['cnty2kx']
+        for f in fields:
+            if data[f] is not None and len(data[f]) == 3 and data['std_st'] == 'PA':
+                data[f] = f'42{data[f]}'
+            else:
+                raise ValueError("Unable to standardize county_fips_code.")
 
 class LIHTCSchema(pl.BaseSchema):
     # Changes to the LIHTCPUB.csv schema between the 2018/2019 version of the data and the May 2021 update:
