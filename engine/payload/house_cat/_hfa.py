@@ -105,13 +105,24 @@ class HFADemographics(pl.BaseSchema):
     # "Partially elderly handicapped", "Partially physically handicapped", "Wholly physically disabled",
     # "Chronically Mentally Ill", but nothing about homelessness (that I can find).
     owner_representative = fields.String(load_from='Owner Representative'.lower(), dump_to='owner_representative')
-    # For 800018475, the "Owner Representative" field maps to the property_manager_company in mf_subsidy_8_ac.csv.
-    # but for 800237654, it is the "Management Agent" field that maps to the property_manager_company in mf_subsidy_8_ac.csv.
-    non_profit = fields.Boolean(load_from='Non-Profit'.lower(), dump_to='non_profit', allow_none=True)
-    management_agent = fields.String(load_from='Management Agent'.lower(), dump_to='management_agent')
+    # Sometimes this is the same as the owner_organization_name, sometimes it matches the property_manager_company,
+    # but sometimes it's something else. This doesn't cleanly map to anything, so I'm leaving it as its own field.
+
+    #non_profit = fields.Boolean(load_from='Non-Profit'.lower(), load_only=True, allow_none=True) #, dump_to='is_non_profit'
+    is_non_profit = fields.String(load_from='Non-Profit'.lower(), load_only=True, allow_none=True) #, dump_to='is_non_profit'
+    owner_type = fields.String(dump_to='owner_type', allow_none=True)
+    management_agent = fields.String(load_from='Management Agent'.lower(), dump_to='property_manager_company') # These values
+    # match best (but not perfectly) with the property_management_company values obtained from mf_subsidy_8.
 
     class Meta:
         ordered = True
+
+    @pre_load
+    def set_owner_type(self, data):
+        f = 'non_profit'
+        if f in data and data[f] not in [None, '', ' ']:
+            if data[f] == 'X':
+                data['owner_type'] = 'Non-Profit'
 
     @pre_load
     def standardize_fha_loan_id(self, data):
@@ -150,7 +161,7 @@ class HFADemographics(pl.BaseSchema):
 
     @pre_load
     def boolify(self, data):
-        fs = ['physical', 'mental', 'homeless', 'non_profit']
+        fs = ['physical', 'mental', 'homeless'] #, 'non_profit']
         for f in fs:
             if f in data:
                 if data[f] is None:
