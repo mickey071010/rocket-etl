@@ -26,9 +26,9 @@ class HFALIHTCSchema(pl.BaseSchema):
     lihtc_units = fields.Integer(load_from='LIHTC Units'.lower(), dump_to='assisted_units')
     lihtc_allocation = fields.Integer(load_from='LIHTC Allocation'.lower(), dump_to='lihtc_allocation') # There can be multiple
     # LIHTC records in the PHFA data. For instance "CONSTANTIN BUILDING" has two records, and the LIHTC Allocation
-    # amounts add up to the lihtc_amount we have in lihtc_projects_pa.csv. 
+    # amounts add up to the lihtc_amount we have in lihtc_projects_pa.csv.
     # In this case, the lihtc_projects_pa value for lihtc_year_allocated is 1996,
-    # while the phfa-lihtc file has 1996 for the Allocation Year in one record and 1997 
+    # while the phfa-lihtc file has 1996 for the Allocation Year in one record and 1997
     # for the Allocation Year in another.
 
     # phfa-lihtc: Placed in Service = 1998 for both records
@@ -45,9 +45,9 @@ class HFALIHTCSchema(pl.BaseSchema):
     #                               ours (assisted_units = None), phfa-lihtc (LIHTC Units == 196).
     # Others where PHFA has more data in its record than we get from LIHTC:
     # 3RD EAST HILLS, ALLEGHENY COMMONS EAST, ALLEQUIPPA TERRACE PHASE 1B, CARSON RETIREMENT RESIDENCE
-    # 
+    #
     unit_restriction = fields.String(load_from='Unit Restriction'.lower(), dump_to='unit_restriction')
-    #"While there are other distinctions, any development financed by either the 9% or 4% tax credit 
+    #"While there are other distinctions, any development financed by either the 9% or 4% tax credit
     # must comply with federal income limits and set-aside rules (20% at 50% AMI or 40% at 60% AMI)."
 
     # "40  at 60" == "40% at 60% AMI"
