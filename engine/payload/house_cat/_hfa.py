@@ -98,9 +98,12 @@ class HFADemographics(pl.BaseSchema):
     legal_owner_entity = fields.String(load_from='Legal Owner Entity'.lower(), dump_to='owner_organization_name', allow_none=True)
     assisted_units = fields.Integer(load_from='Units'.lower(), dump_to='assisted_units') # This has been checked to match up with our "assisted_units" field for a few cases.
     individuals_with_a_occ_type = fields.String(load_from='individuals_with_a:_occtype', dump_to='demographic')
-    physical = fields.Boolean(load_from='Physical'.lower(), dump_to='physical', allow_none=False)
-    mental = fields.Boolean(load_from='Mental'.lower(), dump_to='mental', allow_none=False)
-    homeless = fields.Boolean(load_from='Homeless'.lower(), dump_to='homeless', allow_none=False)
+    physical = fields.Boolean(load_from='Physical'.lower(), dump_to='physical_disability_housing', allow_none=False) # The expansion to e.g.,
+    mental = fields.Boolean(load_from='Mental'.lower(), dump_to='mental_disability_housing', allow_none=False) # "physically_disability_housing"
+    homeless = fields.Boolean(load_from='Homeless'.lower(), dump_to='homeless_housing', allow_none=False) # is a guess at what the PHFA is thinking.
+    # These fields have strong but incomplete fit with the client_group_[name|type] fields, which have values like
+    # "Partially elderly handicapped", "Partially physically handicapped", "Wholly physically disabled",
+    # "Chronically Mentally Ill", but nothing about homelessness (that I can find).
     owner_representative = fields.String(load_from='Owner Representative'.lower(), dump_to='owner_representative')
     # For 800018475, the "Owner Representative" field maps to the property_manager_company in mf_subsidy_8_ac.csv.
     # but for 800237654, it is the "Management Agent" field that maps to the property_manager_company in mf_subsidy_8_ac.csv.
