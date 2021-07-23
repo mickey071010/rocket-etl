@@ -108,21 +108,24 @@ class HFADemographics(pl.BaseSchema):
     # Sometimes this is the same as the owner_organization_name, sometimes it matches the property_manager_company,
     # but sometimes it's something else. This doesn't cleanly map to anything, so I'm leaving it as its own field.
 
-    #non_profit = fields.Boolean(load_from='Non-Profit'.lower(), load_only=True, allow_none=True) #, dump_to='is_non_profit'
-    is_non_profit = fields.String(load_from='Non-Profit'.lower(), load_only=True, allow_none=True) #, dump_to='is_non_profit'
-    owner_type = fields.String(dump_to='owner_type', allow_none=True)
+    non_profit = fields.Boolean(load_from='Non-Profit'.lower(), load_only=True, allow_none=True) #, dump_to='is_non_profit'
+    #is_non_profit = fields.String(load_from='Non-Profit'.lower(), load_only=True, allow_none=True) # I tried merging the PHFA
+    #owner_type = fields.String(dump_to='owner_type', allow_none=True) # Non-Profit value into the owner_type but
+    # it didn't work so well. 1) It's not clear if it should be owner_type or property_manager_type. 2) The
+    # Non-Profit value conflicted with the existing owner_type in the one record that was checkable against
+    # mf_subsidy_8.
     management_agent = fields.String(load_from='Management Agent'.lower(), dump_to='property_manager_company') # These values
     # match best (but not perfectly) with the property_management_company values obtained from mf_subsidy_8.
 
     class Meta:
         ordered = True
 
-    @pre_load
-    def set_owner_type(self, data):
-        f = 'non_profit'
-        if f in data and data[f] not in [None, '', ' ']:
-            if data[f] == 'X':
-                data['owner_type'] = 'Non-Profit'
+    #@pre_load
+    #def set_owner_type(self, data):
+    #    f = 'non_profit'
+    #    if f in data and data[f] not in [None, '', ' ']:
+    #        if data[f] == 'X':
+    #            data['owner_type'] = 'Non-Profit'
 
     @pre_load
     def standardize_fha_loan_id(self, data):
@@ -161,7 +164,7 @@ class HFADemographics(pl.BaseSchema):
 
     @pre_load
     def boolify(self, data):
-        fs = ['physical', 'mental', 'homeless'] #, 'non_profit']
+        fs = ['physical', 'mental', 'homeless', 'non_profit']
         for f in fs:
             if f in data:
                 if data[f] is None:
