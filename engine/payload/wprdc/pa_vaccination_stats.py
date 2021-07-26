@@ -388,6 +388,67 @@ class AllocationByPharmacySchema(pl.BaseSchema):
         if data[f] is not None:
             data[f] = parser.parse(data[f]).date().isoformat()
 
+class ByZIPandAgeSchema(pl.BaseSchema):
+    job_code = 'by_zip_and_age'
+    date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/views/metadata/v1/23vq-vzvj")
+    date_updated = fields.Date(dump_only=True, dump_to='date_updated', default=date_updated_from_site)
+
+    patient_zip_code = fields.String(load_from='Patient Zip Code'.lower(), dump_to='patient_zip_code')
+    partially_covered_10_14 = fields.Integer(load_from='Partially Covered 10-14'.lower(), dump_to='partially_covered_10_14', allow_none=True)
+    partially_covered_15_19 = fields.Integer(load_from='Partially Covered 15-19'.lower(), dump_to='partially_covered_15_19', allow_none=True)
+    partially_covered_20_24 = fields.Integer(load_from='Partially Covered 20-24'.lower(), dump_to='partially_covered_20_24', allow_none=True)
+    partially_covered_25_29 = fields.Integer(load_from='Partially Covered 25-29'.lower(), dump_to='partially_covered_25_29', allow_none=True)
+    partially_covered_30_34 = fields.Integer(load_from='Partially Covered 30-34'.lower(), dump_to='partially_covered_30_34', allow_none=True)
+    partially_covered_35_39 = fields.Integer(load_from='Partially Covered 35-39'.lower(), dump_to='partially_covered_35_39', allow_none=True)
+    partially_covered_40_44 = fields.Integer(load_from='Partially Covered 40-44'.lower(), dump_to='partially_covered_40_44', allow_none=True)
+    partially_covered_45_49 = fields.Integer(load_from='Partially Covered 45-49'.lower(), dump_to='partially_covered_45_49', allow_none=True)
+    partially__covered_50_54 = fields.Integer(load_from='Partially  Covered 50-54'.lower(), dump_to='partially_covered_50_54', allow_none=True)
+    partially_covered_55_59 = fields.Integer(load_from='Partially Covered 55-59'.lower(), dump_to='partially_covered_55_59', allow_none=True)
+    partially_covered_60_64 = fields.Integer(load_from='Partially Covered 60-64'.lower(), dump_to='partially_covered_60_64', allow_none=True)
+    partially_covered_65_69 = fields.Integer(load_from='Partially Covered 65-69'.lower(), dump_to='partially_covered_65_69', allow_none=True)
+    partially_covered_70_74 = fields.Integer(load_from='Partially Covered 70-74'.lower(), dump_to='partially_covered_70_74', allow_none=True)
+    partially_covered_75_79 = fields.Integer(load_from='Partially Covered 75-79'.lower(), dump_to='partially_covered_75_79', allow_none=True)
+    partially_covered_80_84 = fields.Integer(load_from='Partially Covered 80-84'.lower(), dump_to='partially_covered_80_84', allow_none=True)
+    partially_covered_85_89 = fields.Integer(load_from='Partially Covered 85-89'.lower(), dump_to='partially_covered_85_89', allow_none=True)
+    partially_covered_90_94 = fields.Integer(load_from='Partially Covered 90-94'.lower(), dump_to='partially_covered_90_94', allow_none=True)
+    partially_covered_95_99 = fields.Integer(load_from='Partially Covered 95-99'.lower(), dump_to='partially_covered_95_99', allow_none=True)
+    partially_covered_100_104 = fields.Integer(load_from='Partially Covered 100-104'.lower(), dump_to='partially_covered_100_104', allow_none=True)
+    partially_covered_105_plus = fields.Integer(load_from='Partially Covered 105-Plus'.lower(), dump_to='partially_covered_105_plus', allow_none=True)
+    fully_covered_10_14 = fields.Integer(load_from='Fully Covered 10-14'.lower(), dump_to='fully_covered_10_14', allow_none=True)
+    fully_covered_15_19 = fields.Integer(load_from='Fully Covered 15-19'.lower(), dump_to='fully_covered_15_19', allow_none=True)
+    fully_covered_20_24 = fields.Integer(load_from='Fully Covered 20-24'.lower(), dump_to='fully_covered_20_24', allow_none=True)
+    fully_covered_25_29 = fields.Integer(load_from='Fully Covered 25-29'.lower(), dump_to='fully_covered_25_29', allow_none=True)
+    fully_covered_30_34 = fields.Integer(load_from='Fully Covered 30-34'.lower(), dump_to='fully_covered_30_34', allow_none=True)
+    fully_covered_35_39 = fields.Integer(load_from='Fully Covered 35-39'.lower(), dump_to='fully_covered_35_39', allow_none=True)
+    fully_covered_40_44 = fields.Integer(load_from='Fully Covered 40-44'.lower(), dump_to='fully_covered_40_44', allow_none=True)
+    fully_covered_45_49 = fields.Integer(load_from='Fully Covered 45-49'.lower(), dump_to='fully_covered_45_49', allow_none=True)
+    fully_covered_50_54 = fields.Integer(load_from='Fully Covered 50-54'.lower(), dump_to='fully_covered_50_54', allow_none=True)
+    fully_covered_55_59 = fields.Integer(load_from='Fully Covered 55-59'.lower(), dump_to='fully_covered_55_59', allow_none=True)
+    fully_covered_60_64 = fields.Integer(load_from='Fully Covered 60-64'.lower(), dump_to='fully_covered_60_64', allow_none=True)
+    fully_covered_65_69 = fields.Integer(load_from='Fully Covered 65-69'.lower(), dump_to='fully_covered_65_69', allow_none=True)
+    fully_covered_70_74 = fields.Integer(load_from='Fully Covered 70-74'.lower(), dump_to='fully_covered_70_74', allow_none=True)
+    fully_covered_75_79 = fields.Integer(load_from='Fully Covered 75-79'.lower(), dump_to='fully_covered_75_79', allow_none=True)
+    fully_covered_80_84 = fields.Integer(load_from='Fully Covered 80-84'.lower(), dump_to='fully_covered_80_84', allow_none=True)
+    fully_covered_85_89 = fields.Integer(load_from='Fully Covered 85-89'.lower(), dump_to='fully_covered_85_89', allow_none=True)
+    fully_covered_90_94 = fields.Integer(load_from='Fully Covered 90-94'.lower(), dump_to='fully_covered_90_94', allow_none=True)
+    fully_covered_95_99 = fields.Integer(load_from='Fully Covered 95-99'.lower(), dump_to='fully_covered_95_99', allow_none=True)
+    fully_covered_100_104 = fields.Integer(load_from='Fully Covered 100-104'.lower(), dump_to='fully_covered_100_104', allow_none=True)
+    fully_covered_105_plus = fields.Integer(load_from='Fully Covered 105-Plus'.lower(), dump_to='fully_covered_105_plus', allow_none=True)
+    georeferenced_latitude_longitude = fields.String(load_from='Georeferenced Latitude & Longitude'.lower(), load_only=True, allow_none=True)
+    latitude = fields.Float(load_from='Georeferenced Latitude & Longitude'.lower(), dump_to='latitude', allow_none=True)
+    longitude = fields.Float(dump_to='longitude', allow_none=True)
+
+    class Meta:
+        ordered = True
+
+    @pre_load
+    def fix_geocoordinates(self, data):
+        if data['georeferenced_latitude_&_longitude'] is not None:
+            s = re.sub('POINT \(', '', data['georeferenced_latitude_&_longitude'])
+            coords = re.sub('\)', '', s).split(' ')
+            data['latitude'] = coords[1]
+            data['longitude'] = coords[0]
+
 # dfg
 
 vaccinations_stats_archive_package_id = '5a3230bb-5a51-4eec-90bd-ec8796325216'
@@ -599,7 +660,20 @@ job_dicts = [
         'upload_method': 'insert',
         'resource_description': 'Archive of data from https://data.pa.gov/Health/COVID-19-Retail-Pharmacy-Partners-Vaccine-Allocati/vxbs-jbjq',
     },
-
+    {
+        'job_code': ByZIPandAgeSchema().job_code, # 'by_zip_and_age'
+        'source_type': 'http',
+        'source_file': 'COVID-19_Vaccinations_by_Zip_Code_by_Age_Group_Current_Health.csv',
+        'source_full_url': 'https://data.pa.gov/api/views/23vq-vzvj/rows.csv?accessType=DOWNLOAD&api_foundry=true',
+        'schema': ByZIPandAgeSchema,
+        'primary_key_fields': ['date_updated', 'patient_zip_code'],
+        'destination': 'ckan',
+        'destination_file': 'vaccinations_by_zip_and_age.csv',
+        'package': vaccinations_stats_archive_package_id,
+        'resource_name': 'COVID-19 Vaccinations by Zip Code by Age Group Current Health (archive)',
+        'upload_method': 'upsert',
+        'resource_description': 'Archive of data from https://data.pa.gov/Covid-19/COVID-19-Vaccinations-by-Zip-Code-by-Age-Group-Cur/23vq-vzvj',
+    },
 ]
 
 assert len(job_dicts) == len({d['job_code'] for d in job_dicts}) # Verify that all job codes are unique.
