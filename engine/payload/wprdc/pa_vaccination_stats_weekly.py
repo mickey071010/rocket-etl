@@ -9,7 +9,10 @@ from engine.wprdc_etl import pipeline as pl
 from engine.notify import send_to_slack
 from engine.parameters.local_parameters import SOURCE_DIR
 
-from engine.payload.wprdc.pa_vaccination_stats import ByZIPandAgeSchema
+from engine.payload.wprdc.pa_vaccination_stats import (ByZIPandAgeSchema,
+    ByZIPandCoverageSchema, ByZIPandEthnicitySchema,
+    ByZIPandGenderSchema, ByZIPandRaceSchema,
+    )
 
 try:
     from icecream import ic
@@ -421,6 +424,18 @@ class AllocationByPharmacySchema(pl.BaseSchema):
 class WeeklyByZIPandAgeSchema(ByZIPandAgeSchema):
     date_saved = fields.Date(dump_only=True, dump_to='date_saved', default=datetime.now().date().isoformat())
 
+class WeeklyByZIPandCoverageSchema(ByZIPandCoverageSchema):
+    date_saved = fields.Date(dump_only=True, dump_to='date_saved', default=datetime.now().date().isoformat())
+
+class WeeklyByZIPandEthnicitySchema(ByZIPandEthnicitySchema):
+    date_saved = fields.Date(dump_only=True, dump_to='date_saved', default=datetime.now().date().isoformat())
+
+class WeeklyByZIPandGenderSchema(ByZIPandGenderSchema):
+    date_saved = fields.Date(dump_only=True, dump_to='date_saved', default=datetime.now().date().isoformat())
+
+class WeeklyByZIPandRaceSchema(ByZIPandRaceSchema):
+    date_saved = fields.Date(dump_only=True, dump_to='date_saved', default=datetime.now().date().isoformat())
+
 # dfg
 
 vaccinations_stats_weekly_archive_package_id = '78dfb4f8-2ad5-4a7c-af4c-a5982e475a8a'
@@ -646,7 +661,62 @@ job_dicts = [
         'upload_method': 'upsert',
         'resource_description': 'Archive of data from https://data.pa.gov/Covid-19/COVID-19-Vaccinations-by-Zip-Code-by-Age-Group-Cur/23vq-vzvj',
     },
-
+    {
+        'job_code': WeeklyByZIPandCoverageSchema().job_code, # 'by_zip_and_coverage'
+        'source_type': 'http',
+        'source_file': 'COVID-19_Vaccinations_by_Zip_Code_by_Coverage_Current_Health.csv',
+        'source_full_url': 'https://data.pa.gov/api/views/d63n-ygar/rows.csv?accessType=DOWNLOAD&api_foundry=true',
+        'schema': WeeklyByZIPandCoverageSchema,
+        'primary_key_fields': ['date_saved', 'patient_zip_code'],
+        'destination': 'ckan',
+        'destination_file': 'weekly_vaccinations_by_zip_and_coverage.csv',
+        'package': vaccinations_stats_weekly_archive_package_id,
+        'resource_name': 'COVID-19 Vaccinations by Zip Code by Coverage Current Health (archive)',
+        'upload_method': 'upsert',
+        'resource_description': 'Archive of data from https://data.pa.gov/Covid-19/COVID-19-Vaccinations-by-Zip-Code-by-Coverage-Curr/d63n-ygar',
+    },
+    {
+        'job_code': WeeklyByZIPandEthnicitySchema().job_code, # 'by_zip_and_ethnicity'
+        'source_type': 'http',
+        'source_file': 'COVID-19_Vaccinations_by_Zip_Code_by_Ethnicity_Current_Health.csv',
+        'source_full_url': 'https://data.pa.gov/api/views/r2jr-ys6g/rows.csv?accessType=DOWNLOAD&api_foundry=true',
+        'schema': WeeklyByZIPandEthnicitySchema,
+        'primary_key_fields': ['date_saved', 'patient_zip_code'],
+        'destination': 'ckan',
+        'destination_file': 'weekly_vaccinations_by_zip_and_ethnicity.csv',
+        'package': vaccinations_stats_weekly_archive_package_id,
+        'resource_name': 'COVID-19 Vaccinations by Zip Code by Ethnicity Current Health (archive)',
+        'upload_method': 'upsert',
+        'resource_description': 'Archive of data from https://data.pa.gov/Covid-19/COVID-19-Vaccinations-by-Zip-Code-by-Ethnicity-Cur/r2jr-ys6g',
+    },
+    {
+        'job_code': WeeklyByZIPandGenderSchema().job_code, # 'by_zip_and_gender'
+        'source_type': 'http',
+        'source_file': 'COVID-19_Vaccinations_by_Zip_Code_by_Gender_Current_Health.csv',
+        'source_full_url': 'https://data.pa.gov/api/views/x2ja-pwvy/rows.csv?accessType=DOWNLOAD&api_foundry=true',
+        'schema': WeeklyByZIPandGenderSchema,
+        'primary_key_fields': ['date_saved', 'patient_zip_code'],
+        'destination': 'ckan',
+        'destination_file': 'weekly_vaccinations_by_zip_and_gender.csv',
+        'package': vaccinations_stats_weekly_archive_package_id,
+        'resource_name': 'COVID-19 Vaccinations by Zip Code by Gender Current Health (archive)',
+        'upload_method': 'upsert',
+        'resource_description': 'Archive of data from https://data.pa.gov/Covid-19/COVID-19-Vaccinations-by-Zip-Code-by-Gender-Curren/x2ja-pwvy',
+    },
+    {
+        'job_code': WeeklyByZIPandRaceSchema().job_code, # 'by_zip_and_race'
+        'source_type': 'http',
+        'source_file': 'COVID-19_Vaccinations_by_Zip_Code_by_Race_Current_Health.csv',
+        'source_full_url': 'https://data.pa.gov/api/views/g743-p9su/rows.csv?accessType=DOWNLOAD&api_foundry=true',
+        'schema': WeeklyByZIPandRaceSchema,
+        'primary_key_fields': ['date_saved', 'patient_zip_code'],
+        'destination': 'ckan',
+        'destination_file': 'weekly_vaccinations_by_zip_and_race.csv',
+        'package': vaccinations_stats_weekly_archive_package_id,
+        'resource_name': 'COVID-19 Vaccinations by Zip Code by Race Current Health (archive)',
+        'upload_method': 'upsert',
+        'resource_description': 'Archive of data from https://data.pa.gov/Covid-19/COVID-19-Vaccinations-by-Zip-Code-by-Race-Current-/g743-p9su',
+    },
 ]
 
 assert len(job_dicts) == len({d['job_code'] for d in job_dicts}) # Verify that all job codes are unique.

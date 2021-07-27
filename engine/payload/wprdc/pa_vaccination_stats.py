@@ -449,6 +449,122 @@ class ByZIPandAgeSchema(pl.BaseSchema):
             data['latitude'] = coords[1]
             data['longitude'] = coords[0]
 
+class ByZIPandCoverageSchema(pl.BaseSchema):
+    job_code = 'by_zip_and_coverage'
+    date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/views/metadata/v1/d63n-ygar")
+    date_updated = fields.Date(dump_only=True, dump_to='date_updated', default=date_updated_from_site)
+
+    patient_zip_code = fields.String(load_from='Patient Zip Code'.lower(), dump_to='patient_zip_code')
+    partially_covered = fields.Integer(load_from='Partially Covered'.lower(), dump_to='partially_covered', allow_none=True)
+    fully_covered = fields.Integer(load_from='Fully Covered'.lower(), dump_to='fully_covered', allow_none=True)
+    #georeferenced_latitude___longitude = fields.String(load_from='Georeferenced Latitude & Longitude'.lower(), dump_to='georeferenced_latitude_longitude', allow_none=True)
+    georeferenced_latitude_longitude = fields.String(load_from='Georeferenced Latitude & Longitude'.lower(), load_only=True, allow_none=True)
+    latitude = fields.Float(load_from='Georeferenced Latitude & Longitude'.lower(), dump_to='latitude', allow_none=True)
+    longitude = fields.Float(dump_to='longitude', allow_none=True)
+
+    class Meta:
+        ordered = True
+
+    @pre_load
+    def fix_geocoordinates(self, data):
+        if data['georeferenced_latitude_&_longitude'] is not None:
+            s = re.sub('POINT \(', '', data['georeferenced_latitude_&_longitude'])
+            coords = re.sub('\)', '', s).split(' ')
+            data['latitude'] = coords[1]
+            data['longitude'] = coords[0]
+
+class ByZIPandEthnicitySchema(pl.BaseSchema):
+    job_code = 'by_zip_and_ethnicity'
+    date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/views/metadata/v1/r2jr-ys6g")
+    date_updated = fields.Date(dump_only=True, dump_to='date_updated', default=date_updated_from_site)
+
+    patient_zip_code = fields.String(load_from='Patient Zip Code'.lower(), dump_to='patient_zip_code')
+    partially_covered_hispanic = fields.Integer(load_from='Partially Covered Hispanic'.lower(), dump_to='partially_covered_hispanic', allow_none=True)
+    partially_covered_not_hispanic = fields.Integer(load_from='Partially Covered Not Hispanic'.lower(), dump_to='partially_covered_not_hispanic', allow_none=True)
+    partially_covered_unknown = fields.Integer(load_from='Partially Covered Unknown'.lower(), dump_to='partially_covered_unknown', allow_none=True)
+    fully_covered_hispanic = fields.Integer(load_from='Fully Covered Hispanic'.lower(), dump_to='fully_covered_hispanic', allow_none=True)
+    fully_covered_not_hispanic = fields.Integer(load_from='Fully Covered Not Hispanic'.lower(), dump_to='fully_covered_not_hispanic', allow_none=True)
+    fully_covered_unknown = fields.Integer(load_from='Fully Covered Unknown'.lower(), dump_to='fully_covered_unknown', allow_none=True)
+
+    georeferenced_latitude_longitude = fields.String(load_from='Georeference Latitude & Longitude'.lower(), load_only=True, allow_none=True)
+    latitude = fields.Float(load_from='Georeference Latitude & Longitude'.lower(), dump_to='latitude', allow_none=True)
+    longitude = fields.Float(dump_to='longitude', allow_none=True)
+
+    class Meta:
+        ordered = True
+
+    @pre_load
+    def fix_geocoordinates_with_misspelled_field_name(self, data):
+        if data['georeference_latitude_&_longitude'] is not None:
+            s = re.sub('POINT \(', '', data['georeference_latitude_&_longitude'])
+            coords = re.sub('\)', '', s).split(' ')
+            data['latitude'] = coords[1]
+            data['longitude'] = coords[0]
+
+class ByZIPandGenderSchema(pl.BaseSchema):
+    job_code = 'by_zip_and_gender'
+    date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/views/metadata/v1/x2ja-pwvy")
+    date_updated = fields.Date(dump_only=True, dump_to='date_updated', default=date_updated_from_site)
+
+    patient_zip_code = fields.String(load_from='Patient Zip Code '.lower(), dump_to='patient_zip_code')
+    partially_covered_female = fields.Integer(load_from='Partially Covered Female'.lower(), dump_to='partially_covered_female', allow_none=True)
+    partially_covered_male = fields.Integer(load_from='Partially Covered Male'.lower(), dump_to='partially_covered_male', allow_none=True)
+    partially_covered_unknown = fields.Integer(load_from='Partially Covered Unknown'.lower(), dump_to='partially_covered_unknown', allow_none=True)
+    fully_covered_female = fields.Integer(load_from='Fully Covered Female'.lower(), dump_to='fully_covered_female', allow_none=True)
+    fully_covered_male = fields.Integer(load_from='Fully Covered Male'.lower(), dump_to='fully_covered_male', allow_none=True)
+    fully_covered_unknown = fields.Integer(load_from='Fully Covered Unknown'.lower(), dump_to='fully_covered_unknown', allow_none=True)
+    georeferenced_point = fields.String(load_from='Georeferenced point'.lower(), dump_to='georeferenced_point', allow_none=True)
+
+    latitude = fields.Float(load_from='Georeferenced point'.lower(), dump_to='latitude', allow_none=True)
+    longitude = fields.Float(dump_to='longitude', allow_none=True)
+
+    class Meta:
+        ordered = True
+
+    @pre_load
+    def fix_geocoordinates_with_oddball_field_name(self, data):
+        if data['georeferenced_point'] is not None:
+            s = re.sub('POINT \(', '', data['georeferenced_point'])
+            coords = re.sub('\)', '', s).split(' ')
+            data['latitude'] = coords[1]
+            data['longitude'] = coords[0]
+
+class ByZIPandRaceSchema(pl.BaseSchema):
+    job_code = 'by_zip_and_race'
+    date_updated_from_site = get_socrata_updated_date("https://data.pa.gov/api/views/metadata/v1/g743-p9su")
+    date_updated = fields.Date(dump_only=True, dump_to='date_updated', default=date_updated_from_site)
+
+    patient_zip_code = fields.String(load_from='Patient Zip Code'.lower(), dump_to='patient_zip_code')
+    partially_covered_african_american = fields.Integer(load_from='Partially Covered African American'.lower(), dump_to='partially_covered_african_american', allow_none=True)
+    partially_covered_asian = fields.Integer(load_from='Partially Covered Asian'.lower(), dump_to='partially_covered_asian', allow_none=True)
+    partially_covered_native_american = fields.Integer(load_from='Partially Covered Native American'.lower(), dump_to='partially_covered_native_american', allow_none=True)
+    partially_covered_pacific_islander = fields.Integer(load_from='Partially Covered Pacific Islander'.lower(), dump_to='partially_covered_pacific_islander', allow_none=True)
+    partially_covered_multiple_other = fields.Integer(load_from='Partially Covered Multiple Other'.lower(), dump_to='partially_covered_multiple_other', allow_none=True)
+    partially_covered_white = fields.Integer(load_from='Partially Covered White'.lower(), dump_to='partially_covered_white', allow_none=True)
+    partially_covered_unknown = fields.Integer(load_from='Partially Covered Unknown'.lower(), dump_to='partially_covered_unknown', allow_none=True)
+    fully_covered_african_american = fields.Integer(load_from='Fully Covered African American'.lower(), dump_to='fully_covered_african_american', allow_none=True)
+    fully_covered_asian = fields.Integer(load_from='Fully Covered Asian'.lower(), dump_to='fully_covered_asian', allow_none=True)
+    fully_covered_native_american = fields.Integer(load_from='Fully Covered Native American'.lower(), dump_to='fully_covered_native_american', allow_none=True)
+    fully_covered_pacific_islander = fields.Integer(load_from='Fully Covered Pacific Islander'.lower(), dump_to='fully_covered_pacific_islander', allow_none=True)
+    fully_covered_multiple_other = fields.Integer(load_from='Fully Covered Multiple Other'.lower(), dump_to='fully_covered_multiple_other', allow_none=True)
+    fully_covered_white = fields.Integer(load_from='Fully Covered White'.lower(), dump_to='fully_covered_white', allow_none=True)
+    fully_covered_unknown = fields.Integer(load_from='Fully Covered Unknown'.lower(), dump_to='fully_covered_unknown', allow_none=True)
+    georeferenced_latitude___longitude = fields.String(load_from='Georeferenced Latitude & Longitude'.lower(), load_only=True, allow_none=True)
+
+    latitude = fields.Float(dump_to='latitude', allow_none=True)
+    longitude = fields.Float(dump_to='longitude', allow_none=True)
+
+    class Meta:
+        ordered = True
+
+    @pre_load
+    def fix_geocoordinates(self, data):
+        if data['georeferenced_latitude_&_longitude'] is not None:
+            s = re.sub('POINT \(', '', data['georeferenced_latitude_&_longitude'])
+            coords = re.sub('\)', '', s).split(' ')
+            data['latitude'] = coords[1]
+            data['longitude'] = coords[0]
+
 # dfg
 
 vaccinations_stats_archive_package_id = '5a3230bb-5a51-4eec-90bd-ec8796325216'
@@ -673,6 +789,62 @@ job_dicts = [
         'resource_name': 'COVID-19 Vaccinations by Zip Code by Age Group Current Health (archive)',
         'upload_method': 'upsert',
         'resource_description': 'Archive of data from https://data.pa.gov/Covid-19/COVID-19-Vaccinations-by-Zip-Code-by-Age-Group-Cur/23vq-vzvj',
+    },
+    {
+        'job_code': ByZIPandCoverageSchema().job_code, # 'by_zip_and_coverage'
+        'source_type': 'http',
+        'source_file': 'COVID-19_Vaccinations_by_Zip_Code_by_Coverage_Current_Health.csv',
+        'source_full_url': 'https://data.pa.gov/api/views/d63n-ygar/rows.csv?accessType=DOWNLOAD&api_foundry=true',
+        'schema': ByZIPandCoverageSchema,
+        'primary_key_fields': ['date_updated', 'patient_zip_code'],
+        'destination': 'ckan',
+        'destination_file': 'vaccinations_by_zip_and_coverage.csv',
+        'package': vaccinations_stats_archive_package_id,
+        'resource_name': 'COVID-19 Vaccinations by Zip Code by Coverage Current Health (archive)',
+        'upload_method': 'upsert',
+        'resource_description': 'Archive of data from https://data.pa.gov/Covid-19/COVID-19-Vaccinations-by-Zip-Code-by-Coverage-Curr/d63n-ygar',
+    },
+    {
+        'job_code': ByZIPandEthnicitySchema().job_code, # 'by_zip_and_ethnicity'
+        'source_type': 'http',
+        'source_file': 'COVID-19_Vaccinations_by_Zip_Code_by_Ethnicity_Current_Health.csv',
+        'source_full_url': 'https://data.pa.gov/api/views/r2jr-ys6g/rows.csv?accessType=DOWNLOAD&api_foundry=true',
+        'schema': ByZIPandEthnicitySchema,
+        'primary_key_fields': ['date_updated', 'patient_zip_code'],
+        'destination': 'ckan',
+        'destination_file': 'vaccinations_by_zip_and_ethnicity.csv',
+        'package': vaccinations_stats_archive_package_id,
+        'resource_name': 'COVID-19 Vaccinations by Zip Code by Ethnicity Current Health (archive)',
+        'upload_method': 'upsert',
+        'resource_description': 'Archive of data from https://data.pa.gov/Covid-19/COVID-19-Vaccinations-by-Zip-Code-by-Ethnicity-Cur/r2jr-ys6g',
+    },
+    {
+        'job_code': ByZIPandGenderSchema().job_code, # 'by_zip_and_gender'
+        'source_type': 'http',
+        'source_file': 'COVID-19_Vaccinations_by_Zip_Code_by_Gender_Current_Health.csv',
+        'source_full_url': 'https://data.pa.gov/api/views/x2ja-pwvy/rows.csv?accessType=DOWNLOAD&api_foundry=true',
+        'schema': ByZIPandGenderSchema,
+        'primary_key_fields': ['date_updated', 'patient_zip_code'],
+        'destination': 'ckan',
+        'destination_file': 'vaccinations_by_zip_and_gender.csv',
+        'package': vaccinations_stats_archive_package_id,
+        'resource_name': 'COVID-19 Vaccinations by Zip Code by Gender Current Health (archive)',
+        'upload_method': 'upsert',
+        'resource_description': 'Archive of data from https://data.pa.gov/Covid-19/COVID-19-Vaccinations-by-Zip-Code-by-Gender-Curren/x2ja-pwvy',
+    },
+    {
+        'job_code': ByZIPandRaceSchema().job_code, # 'by_zip_and_race'
+        'source_type': 'http',
+        'source_file': 'COVID-19_Vaccinations_by_Zip_Code_by_Race_Current_Health.csv',
+        'source_full_url': 'https://data.pa.gov/api/views/g743-p9su/rows.csv?accessType=DOWNLOAD&api_foundry=true',
+        'schema': ByZIPandRaceSchema,
+        'primary_key_fields': ['date_updated', 'patient_zip_code'],
+        'destination': 'ckan',
+        'destination_file': 'vaccinations_by_zip_and_race.csv',
+        'package': vaccinations_stats_archive_package_id,
+        'resource_name': 'COVID-19 Vaccinations by Zip Code by Race Current Health (archive)',
+        'upload_method': 'upsert',
+        'resource_description': 'Archive of data from https://data.pa.gov/Covid-19/COVID-19-Vaccinations-by-Zip-Code-by-Race-Current-/g743-p9su',
     },
 ]
 
