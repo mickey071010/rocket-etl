@@ -310,7 +310,7 @@ class CenterlinesSchema(pl.BaseSchema):
     a1 = fields.String(load_from='A1'.lower(), dump_to='a1', allow_none=True)
     a2 = fields.String(load_from='A2'.lower(), dump_to='a2', allow_none=True)
     source = fields.String(load_from='SOURCE'.lower(), dump_to='source', allow_none=True)
-    full_name = fields.String(load_from='FULL_NAME'.lower(), dump_to='full_name')
+    full_name = fields.String(load_from='FULL_NAME'.lower(), dump_to='full_name', allow_none=True)
     edit_user = fields.String(load_from='EDIT_USER'.lower(), dump_to='edit_user', allow_none=True)
     edit_date = fields.String(load_from='EDIT_DATE'.lower(), dump_to='edit_date')
     #global_id = fields.String(load_from='GlobalID'.lower(), dump_to='global_id')
