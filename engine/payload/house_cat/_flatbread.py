@@ -681,31 +681,31 @@ class LIHTCSchema(pl.BaseSchema):
 
     @post_load
     def decode_fields(self, data):
-        f = 'lihtc_construction_type'
-        if f in data and data[f] is not None:
+        e = 'construction_type'
+        if e in data and data[e] is not None:
             construction_type_lookup = {'1': 'New construction',
                     '2': 'Acquisition and Rehab',
                     '3': 'Both new construction and A/R',
                     '4': 'Existing',
                     '': None}
-            if data[f] in construction_type_lookup:
-                data[f] = construction_type_lookup[data[f]]
-        f = 'lihtc_credit'
-        if f in data and data[f] is not None:
+            if data[e] in construction_type_lookup:
+                data[e] = construction_type_lookup[data[e]]
+        e = 'credit'
+        if e in data and data[e] is not None:
             credit_type_lookup = {'1': '30 percent present value',
                     '2': '70 percent present value',
                     '3': 'Both',
                     '4': 'Tax Credit Exchange Program only',
                     '': None}
-            if data[f] in credit_type_lookup:
-                data[f] = credit_type_lookup[data[f]]
-        f = 'scattered_site_cd'
-        if f in data and data[f] is not None:
+            if data[e] in credit_type_lookup:
+                data[e] = credit_type_lookup[data[e]]
+        e = 'scattered_site_cd'
+        if e in data and data[e] is not None:
             lookup = {'1': 'Y',
                     '2': 'N',
                     '': None}
-            if data[f] in lookup:
-                data[f] = lookup[data[f]]
+            if data[e] in lookup:
+                data[e] = lookup[data[e]]
 
     @pre_load
     def transform_ints_to_strings(self, data):
