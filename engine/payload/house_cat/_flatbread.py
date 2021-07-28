@@ -209,7 +209,7 @@ class HUDPublicHousingSchema(pl.BaseSchema):
     state = fields.String(load_from='STD_ST'.lower(), dump_to='state')
     zip_code = fields.String(load_from='STD_ZIP5'.lower(), dump_to='zip_code')
     units = fields.Integer(load_from='TOTAL_UNITS'.lower(), dump_to='units')
-    owner_name = fields.String(load_from='FORMAL_PARTICIPANT_NAME'.lower(), dump_to='owner_name')
+    owner_name = fields.String(load_from='FORMAL_PARTICIPANT_NAME'.lower(), dump_to='owner_organization_name')
 
     # Public-Housing-Project-specific fields
     participant_code = fields.String(load_from='PARTICIPANT_CODE'.lower(), dump_to='participant_code')
@@ -222,7 +222,8 @@ class HUDPublicHousingSchema(pl.BaseSchema):
     acc_units = fields.Integer(load_from='ACC_UNITS'.lower(), dump_to='acc_units')
     total_occupied = fields.Integer(load_from='TOTAL_OCCUPIED'.lower(), dump_to='total_occupied')
     regular_vacant = fields.Integer(load_from='REGULAR_VACANT'.lower(), dump_to='regular_vacant')
-    total_units = fields.Integer(load_from='TOTAL_UNITS'.lower(), dump_to='total_units')
+    #total_units = fields.Integer(load_from='TOTAL_UNITS'.lower(), dump_to='total_units') # This is just the same as the 'units' field.
+    # But check that the 'units' value gets correctly loaded.
     pha_total_units = fields.Integer(load_from='PHA_TOTAL_UNITS'.lower(), dump_to='pha_total_units')
     percent_occupied = fields.String(load_from='PCT_OCCUPIED'.lower(), dump_to='percent_occupied', allow_none=True)
     people_per_unit = fields.Float(load_from='PEOPLE_PER_UNIT'.lower(), dump_to='people_per_unit', allow_none=True)
@@ -283,8 +284,8 @@ class HUDPublicHousingBuildingsSchema(HUDPublicHousingSchema):
 class MultifamilyProjectsSubsidySection8Schema(pl.BaseSchema):
     job_code = 'mf_subsidy_8'
     property_id = fields.String(load_from='property_id'.lower(), dump_to='property_id')
-    county_code = fields.String(load_from='county_code'.lower(), dump_to='county_code')
-    county_name_text = fields.String(load_from='county_name_text'.lower(), dump_to='county_name_text')
+    county_code = fields.String(load_from='county_code'.lower(), dump_to='county_fips_code')
+    county_name_text = fields.String(load_from='county_name_text'.lower(), dump_to='county')
     congressional_district_code = fields.String(load_from='congressional_district_code'.lower(), dump_to='congressional_district_code', allow_none=True)
     placed_base_city_name_text = fields.String(load_from='placed_base_city_name_text'.lower(), dump_to='municipality_name', allow_none=True)
     property_name_text = fields.String(load_from='property_name_text'.lower(), dump_to='hud_property_name')
@@ -304,12 +305,12 @@ class MultifamilyProjectsSubsidySection8Schema(pl.BaseSchema):
     #owner_zip_code = fields.String(load_from='owner_zip_code'.lower(), dump_to='owner_zip_code')
     owner_main_phone_number_text = fields.String(load_from='owner_main_phone_number_text'.lower(), dump_to='owner_phone', allow_none=True)
     owner_company_type = fields.String(load_from='owner_company_type'.lower(), dump_to='owner_type', allow_none=True)
-    ownership_effective_date = fields.Date(load_from='ownership_effective_date'.lower(), dump_to='ownership_effective_date', allow_none=True)
+    ownership_effective_date = fields.Date(load_from='ownership_effective_date'.lower(), dump_to='owner_effective_date', allow_none=True)
     owner_participant_id = fields.Integer(load_from='owner_participant_id'.lower(), dump_to='owner_id')
 
     mgmt_agent_full_name = fields.String(load_from='mgmt_agent_full_name'.lower(), dump_to='property_manager_name', allow_none=True)
     mgmt_agent_org_name = fields.String(load_from='mgmt_agent_org_name'.lower(), dump_to='property_manager_company', allow_none=True)
-    mgmt_agent_address = fields.String(load_from='mgmt_agent_address_line1'.lower(), dump_to='mgmt_agent_address', allow_none=True)
+    mgmt_agent_address = fields.String(load_from='mgmt_agent_address_line1'.lower(), dump_to='property_manager_address', allow_none=True)
     #mgmt_agent_address_line1 = fields.String(load_from='mgmt_agent_address_line1'.lower(), dump_to='mgmt_agent_address_line1')
     #mgmt_agent_address_line2 = fields.String(load_from='mgmt_agent_address_line2'.lower(), dump_to='mgmt_agent_address_line2')
     #mgmt_agent_city_name = fields.String(load_from='mgmt_agent_city_name'.lower(), dump_to='mgmt_agent_city_name')
@@ -346,7 +347,10 @@ class MultifamilyProjectsSubsidySection8Schema(pl.BaseSchema):
                 'owner_main_phone_number_text', 'placed_base_city_name_text']
         for f in fields:
             if data[f] is not None:
-                data[f] = str(data[f])
+                if f == 'county_code': # Standardize county_fips_code.
+                    data[f] = str(42000 + data[f])
+                else:
+                    data[f] = str(data[f])
 
     @pre_load
     def form_addresses(self, data):
@@ -359,7 +363,9 @@ class MultifamilyProjectsSection8ContractsSchema(pl.BaseSchema):
     job_code = 'mf_contracts_8'
     property_id = fields.String(load_from='property_id'.lower(), dump_to='property_id')
     property_name_text = fields.String(load_from='property_name_text'.lower(), dump_to='hud_property_name')
-    assisted_units_count = fields.Integer(load_from='assisted_units_count'.lower(), dump_to='assisted_units')
+    assisted_units_count = fields.Integer(load_from='assisted_units_count'.lower(), dump_to='assisted_units') # In the schema, we
+    # also have assisted_units_count under subsidy information, but it seems best to consolidate all the assisted_units
+    # counts in one field in the overall Field Mapping.
     count_0br = fields.Integer(load_from='0BR_count'.lower(), dump_to='count_0br', allow_none=True)
     count_1br = fields.Integer(load_from='1BR_count'.lower(), dump_to='count_1br', allow_none=True)
     count_2br = fields.Integer(load_from='2BR_count'.lower(), dump_to='count_2br', allow_none=True)
@@ -550,7 +556,7 @@ class MultifamilyGuaranteedLoansSchema(pl.BaseSchema):
     primary_fha_number = fields.String(load_from='PRIMARY_FHA_NUMBER'.lower(), dump_to='fha_loan_id')
     associated_fha_number = fields.String(load_from='ASSOCIATED_FHA_NUMBER'.lower(), dump_to='associated_fha_loan_id')
     initial_endorsement_date = fields.Date(load_from='INITIAL_ENDORSEMENT_DATE'.lower(), dump_to='initial_endorsement_date', allow_none=True)
-    original_loan_amount = fields.Integer(load_from='ORIGINAL_LOAN_AMOUNT'.lower(), dump_to='original_loan_amount')
+    original_loan_amount = fields.Integer(load_from='ORIGINAL_LOAN_AMOUNT'.lower(), dump_to='original_mortgage_amount')
     loan_maturity_date = fields.Date(load_from='LOAN_MATURITY_DATE'.lower(), dump_to='maturity_date', allow_none=True)
     program_type1 = fields.String(load_from='PROGRAM_TYPE1'.lower(), dump_to='program_category', allow_none=True)
     program_type2 = fields.String(load_from='PROGRAM_TYPE2'.lower(), dump_to='program_category_2', allow_none=True)
@@ -608,7 +614,7 @@ class LIHTCSchema(pl.BaseSchema):
     longitude = fields.Float(load_from='longitude'.lower(), dump_to='longitude', allow_none=True)
 
     fips2010 = fields.String(load_from='fips2010'.lower(), dump_to='census_tract')
-    fips2000 = fields.String(load_from='fips2000'.lower(), dump_to='fips2000') # Included because it can often
+    fips2000 = fields.String(load_from='fips2000'.lower(), dump_to='census_tract_2000') # Included because it can often
     # have the correct code when the 2010 version includes a long XXXXXXX string.
     county_fips_code = fields.String(load_from='fips2010'.lower(), dump_to='county_fips_code')
     place2010 = fields.Integer(load_from='place2010'.lower(), dump_to='municipality_fips', allow_none=True)
@@ -636,11 +642,11 @@ class LIHTCSchema(pl.BaseSchema):
     lihtc_federal_id = fields.String(load_from='hud_id'.lower(), dump_to='federal_id')
     state_id = fields.String(load_from='state_id'.lower(), dump_to='state_id', allow_none=True)
     normalized_state_id = fields.String(load_from='state_id'.lower(), dump_to='normalized_state_id', allow_none=True)
-    credit = fields.Integer(load_from='credit'.lower(), dump_to='lihtc_credit', allow_none=True)
+    credit = fields.String(load_from='credit'.lower(), dump_to='lihtc_credit', allow_none=True)
 
     construction_type = fields.String(load_from='type'.lower(), dump_to='lihtc_construction_type', allow_none=True)
     yr_alloc = fields.Integer(load_from='yr_alloc'.lower(), dump_to='lihtc_year_allocated')
-    yr_pis = fields.Integer(load_from='yr_pis'.lower(), dump_to='lihtc_year_placed_into_service')
+    yr_pis = fields.Integer(load_from='yr_pis'.lower(), dump_to='lihtc_year_in_service')
     allocamt = fields.String(load_from='allocamt'.lower(), dump_to='lihtc_amount', allow_none=True)
     fmha_514 = fields.Boolean(load_from='fmha_514'.lower(), dump_to='fmha_514_loan', allow_none=True)
     fmha_515 = fields.Boolean(load_from='fmha_515'.lower(), dump_to='fmha_515_loan', allow_none=True)
@@ -721,8 +727,8 @@ class LIHTCSchema(pl.BaseSchema):
     @post_load
     def truncate_to_county_fips_code(self, data):
         # In many cases where the county_fips_code is 42XXX, if the fips2000
-        # code is used instead of the fips2010 code, a better determination
-        # of the county can be made.
+        # code (census_tract_2000) is used instead of the fips2010 code, a
+        # better determination of the county can be made.
         f = 'county_fips_code'
         if data[f] is not None:
             data[f] = str(data[f])[:5]
