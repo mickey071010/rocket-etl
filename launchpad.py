@@ -39,6 +39,110 @@ def import_module(path,name):
 #                destination_file (a file name that overrides just using the source_file name in the
 #                  output_files/ directory)
 
+def parse_args(args, job_dicts, payload_location, module_name):
+    copy_of_args = list(args)
+    mute_alerts = False
+    use_local_input_file = False
+    use_local_output_file = False
+    clear_first = False
+    wipe_data = False
+    migrate_schema = False
+    ignore_empty_rows = False
+    retry_without_last_line = False
+    logging = False
+    test_mode = not PRODUCTION # Use PRODUCTION boolean from parameters/local_parameters.py to set whether test_mode defaults to True or False
+    wake_me_when_found = False
+    selected_job_codes = []
+
+    for k,arg in enumerate(copy_of_args):
+        if arg in ['mute']:
+            mute_alerts = True
+            args.remove(arg)
+        elif arg in ['local', 'from_file', 'local_input']:
+            use_local_input_file = True
+            args.remove(arg)
+        elif arg in ['to_local', 'to_file', 'local_output']:
+            use_local_output_file = True
+            args.remove(arg)
+        elif arg in ['clear_first']:
+            clear_first = True
+            args.remove(arg)
+        elif arg in ['wipe_data']:
+            wipe_data = True
+            args.remove(arg)
+        elif arg in ['dont_wipe_data', "don't_wipe_data",
+                    'don_t_wipe_data', 'override_wipe_data']:
+            # Use one of these arguments to run clear_first
+            # on a job that has always_wipe_data = True.
+            wipe_data = False
+            for job_dict in job_dicts:
+                job_dict.pop('always_wipe_data', None)
+            args.remove(arg)
+        elif arg in ['migrate_schema']:
+            migrate_schema = True
+            args.remove(arg)
+        elif arg in ['ignore_empty_rows']:
+            ignore_empty_rows = True
+            args.remove(arg)
+        elif arg in ['retry_without_last_line']:
+            retry_without_last_line= True
+            args.remove(arg)
+        elif arg in ['log']:
+            logging = True
+            log_path_plus = LOG_DIR + payload_location + '/' + module_name
+            print(log_path_plus + '-out.log')
+            log_path = '/'.join(log_path_plus.split('/')[:-1])
+            if not os.path.isdir(log_path):
+                print("Creating {}".format(log_path))
+                os.makedirs(log_path)
+            sys.stdout = open(log_path_plus + '-out.log', 'w')
+            sys.stderr = open(log_path_plus + '-err.log', 'w')
+            args.remove(arg)
+        elif arg in ['test']:
+            test_mode = True
+            args.remove(arg)
+        elif arg in ['production']:
+            test_mode = False
+            args.remove(arg)
+        elif arg in ['wake_me_when_found', 'wake_me']:
+            wake_me_when_found = True
+            # This parameter may be used (for instance) to run an ETL job during periods when the file is not expected to be present on the source server.
+            # For instance, if a file appears on an FTP server just for the first two weeks of the month, there should be two cron jobs:
+            # The first has a day range of 1-14 and has a default set of command-line arguments.
+            # The second has a day range of 15-31 and appends "wake_me_when_found" to the command-line arguments of the previous cron job.
+            args.remove(arg)
+        elif is_job_code(arg, job_dicts):
+            selected_job_codes.append(arg)
+            args.remove(arg)
+        elif is_job_code_prefix(arg, job_dicts): # Treat codes like "foo-" as
+            code_prefix = arg[:-1] # standing for all codes that start with "foo".
+            selected_job_codes = []
+            for job_dict in job_dicts:
+                if re.match(code_prefix, job_dict['job_code']) is not None:
+                    selected_job_codes.append(job_dict['job_code'])
+            args.remove(arg)
+
+    if 'production' in copy_of_args and use_local_output_file:
+        raise ValueError(f"It makes no sense to use the 'production' flag while also setting use_local_output_file == True. Try again.")
+
+    if len(args) > 0:
+        print("Unused command-line arguments: {}".format(args))
+
+    kwargs = {'selected_job_codes': selected_job_codes,
+        'use_local_input_file': use_local_input_file,
+        'use_local_output_file': use_local_output_file,
+        'clear_first': clear_first,
+        'wipe_data': wipe_data,
+        'migrate_schema': migrate_schema,
+        'ignore_empty_rows': ignore_empty_rows,
+        'retry_without_last_line': retry_without_last_line,
+        'test_mode': test_mode,
+        'wake_me_when_found': wake_me_when_found,
+        'mute_alerts': mute_alerts,
+        }
+
+    return kwargs, args
+
 def get_job_dicts(payload_path):
     # Clean path 1: Remove optional ".py" extension
     payload_path = re.sub('\.py$', '', payload_path)
@@ -61,7 +165,7 @@ def get_job_dicts(payload_path):
     job_dicts = module.job_dicts
     for job_dict in job_dicts:
         job_dict['job_directory'] = payload_parts[-2]
-    return job_dicts
+    return job_dicts, payload_location, module_name
 
 def code_is_in_job_dict(code, job_dict):
     """Identify jobs by a command-line-specified job code which could be 1) the full name of
@@ -94,6 +198,19 @@ def select_jobs_by_code(selected_job_codes, job_dicts):
                 selected_jobs.append(Job(job_dict))
     return selected_jobs
 
+def run_job_and_post_processing(job, args_dict):
+    kwparameters = dict(args_dict)
+    locators_by_destination = job.process_job(**kwparameters)
+    for destination, table_locator in locators_by_destination.items():
+        if destination in ['ckan', 'ckan_filestore']: # [ ] So far all post-processing is CKAN-specific.
+            post_process(locators_by_destination[destination], job, **kwparameters)
+        if destination == 'ckan': # The data dictionary seemingly doesn't need
+            # to be reset if it's a ckan_filestore Express Loader operation.
+            resource_id = table_locator
+            if args_dict['clear_first'] or args_dict['migrate_schema']: # [ ] Should the data dictionary definitely be restored if clear_first = True?
+                results = set_data_dictionary(resource_id, job.saved_data_dictionary)
+                # Attempt to restore data dictionary, taking into account the deletion and addition of fields, and ignoring any changes in type.
+
 def main(**kwargs):
     selected_job_codes = kwargs.get('selected_job_codes', [])
     use_local_input_file = kwargs.get('use_local_input_file', False)
@@ -116,17 +233,7 @@ def main(**kwargs):
     # server to be searched for unharvested tables.
     try:
         for job in selected_jobs:
-            kwparameters = dict(kwargs)
-            locators_by_destination = job.process_job(**kwparameters)
-            for destination, table_locator in locators_by_destination.items():
-                if destination in ['ckan', 'ckan_filestore']: # [ ] So far all post-processing is CKAN-specific.
-                    post_process(locators_by_destination[destination], job, **kwparameters)
-                if destination == 'ckan': # The data dictionary seemingly doesn't need
-                    # to be reset if it's a ckan_filestore Express Loader operation.
-                    resource_id = table_locator
-                    if clear_first or migrate_schema: # [ ] Should the data dictionary definitely be restored if clear_first = True?
-                        results = set_data_dictionary(resource_id, job.saved_data_dictionary)
-                        # Attempt to restore data dictionary, taking into account the deletion and addition of fields, and ignoring any changes in type.
+            run_job_and_post_processing(job, kwargs)
     except Exception as e:
         import sys
         raise type(e)(f'{e} [for job_code == "{job.job_code}"]').with_traceback(sys.exc_info()[2])
@@ -172,21 +279,9 @@ if __name__ == '__main__':
     elif len(sys.argv) != 1:
         try:
             args = sys.argv[2:]
-            copy_of_args = list(args)
-            mute_alerts = False
-            use_local_input_file = False
-            use_local_output_file = False
-            clear_first = False
-            wipe_data = False
-            migrate_schema = False
-            ignore_empty_rows = False
-            retry_without_last_line = False
-            logging = False
-            test_mode = not PRODUCTION # Use PRODUCTION boolean from parameters/local_parameters.py to set whether test_mode defaults to True or False
-            wake_me_when_found = False
+            original_args = list(args)
 
-            job_dicts = get_job_dicts(sys.argv[1])
-            selected_job_codes = []
+            job_dicts, payload_location, module_name = get_job_dicts(sys.argv[1])
         except: # This is mainly to catch import_module errors and make sure
             # that they result in Slack notifications.
             e = sys.exc_info()[0]
@@ -194,111 +289,39 @@ if __name__ == '__main__':
             lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
             msg = ''.join('!! ' + line for line in lines)
             print(msg) # Log it or whatever here
-            copy_of_args = list(args)
-            if 'mute' not in copy_of_args and 'mute_alert' not in copy_of_args:
-                channel = "@david" if (test_mode or not PRODUCTION) else "#etl-hell"
+            if 'mute' not in args and 'mute_alerts' not in args:
+                channel = "@david" if not PRODUCTION else "#etl-hell"
                 if channel != "@david":
                     msg = f"@david {msg}"
                 send_to_slack(msg, username='{}/{} ETL assistant'.format(payload_location, module_name), channel=channel, icon=':illuminati:')
             raise
 
-        if not PRODUCTION and 'test' not in copy_of_args and 'production' not in copy_of_args:
-            print("Remember that to make changes to production datasets when on a PRODUCTION = False, it's necessary to use the command-line parameter 'production'.")
-        try:
-            for k,arg in enumerate(copy_of_args):
-                if arg in ['mute']:
-                    mute_alerts = True
-                    args.remove(arg)
-                elif arg in ['local', 'from_file', 'local_input']:
-                    use_local_input_file = True
-                    args.remove(arg)
-                elif arg in ['to_local', 'to_file', 'local_output']:
-                    use_local_output_file = True
-                    args.remove(arg)
-                elif arg in ['clear_first']:
-                    clear_first = True
-                    args.remove(arg)
-                elif arg in ['wipe_data']:
-                    wipe_data = True
-                    args.remove(arg)
-                elif arg in ['dont_wipe_data', "don't_wipe_data",
-                            'don_t_wipe_data', 'override_wipe_data']:
-                    # Use one of these arguments to run clear_first
-                    # on a job that has always_wipe_data = True.
-                    wipe_data = False
-                    for job_dict in job_dicts:
-                        job_dict.pop('always_wipe_data', None)
-                    args.remove(arg)
-                elif arg in ['migrate_schema']:
-                    migrate_schema = True
-                    args.remove(arg)
-                elif arg in ['ignore_empty_rows']:
-                    ignore_empty_rows = True
-                    args.remove(arg)
-                elif arg in ['retry_without_last_line']:
-                    retry_without_last_line= True
-                    args.remove(arg)
-                elif arg in ['log']:
-                    logging = True
-                    log_path_plus = LOG_DIR + payload_location + '/' + module_name
-                    print(log_path_plus + '-out.log')
-                    log_path = '/'.join(log_path_plus.split('/')[:-1])
-                    if not os.path.isdir(log_path):
-                        print("Creating {}".format(log_path))
-                        os.makedirs(log_path)
-                    sys.stdout = open(log_path_plus + '-out.log', 'w')
-                    sys.stderr = open(log_path_plus + '-err.log', 'w')
-                    args.remove(arg)
-                elif arg in ['test']:
-                    test_mode = True
-                    args.remove(arg)
-                elif arg in ['production']:
-                    test_mode = False
-                    args.remove(arg)
-                elif arg in ['wake_me_when_found', 'wake_me']:
-                    wake_me_when_found = True
-                    # This parameter may be used (for instance) to run an ETL job during periods when the file is not expected to be present on the source server.
-                    # For instance, if a file appears on an FTP server just for the first two weeks of the month, there should be two cron jobs:
-                    # The first has a day range of 1-14 and has a default set of command-line arguments.
-                    # The second has a day range of 15-31 and appends "wake_me_when_found" to the command-line arguments of the previous cron job.
-                    args.remove(arg)
-                elif is_job_code(arg, job_dicts):
-                    selected_job_codes.append(arg)
-                    args.remove(arg)
-            if len(args) > 0:
-                print("Unused command-line arguments: {}".format(args))
 
-            kwargs = {'selected_job_codes': selected_job_codes,
-                'use_local_input_file': use_local_input_file,
-                'use_local_output_file': use_local_output_file,
-                'clear_first': clear_first,
-                'wipe_data': wipe_data,
-                'migrate_schema': migrate_schema,
-                'ignore_empty_rows': ignore_empty_rows,
-                'retry_without_last_line': retry_without_last_line,
-                'test_mode': test_mode,
-                }
+        if not PRODUCTION and 'test' not in original_args and 'production' not in original_args:
+            print("Remember that to make changes to production datasets when PRODUCTION == False, it's necessary to use the command-line parameter 'production'.")
+        try:
+            kwargs, args = parse_args(args, job_dicts, payload_location, module_name)
             main(**kwargs)
 
-            if wake_me_when_found:
+            if kwargs['wake_me_when_found']:
                 msg = "A file that was not expected (one of these: {}) has resurfaced!\nIf this was a one-time outage, you can remove the wake_me_when_found parameter from the cron job for this ETL process.\nIf this is a source file that appears on some schedule, the file has appeared at an unexpected time. The cron job date specification might need to be altered.".format(list(set([j_dict['source_file'] for j_dict in job_dicts])))
                 print(msg)
                 if not mute_alerts:
-                    channel = "@david" if (test_mode or not PRODUCTION) else "#etl-hell"
-                    send_to_slack(msg,username='{}/{} ETL assistant'.format(payload_location,module_name),channel=channel,icon=':illuminati:')
+                    channel = "@david" if (kwargs['test_mode'] or not PRODUCTION) else "#etl-hell"
+                    send_to_slack(msg, username='{}/{} ETL assistant'.format(payload_location, module_name), channel=channel, icon=':illuminati:')
         except:
             e = sys.exc_info()[0]
-            if e == FileNotFoundError and wake_me_when_found:
+            if e == FileNotFoundError and kwargs['wake_me_when_found']:
                 print("As expected, this script threw an exception because the ETL framework could not find a source file.")
             else:
                 exc_type, exc_value, exc_traceback = sys.exc_info()
                 lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
                 msg = ''.join('!! ' + line for line in lines)
                 print(msg) # Log it or whatever here
-                if not mute_alerts:
-                    channel = "@david" if (test_mode or not PRODUCTION) else "#etl-hell"
+                if not kwargs['mute_alerts']:
+                    channel = "@david" if (kwargs['test_mode'] or not PRODUCTION) else "#etl-hell"
                     if channel != "@david":
                         msg = f"@david {msg}"
-                    send_to_slack(msg,username='{}/{} ETL assistant'.format(payload_location,module_name),channel=channel,icon=':illuminati:')
+                    send_to_slack(msg, username='{}/{} ETL assistant'.format(payload_location, module_name), channel=channel, icon=':illuminati:')
     else:
         print("The first argument should be the payload descriptor (where the script for the job is).")
