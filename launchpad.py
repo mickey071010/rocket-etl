@@ -293,7 +293,7 @@ if __name__ == '__main__':
                 channel = "@david" if not PRODUCTION else "#etl-hell"
                 if channel != "@david":
                     msg = f"@david {msg}"
-                send_to_slack(msg, username='{}/{} ETL assistant'.format(payload_location, module_name), channel=channel, icon=':illuminati:')
+                send_to_slack(msg, username='get_job_dicts() monitor', channel=channel, icon=':illuminati:')
             raise
 
 
