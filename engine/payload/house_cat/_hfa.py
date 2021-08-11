@@ -208,6 +208,41 @@ class HFADemographics(pl.BaseSchema):
         elif f in data and data[f] == 'PAT28T791005':
             data[f] = 'PA28T791005'
 
+class ApartmentDistributionSchema(pl.BaseSchema):
+    job_code = 'hfa_apartment_distributions'
+    pmindx = fields.Integer(load_from='PMINDX'.lower(), dump_to='pmindx') # [ ] Figure out how to change this to phfa_id
+    # in all the tango_with_django.py code.
+    project_name = fields.String(load_from='Project Name'.lower(), dump_to='hud_property_name')
+    total_units = fields.Integer(load_from='Total Units'.lower(), dump_to='total_units')
+    count_0br = fields.Integer(load_from='EFF'.lower(), dump_to='count_0br', allow_none=True)
+    count_1br = fields.Integer(load_from='apartment_distribution:_1br', dump_to='count_1br', allow_none=True)
+    count_2br = fields.Integer(load_from='2BR'.lower(), dump_to='count_2br', allow_none=True)
+    count_3br = fields.Integer(load_from='3BR'.lower(), dump_to='count_3br', allow_none=True)
+    count_4br = fields.Integer(load_from='4BR'.lower(), dump_to='count_4br', allow_none=True)
+    count_5br = fields.Integer(load_from='5BR'.lower(), dump_to='count_5br', allow_none=True)
+    count_6br = fields.Integer(load_from='6BR'.lower(), dump_to='count_6br', allow_none=True)
+    income_targeting_1 = fields.Integer(load_from='income_targeting:_+1', dump_to='plus_1_manager_unit', allow_none=True) # "+1" indicates the unit(s) is a plus one unit type.
+    _20 = fields.Integer(load_from='20'.lower(), dump_to='20percent_ami_limit', allow_none=True)
+    _30 = fields.Integer(load_from='30'.lower(), dump_to='30percent_ami_limit', allow_none=True)
+    _40 = fields.Integer(load_from='40'.lower(), dump_to='40percent_ami_limit', allow_none=True)
+    _50 = fields.Integer(load_from='50'.lower(), dump_to='50percent_ami_limit', allow_none=True)
+    _60 = fields.Integer(load_from='60'.lower(), dump_to='60percent_ami_limit', allow_none=True)
+    _80 = fields.Integer(load_from='80'.lower(), dump_to='80percent_ami_limit', allow_none=True)
+    mr = fields.Integer(load_from='MR'.lower(), dump_to='market_rate', allow_none=True)
+    o = fields.Integer(load_from='O'.lower(), dump_to='other_income_limit', allow_none=True) # An Other unit type, not between market rate - 80% median income
+    uncategorized = fields.Integer(load_from='Uncategorized'.lower(), dump_to='uncategorized_income_limit', allow_none=True)
+    subsidies_81 = fields.Integer(load_from='subsidies:_81', dump_to='units_w_section_811_subsidy', allow_none=True) # Units with Section 811 subsidy
+    fm = fields.Integer(load_from='FM'.lower(), dump_to='units_w_section_8_fair_market_rent', allow_none=True) # Section 8 Fair Market Rent
+    hv = fields.Integer(load_from='HV'.lower(), dump_to='units_w_housing_vouchers', allow_none=True) # Housing Vouchers
+    mu = fields.Integer(load_from='MU'.lower(), dump_to='units_w_staff_unit', allow_none=True) # Manager/Staff Unit
+    o2 = fields.Integer(load_from='O'.lower(), dump_to='units_w_other_subsidy_type', allow_none=True) # Other subsidy type
+    pb = fields.Integer(load_from='PB'.lower(), dump_to='units_w_project_based_section_8_certificate', allow_none=True) # Project Based Section 8 Certificate
+    uncategorized_subsidy = fields.Integer(load_from='Uncategorized'.lower(), dump_to='units_w_uncategorized_subsidy', allow_none=True)
+
+    class Meta:
+        ordered = True
+
+
 #housecat_package_id = 'bb77b955-b7c3-4a05-ac10-448e4857ade4'
 
 job_dicts = [
@@ -228,6 +263,18 @@ job_dicts = [
         'source_type': 'local',
         'source_file': 'phfa_pgh_demographics.csv',
         'schema': HFADemographics,
+        'always_wipe_data': True,
+        'destination': 'file',
+        #'package': housecat_package_id,
+        #'resource_name': 'Active HUD Multifamily Insured Mortgages (Pennsylvania)',
+        'upload_method': 'insert',
+        #'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
+    },
+    {
+        'job_code': ApartmentDistributionSchema().job_code, # 'hfa_apartment_distributions'
+        'source_type': 'local',
+        'source_file': 'phfa_pgh_apartment_distribution.csv',
+        'schema': ApartmentDistributionSchema,
         'always_wipe_data': True,
         'destination': 'file',
         #'package': housecat_package_id,
