@@ -24,7 +24,7 @@ class HFALIHTCSchema(pl.BaseSchema):
     pmindx = fields.String(load_from='PMINDX'.lower(), dump_to='pmindx')
     property_name = fields.String(load_from='Property Name'.lower(), dump_to='hud_property_name')
     lihtc_units = fields.Integer(load_from='LIHTC Units'.lower(), dump_to='assisted_units')
-    lihtc_allocation = fields.Integer(load_from='LIHTC Allocation'.lower(), dump_to='lihtc_allocation') # There can be multiple
+    lihtc_allocation = fields.Integer(load_from='LIHTC Allocation'.lower(), dump_to='total_lihtc_allocation') # There can be multiple
     # LIHTC records in the PHFA data. For instance "CONSTANTIN BUILDING" has two records, and the LIHTC Allocation
     # amounts add up to the lihtc_amount we have in lihtc_projects_pa.csv.
     # In this case, the lihtc_projects_pa value for lihtc_year_allocated is 1996,
@@ -37,7 +37,7 @@ class HFALIHTCSchema(pl.BaseSchema):
     # The datanote field in LIHTCPUB.csv says "PREVIOUSLY LISTED AS PAA1998070." which may
     # explain these discrepancies.
 
-    # phfa-lihtc has this last_yr_of_rca field, which in 92% of cases is 29 or 30, but ca be 28 through
+    # phfa-lihtc has this last_yr_of_rca field, which in 92% of cases is 29 or 30, but can be 28 through
     # 31, and also sometimes last_yr_of_rca == 0.
 
     # ADDISON TERRACE PHASE 2 discrepancy: ours (lihtc_amount == 774108), phfa-lithc (LIHTC Allocation == 0)
@@ -53,13 +53,29 @@ class HFALIHTCSchema(pl.BaseSchema):
     # "40  at 60" == "40% at 60% AMI"
     # "20  at 50" == "20% at 50% AMI"
     # "0  at 0"   == "0% at 0% AMI"
-    tax_credit_rate = fields.Float(load_from='4%_or_9%'.lower(), dump_to='tax_credit_rate') # The 9% tax credit tends to generate around 70% of a development’s equity while a 4% tax credit will generate around 30% of a development’s equity.
+    tax_credit_rate = fields.Float(load_from='4%_or_9%'.lower(), load_only=True) # The 9% tax credit tends to generate around 70% of a development’s equity while a 4% tax credit will generate around 30% of a development’s equity.
+    # "The LIHTC is designed to subsidize either 30 percent or 70 percent of the low-income unit costs in a project. The 30 percent subsidy, which is known as the so-called automatic 4 percent tax credit, covers new construction that uses additional subsidies or the acquisition cost of existing buildings. The 70 percent subsidy, or 9 percent tax credit, supports new construction without any additional federal subsidies."
+    # This can be mapped to the 1/2 options in the existing lihtc_credit field.
+    lihtc_credit = fields.String(dump_to='lihtc_credit', allow_none=True)
     allocation_year = fields.Integer(load_from='Allocation Year'.lower(), dump_to='lihtc_year_allocated', allow_none=True)
-    placed_in_service_year = fields.Integer(load_from='Placed in Service Year'.lower(), dump_to='lihtc_year_placed_into_service', allow_none=True)
+    placed_in_service_year = fields.Integer(load_from='Placed in Service Year'.lower(), dump_to='lihtc_year_in_service', allow_none=True)
     last_yr_of_rca = fields.Integer(load_from='Last Yr of RCA'.lower(), dump_to='last_year_of_rca', allow_none=True)
 
     class Meta:
         ordered = True
+
+    @post_load
+    def set_credit(self, data):
+        if 'tax_credit_rate' in data:
+            value = data['tax_credit_rate']
+            if str(value) == '0.04':
+                data['lihtc_credit'] = '70 percent present value'
+            elif str(value) == '0.09':
+                data['lihtc_credit'] = '30 percent present value'
+            elif value in [None, '', ' ']:
+                data['lihtc_credit'] = None
+            else:
+                raise ValueError(f"set_credit() does not know how to translate a tax_credit_rate value of {data['tax_credit_rate']}.")
 
     @pre_load
     def fix_ur(self, data):
