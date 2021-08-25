@@ -119,6 +119,7 @@ class MultifamilyProductionInitialCommitmentSchema(pl.BaseSchema):
     date_of_firm_issue = fields.Date(load_from='Date of Firm Issue'.lower(), dump_to='date_of_firm_issue')
     firm_commitment_lender = fields.String(load_from='Firm Commitment Lender'.lower(), dump_to='firm_commitment_lender')
     final_endorsement_lender = fields.String(load_from='Final Endorsement Lender'.lower(), dump_to='holder_name', allow_none=True)
+    hope_vi_designation = fields.Boolean(load_from='HOPE VI Designation'.lower(), dump_to='hope_vi_designation', allow_none=True)
 
     class Meta:
         ordered = True
@@ -128,6 +129,17 @@ class MultifamilyProductionInitialCommitmentSchema(pl.BaseSchema):
         f = 'fha_number'
         if f in data and re.search('-', data[f]) is not None:
             data[f] = re.sub('-', '', data[f])
+
+    @pre_load
+    def fix_hope_vi_designation(self, data):
+        f = 'hope_vi_designation'
+        if f in data:
+            if data[f] == 'Y':
+                data[f] = True
+            elif data[f] == 'N':
+                data[f] = False
+            else:
+                data[f] = None
 
     @pre_load
     def fix_dates(self, data):
@@ -652,9 +664,22 @@ class LIHTCSchema(pl.BaseSchema):
     fmha_515 = fields.Boolean(load_from='fmha_515'.lower(), dump_to='fmha_515_loan', allow_none=True)
     fmha_538 = fields.Boolean(load_from='fmha_538'.lower(), dump_to='fmha_538_loan', allow_none=True)
     scattered_site_cd = fields.String(load_from='scattered_site_cd'.lower(), dump_to='scattered_site_ind', allow_none=True)
+    hope_vi_designation = fields.Boolean(load_from='hopevi', dump_to='hope_vi_designation', allow_none=True)
 
     class Meta:
         ordered = True
+
+    @pre_load
+    def fix_hope_vi_designation(self, data):
+        f = 'hopevi'
+        f2 = 'hope_vi_designation'
+        if f in data:
+            if data[f] == '1':
+                data[f2] = True
+            elif data[f] == '2':
+                data[f2] = False
+            else:
+                data[f2] = None
 
     @pre_load
     def future_proof(self, data):

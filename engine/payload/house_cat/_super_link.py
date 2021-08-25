@@ -238,6 +238,8 @@ def link_records_into_index():
     # These particular records also lack geocoordinates, so they could not be pulled out of
     # lihtc_projects_pa.csv based on latitude and longitude either.
 
+    # It looks like after the 2021 update, our 'fips2000'-equivalent field is
+    # now called 'census_tract_2000'.
     f = 'lihtc_projects_pa.csv'
     assert f in files
 
@@ -246,7 +248,7 @@ def link_records_into_index():
     with open(f'{path}/{f}', 'r') as g:
         reader = csv.DictReader(g)
         for row in reader:
-            in_allegheny_county = row['county_fips_code'] == '42003' or row['fips2000'][:5] == '42003'
+            in_allegheny_county = row['county_fips_code'] == '42003' or row['census_tract_2000'][:5] == '42003'
             # Whitelist known exceptions
             in_allegheny_county = in_allegheny_county or (row[id_field] in ['PAA19890800', 'PAA19900328', 'PAA19910120'])
             # Additional inclusions could be made based on latitude+longitude or city or zip_code
