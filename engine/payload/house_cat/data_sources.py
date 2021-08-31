@@ -33,19 +33,21 @@ group_by_job_code = {
         'mf_contracts_8': 'Multifamily Direct Subsidy',
         'mf_loans': 'Multifamily Insured Financing',
         'mf_inspections_1': 'Inspections',
+
+        'hfa_lihtc': 'LIHTC',
         }
 
 
 class HouseCatSourcesSchema(pl.BaseSchema):
     job_code = 'data_sources'
-    resource_name = fields.String(load_from='resource_name'.lower(), dump_to='resource_name', allow_none=True)
     source_name = fields.String(load_from='resource_name'.lower(), dump_to='source_name', allow_none=True)
-    package_id = fields.String(load_from='package'.lower(), dump_to='package_id', allow_none=True)
-    resource_id = fields.String(load_from='resource_id', dump_to='resource_id', allow_none=True)
-    other_job_code = fields.String(load_from='job_code'.lower(), dump_to='job_code')
-    job_directory = fields.String(load_from='job_directory'.lower(), dump_to='job_directory')
     source_full_url = fields.String(load_from='source_full_url'.lower(), dump_to='source_full_url', allow_none=True)
     source_landing_page = fields.String(load_from='resource_description'.lower(), dump_to='source_landing_page', allow_none=True)
+    other_job_code = fields.String(load_from='job_code'.lower(), dump_to='job_code')
+    job_directory = fields.String(load_from='job_directory'.lower(), dump_to='job_directory')
+    resource_name = fields.String(load_from='resource_name'.lower(), dump_to='resource_name', allow_none=True)
+    resource_id = fields.String(load_from='resource_id', dump_to='resource_id', allow_none=True)
+    package_id = fields.String(load_from='package'.lower(), dump_to='package_id', allow_none=True)
     data_group = fields.String(dump_only=True, dump_to='data_group')
 
     class Meta:
@@ -67,7 +69,6 @@ class HouseCatSourcesSchema(pl.BaseSchema):
     def set_group(self, data):
         f = 'other_job_code'
         f2 = 'data_group'
-        ic(data[f])
         if data[f] in group_by_job_code:
             data[f2] = group_by_job_code[data[f]]
         else:
@@ -104,7 +105,7 @@ def scrape_rocket_jobs(job, **kwparameters):
 
 # dfg
 
-housecat_package_id = 'bb77b955-b7c3-4a05-ac10-448e4857ade4'
+from engine.payload.house_cat._parameters import housecat_tango_with_django_package_id
 
 job_dicts = [
     {
@@ -122,10 +123,31 @@ job_dicts = [
         #'primary_key_fields': ['hud_project_number'],
         'destination': 'ckan',
         'destination_file': 'sources.csv',
-        'package': housecat_package_id,
-        'resource_name': 'house_cat Data Sources',
+        'package': housecat_tango_with_django_package_id,
+        'resource_name': 'house_cat_data_sources',
         'upload_method': 'insert',
         'resource_description': f'Derived from engine/payload/house_cat/_flatbread.py',
+        'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
+    },
+    {
+        'job_code': HouseCatSourcesSchema().job_code + '_phfa', #'data_sources_phfa'
+        'source_type': 'local',
+        'source_file': 'phfa_sources.csv',
+        #'encoding': 'binary',
+        'custom_processing': scrape_rocket_jobs,
+        'custom_parameters': {'path_to_scrape': 'engine/payload/house_cat/_hfa.py'},
+        'schema': HouseCatSourcesSchema,
+        'filters': [['resource_description', '!=', None]], # We can only filter on fields in the source file.
+        # If 'resource_description' is blank, filter out the source.
+        # Otherwise, pull the source_landing_page out of there.
+        'always_wipe_data': False,
+        #'primary_key_fields': ['hud_project_number'],
+        'destination': 'ckan',
+        'destination_file': 'sources.csv',
+        'package': housecat_tango_with_django_package_id,
+        'resource_name': 'house_cat_data_sources',
+        'upload_method': 'insert',
+        'resource_description': f'Derived from engine/payload/house_cat/_hfa.py',
         'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
     },
 ]
