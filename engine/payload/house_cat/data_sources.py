@@ -35,6 +35,8 @@ group_by_job_code = {
         'mf_inspections_1': 'Inspections',
 
         'hfa_lihtc': 'LIHTC',
+
+        'hunt_and_peck': 'Property Information',
         }
 
 
@@ -52,8 +54,8 @@ class HouseCatSourcesSchema(pl.BaseSchema):
 
     class Meta:
         ordered = True
-        
-    # Split the parenthetical part off of the resource_name 
+
+    # Split the parenthetical part off of the resource_name
     # to make source_name.
 
     @pre_load
@@ -94,6 +96,10 @@ def scrape_rocket_jobs(job, **kwparameters):
     #job.path_to_scrape # 'engine/payload/house_cat/_flatbread.py'
     path_to_scrape = job.custom_parameters['path_to_scrape']
     scraped_job_dicts, payload_location, module_name = get_job_dicts(path_to_scrape)
+
+    if 'only_these_job_codes' in job.custom_parameters:
+        scraped_job_dicts = [d for d in scraped_job_dicts if d['job_code'] in job.custom_parameters['only_these_job_codes']]
+
     # Convert list of dicts to a CSV file.
     from engine.etl_util import write_to_csv
     filename = job.source_file
@@ -147,7 +153,29 @@ job_dicts = [
         'package': housecat_tango_with_django_package_id,
         'resource_name': 'house_cat_data_sources',
         'upload_method': 'insert',
-        'resource_description': f'Derived from engine/payload/house_cat/_hfa.py',
+        #'resource_description': f'Derived from engine/payload/house_cat/_hfa.py',
+        'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
+    },
+    {
+        'job_code': HouseCatSourcesSchema().job_code + '_tango', #'data_sources_tango'
+        'source_type': 'local',
+        'source_file': 'tango_sources.csv',
+        #'encoding': 'binary',
+        'custom_processing': scrape_rocket_jobs,
+        'custom_parameters': {'path_to_scrape': 'engine/payload/house_cat/tango_with_django.py',
+            'only_these_job_codes': 'hunt_and_peck'},
+        'schema': HouseCatSourcesSchema,
+        'filters': [['resource_description', '!=', None]], # We can only filter on fields in the source file.
+        # If 'resource_description' is blank, filter out the source.
+        # Otherwise, pull the source_landing_page out of there.
+        'always_wipe_data': False,
+        #'primary_key_fields': ['hud_project_number'],
+        'destination': 'ckan',
+        'destination_file': 'sources.csv',
+        'package': housecat_tango_with_django_package_id,
+        'resource_name': 'house_cat_data_sources',
+        'upload_method': 'insert',
+        #'resource_description': f'Derived from engine/payload/house_cat/tango_with_django.py',
         'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
     },
 ]
