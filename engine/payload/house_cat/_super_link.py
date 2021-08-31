@@ -147,6 +147,7 @@ def link_records_into_index():
     fields_to_get = ['hud_property_name',
             'property_street_address', 'municipality_name', 'city', 'zip_code', 'units',
             'latitude', 'longitude',
+            'census_tract',
             'contract_id', # mf_subsidy_ac
             'fha_loan_id',
             'normalized_state_id',
