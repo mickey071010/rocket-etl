@@ -243,7 +243,7 @@ class ApartmentDistributionSchema(pl.BaseSchema):
         ordered = True
 
 
-#housecat_package_id = 'bb77b955-b7c3-4a05-ac10-448e4857ade4'
+phfa_package_id = '06ea7b14-3d37-4fa9-8a27-ed8d4fcb6d3e'
 
 job_dicts = [
     {
@@ -252,10 +252,11 @@ job_dicts = [
         'source_file': 'phfa_lihtc.csv',
         'schema': HFALIHTCSchema,
         'always_wipe_data': True,
-        'destination': 'file',
-        #'package': housecat_package_id,
-        #'resource_name': 'Active HUD Multifamily Insured Mortgages (Pennsylvania)',
+        'destination': 'ckan',
+        'package': phfa_package_id,
+        'resource_name': 'LIHTC Data from PHFA (Allegheny County)',
         'upload_method': 'insert',
+        'resource_description': 'Derived from a file sent by the PHFA',
         #'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
     },
     {
@@ -264,10 +265,11 @@ job_dicts = [
         'source_file': 'phfa_pgh_demographics.csv',
         'schema': HFADemographics,
         'always_wipe_data': True,
-        'destination': 'file',
-        #'package': housecat_package_id,
-        #'resource_name': 'Active HUD Multifamily Insured Mortgages (Pennsylvania)',
+        'destination': 'ckan',
+        'package': phfa_package_id,
+        'resource_name': 'Demographics by Housing Project from PHFA (Allegheny County)',
         'upload_method': 'insert',
+        'resource_description': 'Derived from a file sent by the PHFA',
         #'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
     },
     {
@@ -276,10 +278,11 @@ job_dicts = [
         'source_file': 'phfa_pgh_apartment_distribution.csv',
         'schema': ApartmentDistributionSchema,
         'always_wipe_data': True,
-        'destination': 'file',
-        #'package': housecat_package_id,
-        #'resource_name': 'Active HUD Multifamily Insured Mortgages (Pennsylvania)',
+        'destination': 'ckan',
+        'package': phfa_package_id,
+        'resource_name': 'Apartment Distributions, Income Limits, and Subsidies by Housing Project from PHFA (Allegheny County)',
         'upload_method': 'insert',
+        'resource_description': 'Derived from a file sent by the PHFA',
         #'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
     },
 ]
