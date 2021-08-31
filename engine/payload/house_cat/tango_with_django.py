@@ -52,7 +52,7 @@ class LookupSchema(pl.BaseSchema):
 
 class PropertyIndexSchema(pl.BaseSchema):
     job_code = 'update_index'
-    the_id = fields.Integer(dump_only=True, dump_to=ID_FIELD_NAME)
+    the_id = fields.Integer(load_from='id', dump_only=True, dump_to=ID_FIELD_NAME)
     property_id = fields.String(load_from='property_id'.lower(), dump_to='property_id', allow_none=True)
     hud_property_name = fields.String(load_from='hud_property_name'.lower(), dump_to='hud_property_name')
     property_street_address = fields.String(load_from='property_street_address'.lower(), dump_to='property_street_address', allow_none=True)
@@ -313,35 +313,37 @@ job_dicts = [
         'always_wipe_data': False, # We'd like to keep the records to try to preserve the _id values
         # to maintain links through the little lookup tables.
 
-        #'primary_key_fields': ['property_id'], # This doesn't work because of the many projects that
-        # have no property_id.
-        'destination': 'file',
-        'package': housecat_tango_with_django_package_id,
-        'resource_name': 'house_cat_projectindex',
-        'upload_method': 'insert', # We can't just upsert PropertyIndex records because there is no
-        # consistent key. In the absence of such a key, we have to search the existing table to
-        # find matching records and update them; when no matches are found, we must insert the
-        # records. The only alternative is to keep wiping the table, but this would result
-        # in no consistent 'id' value, which might be a problem if there's any caching involved
-        # in queries using those 'id' values.
-    },
-    {
-        'job_code': PropertyIndexSchema().job_code, # 'update_index'
-        'source_type': 'local',
-        'source_file': deduplicated_index_filename+'.csv',
-        'updates': 'Monthly',
-        'schema': PropertyIndexSchema,
-        #'filters': [['property_id', '!=', None]], # Might it be necessary to iterate through all the property fields
-        # like this, upserting on each one?
-        'always_wipe_data': False, # We'd like to keep the records to try to preserve the _id values
-        # to maintain links through the little lookup tables.
-
-        'primary_key_fields': ['id'],
+        'primary_key_fields': ['id'], # The 'id' value lives in the CKAN table.
         'destination': 'ckan',
         'package': housecat_tango_with_django_package_id,
         'resource_name': 'house_cat_projectindex',
         'upload_method': 'upsert',
+        # consistent key. In the absence of such a key, we have to search the existing table to
+        # find matching records and update them; when no matches are found, we must insert the
+        # records. The only alternative is to keep wiping the table, but this would result
+        # in no consistent 'id' value, which might be a problem if there's any caching involved
+        # in queries using those 'id' values. Solution: the hunt_and_peck_update function
+        # gets the 'id' values where available and otherwise synthesizes new ones, creates
+        # the correct CSV file to fuel this job, and updates the job.target attribute to
+        # point to it.
     },
+#    { # I think this job has been completely folded into hunt_and_peck.
+#        'job_code': PropertyIndexSchema().job_code, # 'update_index'
+#        'source_type': 'local',
+#        'source_file': deduplicated_index_filename+'.csv',
+#        'updates': 'Monthly',
+#        'schema': PropertyIndexSchema,
+#        #'filters': [['property_id', '!=', None]], # Might it be necessary to iterate through all the property fields
+#        # like this, upserting on each one?
+#        'always_wipe_data': False, # We'd like to keep the records to try to preserve the _id values
+#        # to maintain links through the little lookup tables.
+#
+#        'primary_key_fields': ['id'],
+#        'destination': 'ckan',
+#        'package': housecat_tango_with_django_package_id,
+#        'resource_name': 'house_cat_projectindex',
+#        'upload_method': 'upsert',
+#    },
 ]
 
 job_dict_template = \
