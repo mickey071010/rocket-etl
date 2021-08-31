@@ -318,6 +318,8 @@ job_dicts = [
         'package': housecat_tango_with_django_package_id,
         'resource_name': 'house_cat_projectindex',
         'upload_method': 'upsert',
+        'resource_description': 'Derived from a bunch of other tables and some Python scripts',
+        # We can't just upsert PropertyIndex records because there is no
         # consistent key. In the absence of such a key, we have to search the existing table to
         # find matching records and update them; when no matches are found, we must insert the
         # records. The only alternative is to keep wiping the table, but this would result
