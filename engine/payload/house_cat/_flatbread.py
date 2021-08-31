@@ -1110,7 +1110,6 @@ job_dicts = [
         'package': housecat_package_id,
         'resource_name': 'All Buildings from LIHTC Projects (Pennsylvania)',
         'upload_method': 'insert',
-        'resource_description': f'Derived from https://lihtc.huduser.gov/', #\n\njob_code: {LIHTCBuildingSchema().job_code}',
         'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
     },
     {
@@ -1242,7 +1241,7 @@ job_dicts = [
         'package': housecat_package_id,
         'resource_name': 'Multifamily Assistance & Section 8 Contracts (Pennsylvania)',
         'upload_method': 'insert',
-        'resource_description': f'Derived from https://www.hud.gov/program_offices/housing/mfh/exp/mfhdiscl\n\n', #job code: {MultifamilyProjectsSection8ContractsSchema().job_code}',
+        'resource_description': f'Derived from https://www.hud.gov/program_offices/housing/mfh/exp/mfhdiscl', #\n\njob code: {MultifamilyProjectsSection8ContractsSchema().job_code}',
         'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
     },
     {
