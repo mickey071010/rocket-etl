@@ -64,6 +64,7 @@ class PropertyIndexSchema(pl.BaseSchema):
     #index = fields.Integer(load_from='index'.lower(), dump_to='index')
     latitude = fields.String(load_from='latitude'.lower(), dump_to='latitude', allow_none=True)
     longitude = fields.String(load_from='longitude'.lower(), dump_to='longitude', allow_none=True)
+    census_tract = fields.String(load_from='census_tract'.lower(), dump_to='census_tract', allow_none=True)
     crowdsourced_id = fields.String(load_from='crowdsourced_id'.lower(), dump_to='crowdsourced_id', allow_none=True) # This is designed to
     # NOT be an ID that can be used in a ManyToManyField. There should either be zero or one crowdsourced_id values for each project.
 
@@ -75,6 +76,9 @@ class PropertyIndexSchema(pl.BaseSchema):
     pmindx = fields.String(load_from='pmindx'.lower(), load_only=True, dump_to='pmindx', allow_none=True)
     lihtc_project_id = fields.String(load_from='lihtc_project_id'.lower(), load_only=True, dump_to='lihtc_project_id', allow_none=True)
     development_code = fields.String(load_from='development_code'.lower(), load_only=True, dump_to='development_code', allow_none=True)
+
+    status = fields.String(load_from='status'.lower(), dump_to='status', allow_none=True) # Can be 'Closed' for a permanently closed
+    # housing project. Could also be something like 'Under construction' for one that has not yet opened.
 
     #house_cat_id = fields.String(load_from='house_cat_id'.lower(), dump_to='house_cat_id', allow_none=True)
 

@@ -156,6 +156,15 @@ def merge(record_1, record_2, verbose):
         elif key == 'source_file':
             source_files = sorted(value.split('|') + other_value.split('|'))
             merged_record[key] = '|'.join(source_files)
+        elif key == 'census_tract':
+            if value in ['42XXXXXXXXX', '']:
+                merged_record[key] = other_value
+            elif other_value in ['42XXXXXXXXX', '']:
+                merged_record[key] = value
+            else:
+                print(f"Since this code doesn't know how to merge key = {key}, value = {value}, other value = {record_2[key]}, it's just going to list both.")
+                merged_record[key] = '|'.join(sorted([value, other_value]))
+
         elif re.match(value.upper(), other_value.upper()) is not None: # other_value starts with value
             merged_record[key] = other_value # Go with the longer version
         elif re.match(other_value.upper(), value.upper()) is not None:
@@ -183,6 +192,8 @@ fields_to_get = ['hud_property_name',
         'pmindx',
         'units',
         'latitude', 'longitude',
+        'census_tract',
+        'status'
         ]
 
 possible_keys = ['property_id', 'lihtc_project_id', 'development_code', 'fha_loan_id', 'normalized_state_id', 'contract_id', 'pmindx', 'crowdsourced_id'] # 'inspection_property_id_multiformat']
