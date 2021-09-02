@@ -72,6 +72,71 @@ def standardize_field(x, fieldname):
         return standardize_city(x)
     return standardize_string(x)
 
+def fix_some_records(record_1, record_2, merged_record, verbose):
+    if '800030192' in [record_1['property_id'], record_2['property_id']]:
+        merged_record['property_street_address'] = '301 S HIGHLAND AVE'
+        merged_record['city'] = 'PITTSBURGH'
+        merged_record['zip_code'] = '15206'
+        merged_record['census_tract'] = '42003070600' # HUD_Insured_Multifamily_Properties.csv had the correct values.
+        # LIHTCPUB.csv was totally wrong. Maybe because it had 301 Highland Ave instead of 301 S Highland Ave.
+        assert merged_record['census_tract'] in record_1['census_tract'].split('|') + record_2['census_tract'].split('|') # Guard against Census tract drift.
+        merged_record['latitude'] = '40.457363999' # It should be fine to set these as strings.
+        merged_record['longitude'] = '-79.924964'
+    elif '800238769' in [record_1['property_id'], record_2['property_id']]:
+        merged_record['property_street_address'] = '130 7TH ST'
+        merged_record['city'] = 'PITTSBURGH'
+        merged_record['zip_code'] = '15222'
+        merged_record['census_tract'] = '42003020100' # HUD_Insured_Multifamily_Properties.csv had the correct values.
+        # LIHTCPUB.csv was totally wrong (again).
+        assert merged_record['census_tract'] in record_1['census_tract'].split('|') + record_2['census_tract'].split('|') # Guard against Census tract drift.
+        merged_record['latitude'] = '40.443638999'
+        merged_record['longitude'] = '-80.000669'
+    elif 'PA001000095' in [record_1['development_code'], record_2['development_code']]:
+        merged_record['property_street_address'] = '5171 COLUMBO ST'
+        merged_record['city'] = 'PITTSBURGH'
+        merged_record['census_tract'] = '42003101600' # This is the 2010 tract (which I found somewhere in the data).
+        merged_record['census_tract'] = '42003101900' # This is the 2020 tract (which I looked up:
+        # https://geocoding.geo.census.gov/geocoder/geographies/address?street=5171+COLUMBO+ST&city=Pittsburgh&state=PA&zip=15212&benchmark=4&vintage=4
+        # housing_inspections has the right street/city/latitude/longitude (but no tract)
+        # public_housing_projects has everything right (including the census_tract). It also has a geocoding_accuracy field!
+        merged_record['latitude'] = '40.469373999'
+        merged_record['longitude'] = '-79.9393939999999'
+    elif '800240610' in [record_1['property_id'], record_2['property_id']]:
+        # The proposed 25-acre Larimer/East Liberty Park spans from Station Street and Larimer Avenue to the northern corner of the Larimer Neighborhood at Orphan Street and Larimer Avenue. The park will serve 4,177 residents who live within a five-minute walk.
+        merged_record['zip_code'] = '15206'
+        merged_record['census_tract'] = '42003120900' # 2020 tract (Looked up on census.gov). The HUD MF data had the correct 2010 tract.
+        merged_record['latitude'] = '40.465034999' # Using HUD MF numbers.
+        merged_record['longitude'] = '-79.915303' # Using HUD MF numbers.
+    elif '800246671' in [record_1['property_id'], record_2['property_id']]:
+        merged_record['property_street_address'] = '537 Oak Hill Dr' # Just choosing the HUD MF address
+        merged_record['city'] = 'PITTSBURGH'
+        merged_record['zip_code'] = '15213'
+        merged_record['census_tract'] = '42003051000'  # 2020-verified Census tract matched one from another file.
+        assert merged_record['census_tract'] in record_1['census_tract'].split('|') + record_2['census_tract'].split('|') # Guard against Census tract drift.
+        merged_record['latitude'] = '40.4438084'
+        merged_record['longitude'] = '-79.970124'
+    elif 'PA006000824' in [record_1['development_code'], record_2['development_code']]:
+        merged_record['property_street_address'] = '5171 COLUMBO ST'
+        merged_record['city'] = 'PITTSBURGH'
+        merged_record['census_tract'] = '42003101900' # This is the 2020 tract (which I looked up).
+
+        merged_record['latitude'] = '40.469373999'
+        merged_record['longitude'] = '-79.9393939999999'
+
+    elif 'TC1990-0139' in [record_1['normalized_state_id'], record_2['normalized_state_id']]:
+        merged_record['property_street_address'] = '5171 COLUMBO ST'
+        merged_record['city'] = 'PITTSBURGH'
+        merged_record['census_tract'] = '42003101900' # This is the 2020 tract (which I looked up).
+
+        merged_record['latitude'] = '40.469373999'
+        merged_record['longitude'] = '-79.9393939999999'
+
+        merged_record['status'] = 'Closed' # According to web searches
+
+    return merged_record
+
+
+
 def merge(record_1, record_2, verbose):
     merged_record = {}
     for key, value in record_1.items():
@@ -105,6 +170,8 @@ def merge(record_1, record_2, verbose):
     for key, value in record_2.items():
         if key not in merged_record or merged_record[key] == '':
             merged_record[key] = value
+
+    merged_record = fix_some_records(record_1, record_2, merged_record, verbose)
 
     return merged_record
 
