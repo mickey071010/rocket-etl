@@ -95,6 +95,13 @@ class HFALIHTCSchema(pl.BaseSchema):
             if f in data and data[f] == '0':
                 data[f] = None
 
+    @pre_load
+    def trim_strings(self, data):
+        fs = ['project_name']
+        for f in fs:
+            if f in data and data[f] is not None:
+                data[f] = data[f].strip()
+
 
 class HFADemographics(pl.BaseSchema):
     job_code = 'hfa_demographics'
@@ -241,6 +248,13 @@ class ApartmentDistributionSchema(pl.BaseSchema):
 
     class Meta:
         ordered = True
+
+    @pre_load
+    def trim_strings(self, data):
+        fs = ['project_name']
+        for f in fs:
+            if f in data and data[f] is not None:
+                data[f] = data[f].strip()
 
 
 phfa_package_id = '06ea7b14-3d37-4fa9-8a27-ed8d4fcb6d3e'
