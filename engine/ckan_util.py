@@ -222,3 +222,47 @@ def get_number_of_rows(resource_id):
         print("get_number_of_rows threw an exception. Returning 'None'.")
         return None
     return count
+
+def query_resource(site, query, API_key=None):
+    # Use the datastore_search_sql API endpoint to query a CKAN resource.
+
+
+    # Note that this doesn't work for private datasets.
+    # The relevant CKAN GitHub issue has been closed.
+    # https://github.com/ckan/ckan/issues/1954
+    ckan = ckanapi.RemoteCKAN(site, apikey=API_key)
+    response = ckan.action.datastore_search_sql(sql=query)
+    # A typical response is a dictionary like this
+    #{u'fields': [{u'id': u'_id', u'type': u'int4'},
+    #             {u'id': u'_full_text', u'type': u'tsvector'},
+    #             {u'id': u'pin', u'type': u'text'},
+    #             {u'id': u'number', u'type': u'int4'},
+    #             {u'id': u'total_amount', u'type': u'float8'}],
+    # u'records': [{u'_full_text': u"'0001b00010000000':1 '11':2 '13585.47':3",
+    #               u'_id': 1,
+    #               u'number': 11,
+    #               u'pin': u'0001B00010000000',
+    #               u'total_amount': 13585.47},
+    #              {u'_full_text': u"'0001c00058000000':3 '2':2 '7827.64':1",
+    #               u'_id': 2,
+    #               u'number': 2,
+    #               u'pin': u'0001C00058000000',
+    #               u'total_amount': 7827.64},
+    #              {u'_full_text': u"'0001c01661006700':3 '1':1 '3233.59':2",
+    #               u'_id': 3,
+    #               u'number': 1,
+    #               u'pin': u'0001C01661006700',
+    #               u'total_amount': 3233.59}]
+    # u'sql': u'SELECT * FROM "d1e80180-5b2e-4dab-8ec3-be621628649e" LIMIT 3'}
+    data = response['records']
+
+    # Note that if a CKAN table field name is a Postgres reserverd word, you
+    # get a not-very-useful error
+    #      (e.g., 'query': ['(ProgrammingError) syntax error at or near
+    #     "on"\nLINE 1: SELECT * FROM (SELECT load, on FROM)
+    # and you need to escape the reserved field name with double quotes.
+
+    # These seem to be reserved Postgres words:
+    # ALL, ANALYSE, ANALYZE, AND, ANY, ARRAY, AS, ASC, ASYMMETRIC, AUTHORIZATION, BETWEEN, BINARY, BOTH, CASE, CAST, CHECK, COLLATE, COLUMN, CONSTRAINT, CREATE, CROSS, CURRENT_DATE, CURRENT_ROLE, CURRENT_TIME, CURRENT_TIMESTAMP, CURRENT_USER, DEFAULT, DEFERRABLE, DESC, DISTINCT, DO, ELSE, END, EXCEPT, FALSE, FOR, FOREIGN, FREEZE, FROM, FULL, GRANT, GROUP, HAVING, ILIKE, IN, INITIALLY, INNER, INTERSECT, INTO, IS, ISNULL, JOIN, LEADING, LEFT, LIKE, LIMIT, LOCALTIME, LOCALTIMESTAMP, NATURAL, NEW, NOT, NOTNULL, NULL, OFF, OFFSET, OLD, ON, ONLY, OR, ORDER, OUTER, OVERLAPS, PLACING, PRIMARY, REFERENCES, RIGHT, SELECT, SESSION_USER, SIMILAR, SOME, SYMMETRIC, TABLE, THEN, TO, TRAILING, TRUE, UNION, UNIQUE, USER, USING, VERBOSE, WHEN, WHERE
+
+    return data
