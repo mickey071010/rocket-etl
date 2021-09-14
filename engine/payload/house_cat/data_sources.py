@@ -109,6 +109,34 @@ class HouseCatFieldsSchema(pl.BaseSchema):
     class Meta:
         ordered = True
 
+id_fields_by_code = {
+        'mf_mortgages': ['fha_loan_id'],
+        'mf_init_commit': ['fha_loan_id'],
+        'lihtc': ['lihtc_project_id', 'normalized_state_id'],
+        'lihtc_building': ['lihtc_project_id', 'normalized_state_id'],
+        'housing_inspections': ['development_code'],
+        'hud_public_housing_projects': ['development_code'],
+        'hud_public_housing_buildings': ['development_code'],
+        'mf_subsidy_loans': ['property_id'], #, 'contract_id'],
+        'mf_subsidy_8': ['property_id'],
+        'mf_contracts_8': ['property_id'], #, 'contract_id'],
+        # I'm leaving out contract_id since so far, any table
+        # that has contract_id also has property_id.
+        'mf_loans': ['property_id', 'fha_loan_id'],
+        'mf_inspections_1': ['property_id'],
+        'hfa_lihtc': ['pmindx'],
+        'hfa_demographics': ['property_id', 'pmindx', 'normalized_state_id', 'fha_loan_id'],
+        'hfa_apartment_distributions': ['pmindx'],
+        'hunt_and_peck': ['id'] # 'property_id', 'pmindx', 'fha_loan_id', 'lihtc_project_id', 'normalized_state_id', 'development_code'], # This is the deduplicated index, which is
+        # really supposed to be linked with Django magic to all the other key values,
+        # so maybe really everything should be listed here (even contract_id?).
+        # But since most of those fields are not queryable DIRECTLY through the CKAN API,
+        # I'm leaving them out for now.
+        # Also, maybe this one shouldn't even have id_fields listed since it's not
+        # supposed to be queried in this fashion.
+        }
+# Should these be defined on the job level (e.g., in _flatbread.py)?
+
 def scrape_rocket_jobs(job, **kwparameters):
     #if not kwparameters['use_local_input_file']:
     #job.path_to_scrape # 'engine/payload/house_cat/_flatbread.py'
@@ -118,17 +146,6 @@ def scrape_rocket_jobs(job, **kwparameters):
     if 'only_these_job_codes' in job.custom_parameters:
         scraped_job_dicts = [d for d in scraped_job_dicts if d['job_code'] in job.custom_parameters['only_these_job_codes']]
 
-    id_fields_by_code = {
-            'mf_mortgages': ['fha_loan_id'],
-            'mf_init_commit': ['fha_loan_id'],
-            'lihtc': ['lihtc_project_id', 'normalized_state_id'],
-            'lihtc_building': ['lihtc_project_id', 'normalized_state_id'],
-            'housing_inspections': ['development_code'],
-            'hud_public_housing_projects': ['development_code'],
-            'hud_public_housing_buildings': ['development_code'],
-            'mf_subsidy_loans': ['property_id'], #, 'contract_id'],
-            'mf_subsidy_8': ['property_id'],
-            'mf_contracts_8': ['property_id'], #, 'contract_id'],
             # I'm leaving out contract_id since so far, any table
             # that has contract_id also has property_id.
             'mf_loans': ['property_id', 'fha_loan_id'],
