@@ -41,7 +41,7 @@ def standardize_name(x):
             'PHASE 2': 'PHASE II',
             'PHASE 3': 'PHASE III',
             'PHASE 4': 'PHASE IV',
-            ' HTS ': ' HEIGHTS',
+            ' HTS ': ' HEIGHTS ',
             'BEDFORD IB': 'BEDFORD PHASE IB',
             'NORTH HILLS HIGHLANDS II': 'NORTH HILLS HIGHLANDS PHASE II',
             'OAK HILL APT PHASE II': 'OAK HILL PHASE II',
@@ -146,7 +146,7 @@ def compare_decimal_strings(value_1, value_2, digits):
     integer_part_2, decimal_part_2 = value_2.split('.')
     if integer_part_1 == integer_part_2:
         if decimal_part_1[:digits] == decimal_part_2[:digits]:
-            return True, decimal_part_1[:digits]
+            return True, f'{integer_part_1}.{decimal_part_1[:digits]}'
     return False, None
 
 def merge(record_1, record_2, verbose):
