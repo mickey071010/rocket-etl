@@ -124,24 +124,95 @@ def fix_some_records(record_1, record_2, merged_record, verbose):
         merged_record['longitude'] = '-79.9393939999999'
 
     elif 'TC1990-0139' in [record_1['normalized_state_id'], record_2['normalized_state_id']]:
-        merged_record['property_street_address'] = '5171 COLUMBO ST'
+        merged_record['hud_property_name'] = 'MELVIN COURT/CHURCHILL APTS'
+        #merged_record['property_street_address'] = ''
+        merged_record['municipality_name'] = 'PENN HILLS'
         merged_record['city'] = 'PITTSBURGH'
-        merged_record['census_tract'] = '42003101900' # This is the 2020 tract (which I looked up).
+        merged_record['zip_code'] = '15235'
+        merged_record['census_tract'] = '42003523200' # This is the 2020 tract (which I looked up and which matches one of the existing values).
+        assert merged_record['census_tract'] in record_1['census_tract'].split('|') + record_2['census_tract'].split('|') # Guard against Census tract drift.
 
-        merged_record['latitude'] = '40.469373999'
-        merged_record['longitude'] = '-79.9393939999999'
+        merged_record['latitude'] = '40.4587898254395' # Closest to Census geocoder location
+        merged_record['longitude'] = '-79.8440475463867'
 
         merged_record['status'] = 'Closed' # According to web searches
 
-    return merged_record
+    elif 'PA006000301' in [record_1['development_code'], record_2['development_code']]:
+        merged_record['property_street_address'] = '209 LOCUST ST'
+        merged_record['city'] = 'PITTSBURGH'
+        merged_record['census_tract'] = '42003481000' # The 2020 tract does not match the previous values.
+        merged_record['latitude'] = '40.4666786193848'
+        merged_record['longitude'] = '-80.0561752319336'
 
+    elif '800018237' in [record_1['property_id'], record_2['property_id']]:
+        merged_record['property_street_address'] = '7021 Kelly Street'
+        merged_record['zip_code'] = '15208'
+        merged_record['census_tract'] = '42003130800' # Added from census.gov (2020 tract)
+        merged_record['latitude'] = '40.45648' # Added from census.gov.
+        merged_record['longitude'] = '-79.90119' # Added from census.gov.
+    elif '800018276' in [record_1['property_id'], record_2['property_id']]:
+        merged_record['property_street_address'] = '120 CAMBRIDGE SQUARE DR'
+        merged_record['census_tract'] = '42003521301' # Added from census.gov (2020 tract)
+        merged_record['latitude'] = '40.422333' # Added from census.gov.
+        merged_record['longitude'] = '-79.76022' # Added from census.gov.
+    elif '800018357' in [record_1['property_id'], record_2['property_id']]:
+        merged_record['property_street_address'] = '2017-2031 DE RUAD ST' # I'm deliberately keeping this as a range of addresses, for now.
+        merged_record['zip_code'] = '15208'
+        merged_record['census_tract'] = '42003040200' # Added from census.gov (2020 tract)
+        merged_record['latitude'] = '40.438619368902245' # Added manually
+        merged_record['longitude'] = '-79.97572065933687' # Added manually
+    elif '800018531' in [record_1['property_id'], record_2['property_id']]:
+        merged_record['property_street_address'] = '7130 FRANKSTOWN AVE'
+        merged_record['census_tract'] = '42003130800' # Added from census.gov (2020 tract)
+        merged_record['latitude'] = '40.45773' # Added manually
+        merged_record['longitude'] = '-79.89778' # Added manually
+    elif '800018532' in [record_1['property_id'], record_2['property_id']]:
+        merged_record['property_street_address'] = '1020 BRUSHTON AVE'
+        merged_record['census_tract'] = '42003130700' # Added from census.gov (2020 tract)
+        merged_record['latitude'] = '40.457275' # Added manually
+        merged_record['longitude'] = '-79.88773' # Added manually
+        merged_record['units'] = 126
+        assert str(merged_record['units']) in record_1['units'].split('|') + record_2['units'].split('|') # Guard against units drift.
+#    elif '800018175' in [record_1['property_id'], record_2['property_id']]:
+#        #merged_record['units'] = 126 # [ ] Need to distinguish between 130 and 136 units.
+#        #assert str(merged_record['units']) in record_1['units'].split('|') + record_2['units'].split('|') # Guard against units drift.
+    elif '800246670' in [record_1['property_id'], record_2['property_id']]:
+#        merged_record['census_tract'] = '42003130700' # Added from census.gov (2020 tract)
+#        merged_record['latitude'] = '40.4528969990001' # Chosen from two very close sets
+        assert 'OAK HILL PHASE IC' in [record_1['hud_property_name'], record_2['hud_property_name']]
+        merged_record['hud_property_name'] = 'OAK HILL PHASE 1C'
+        merged_record['property_street_address'] = '537 Oak Hill Drive'
+        merged_record['latitude'] = '40.4437629990001'
+        merged_record['longitude'] = '-79.970113'
+        merged_record['scattered_sites'] = True # This may not be necessary, but setting property_street_address is
+        # obscuring the fact that one table has SCATTERED SITES as the address.
+
+    elif 'TC1994-0155' in [record_1['normalized_state_id'], record_2['normalized_state_id']]:
+        merged_record['property_street_address'] = '2253-2263 HAWTHORNE AVE'
+        merged_record['municipality_name'] = 'SWISSVALE'
+        merged_record['city'] = 'PITTSBURGH'
+        merged_record['latitude'] = '40.42121887' # The coordinates of 2263 HAWTHORNE
+        merged_record['longitude'] = '-79.8805542'
+        merged_record['status'] = 'Closed' # According to web searches
+    elif 'PA006000812' in [record_1['development_code'], record_2['development_code']]:
+        merged_record['property_street_address'] = '200 TREFOIL CT'
+        merged_record['latitude'] = '40.4252243' # The coordinates of 2263 HAWTHORNE
+        merged_record['longitude'] = '-79.75964355'
+    elif 'PA006000303' in [record_1['development_code'], record_2['development_code']]:
+        merged_record['property_street_address'] = '507 GROVETON DR'
+        merged_record['latitude'] = '40.50457382'
+        merged_record['longitude'] = '-80.14112854'
+    elif 'PA001000096' in [record_1['development_code'], record_2['development_code']]:
+        merged_record['property_street_address'] = '242 FERN ST'
+        merged_record['latitude'] = '40.47097'
+        merged_record['longitude'] = '-79.9348'
+    return merged_record
 
 def compare_decimal_strings(value_1, value_2, digits):
     if '|' in value_1 or '|' in value_2: # Handle lists.
         return False, None
     if '.' not in value_1 or '.' not in value_2:
         return False, None
-    ic(value_1, value_2)
     integer_part_1, decimal_part_1 = value_1.split('.')
     integer_part_2, decimal_part_2 = value_2.split('.')
     if integer_part_1 == integer_part_2:
