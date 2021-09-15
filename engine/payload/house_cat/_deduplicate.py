@@ -136,8 +136,21 @@ def fix_some_records(record_1, record_2, merged_record, verbose):
     return merged_record
 
 
+def compare_decimal_strings(value_1, value_2, digits):
+    if '|' in value_1 or '|' in value_2: # Handle lists.
+        return False, None
+    if '.' not in value_1 or '.' not in value_2:
+        return False, None
+    ic(value_1, value_2)
+    integer_part_1, decimal_part_1 = value_1.split('.')
+    integer_part_2, decimal_part_2 = value_2.split('.')
+    if integer_part_1 == integer_part_2:
+        if decimal_part_1[:digits] == decimal_part_2[:digits]:
+            return True, decimal_part_1[:digits]
+    return False, None
 
 def merge(record_1, record_2, verbose):
+    DIGITS_OF_PRECISION = 4
     merged_record = {}
     for key, value in record_1.items():
         other_value = record_2.get(key, None)
@@ -149,8 +162,10 @@ def merge(record_1, record_2, verbose):
 
         if key == 'index':
             merged_record[key] = min(value, other_value)
-        elif other_value is None:
+        elif other_value in [None, '']:
             merged_record[key] = value
+        elif value in [None, '']:
+            merged_record[key] = other_value
         elif value.upper() == other_value.upper():
             merged_record[key] = value
         elif key == 'source_file':
@@ -162,9 +177,15 @@ def merge(record_1, record_2, verbose):
             elif other_value in ['42XXXXXXXXX', '']:
                 merged_record[key] = value
             else:
-                print(f"Since this code doesn't know how to merge key = {key}, value = {value}, other value = {record_2[key]}, it's just going to list both.")
+                #print(f"Since this code doesn't know how to merge key = {key}, value = {value}, other value = {record_2[key]}, it's just going to list both.")
                 merged_record[key] = '|'.join(sorted([value, other_value]))
 
+        elif key in ['latitude', 'longitude'] and compare_decimal_strings(value, other_value, DIGITS_OF_PRECISION)[0]:
+            # Sometimes the geocoordinates from different sources differ by something like a floating
+            # point error (or certainly an insignificant amount).
+            merged_record[key] = compare_decimal_strings(value, other_value, DIGITS_OF_PRECISION)[1]
+            # 4 decimal points is enough, according to XKCD:
+            # https://xkcd.com/2170/
         elif re.match(value.upper(), other_value.upper()) is not None: # other_value starts with value
             merged_record[key] = other_value # Go with the longer version
         elif re.match(other_value.upper(), value.upper()) is not None:
