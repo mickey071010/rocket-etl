@@ -62,7 +62,6 @@ def query_housing_project(id_field_name, id_field_value):
 
     value_list_by_job_code_and_field = defaultdict(lambda: defaultdict(list))
     fields_by_job_code = {}
-    rows_with_values = []
 
     with open('/Users/drw/WPRDC/etl/rocket-etl/output_files/house_cat/sources.csv') as g:
         reader = csv.DictReader(g)
@@ -70,11 +69,11 @@ def query_housing_project(id_field_name, id_field_value):
             job_code = source['job_code']
             table_id_fields = source['id_fields'].split('|')
             list_of_dicts = []
-            where_clauses = []
             resource_id = source['resource_id']
 
             fields_by_job_code[job_code] = get_resource_fields(site, resource_id, API_key)[0]
 
+            where_clauses = []
             for id_f, id_value in id_fields_and_values:
                 if id_f in table_id_fields:
                     # Combine clauses to eliminate duplicates.
@@ -92,17 +91,16 @@ def query_housing_project(id_field_name, id_field_value):
                     if field not in ['_id', '_geom', '_the_geom_webmercator', '_full_text']:
                         source['field'] = field
                         source['value'] = value
-                        rows_with_values.append(dict(source))
                         value_list_by_job_code_and_field[job_code][field].append(value)
 
-    return rows_with_values, value_list_by_job_code_and_field
+    return value_list_by_job_code_and_field
 
 def generate_housing_project_file_from_multitable_query(job, **kwparameters):
     # Get field name and value (interactively)
     id_field_name = input("Enter name of property ID field: ")
     id_field_value = input(f"Search for {id_field_name} = ")
 
-    rows_with_values, value_list_by_job_code_and_field = query_housing_project(id_field_name, id_field_value)
+    value_list_by_job_code_and_field = query_housing_project(id_field_name, id_field_value)
     write_to_csv(job.target, rows_with_values)
     other_path = re.sub('fields', 'ordered_fields', job.target)
 
