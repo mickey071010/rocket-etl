@@ -139,6 +139,8 @@ class HFADemographics(pl.BaseSchema):
     # mf_subsidy_8.
     management_agent = fields.String(load_from='Management Agent'.lower(), dump_to='property_manager_company') # These values
     # match best (but not perfectly) with the property_management_company values obtained from mf_subsidy_8.
+    #scattered_site_ind = fields.Boolean(load_from='address', dump_to='scattered_site_ind')
+    scattered_sites = fields.Boolean(load_from='scattered_sites', dump_to='scattered_sites')
 
     class Meta:
         ordered = True
@@ -149,6 +151,16 @@ class HFADemographics(pl.BaseSchema):
     #    if f in data and data[f] not in [None, '', ' ']:
     #        if data[f] == 'X':
     #            data['owner_type'] = 'Non-Profit'
+
+    @pre_load
+    def fix_scattered_site_ind(self, data):
+        f2 = 'scattered_sites'
+
+        fs = ['address']
+        for i in fs:
+            if i in data and data[i] is not None:
+                if re.search('scattered', data[i], re.IGNORECASE) is not None:
+                    data[f2] = True
 
     @pre_load
     def standardize_fha_loan_id(self, data):

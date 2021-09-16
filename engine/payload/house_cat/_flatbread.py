@@ -287,7 +287,27 @@ class HUDPublicHousingSchema(pl.BaseSchema):
 class HUDPublicHousingProjectsSchema(HUDPublicHousingSchema):
     job_code = 'hud_public_housing_projects'
     scattered_site_ind = fields.String(load_from='SCATTERED_SITE_IND'.lower(), dump_to='scattered_site_ind') # Projects-only
+    scattered_sites = fields.Boolean(load_from='scattered_sites', dump_to='scattered_sites')
     pd_status_type_code = fields.String(load_from='PD_STATUS_TYPE_CODE'.lower(), dump_to='pd_status_type_code') # Projects-only
+
+    @pre_load
+    def fix_scattered_site_ind(self, data):
+        f = 'scattered_site_ind'
+        f2 = 'scattered_sites'
+        data[f2] = False
+        if f in data:
+            if data[f] in [False, 'N', None]:
+                data[f2] = False
+            else:
+                data[f2] = True
+
+        fs = ['std_addr']
+        for i in fs:
+            if i in data and data[i] is not None:
+                if re.search('scattered', data[i], re.IGNORECASE) is not None:
+                    data[f2] = True
+                    # This will force 'scattered_sites' to be True, even if it
+                    # is already explicitly False.
 
 class HUDPublicHousingBuildingsSchema(HUDPublicHousingSchema):
     job_code = 'hud_public_housing_buildings'
@@ -577,9 +597,22 @@ class MultifamilyGuaranteedLoansSchema(pl.BaseSchema):
     client_group_type = fields.String(load_from='CLIENT_GROUP_TYPE'.lower(), dump_to='client_group_type', allow_none=True)
     soacode1 = fields.String(load_from='SOACODE1'.lower(), dump_to='section_of_act_code', allow_none=True)
     servicing_site_name_text = fields.String(load_from='servicing_site_name_text'.lower(), dump_to='servicing_site_name_loan', allow_none=True)
+    scattered_sites = fields.Boolean(load_from='scattered_sites', dump_to='scattered_sites', allow_none=True)
 
     class Meta:
         ordered = True
+
+    @pre_load
+    def fix_scattered_site_ind(self, data):
+        f2 = 'scattered_sites'
+
+        fs = ['address_line1_text']
+        for i in fs:
+            if i in data and data[i] is not None:
+                if re.search('scattered', data[i], re.IGNORECASE) is not None:
+                    data[f2] = True
+                    # This will force 'scattered_sites' to be True, even if it
+                    # is already explicitly False.
 
     @pre_load
     def standardize_fha_loan_id(self, data):
@@ -664,6 +697,7 @@ class LIHTCSchema(pl.BaseSchema):
     fmha_515 = fields.Boolean(load_from='fmha_515'.lower(), dump_to='fmha_515_loan', allow_none=True)
     fmha_538 = fields.Boolean(load_from='fmha_538'.lower(), dump_to='fmha_538_loan', allow_none=True)
     scattered_site_cd = fields.String(load_from='scattered_site_cd'.lower(), dump_to='scattered_site_ind', allow_none=True)
+    scattered_sites = fields.Boolean(load_from='scattered_sites', dump_to='scattered_sites')
     hope_vi_designation = fields.Boolean(load_from='hopevi', dump_to='hope_vi_designation', allow_none=True)
 
     class Meta:
@@ -737,6 +771,25 @@ class LIHTCSchema(pl.BaseSchema):
                     '': None}
             if data[e] in lookup:
                 data[e] = lookup[data[e]]
+
+    @pre_load
+    def fix_scattered_site_ind(self, data):
+        f = 'scattered_site_cd'
+        f2 = 'scattered_sites'
+        data[f2] = None
+        if f in data:
+            if data[f] in ['2']:
+                data[f2] = False
+            elif data[f] in ['1']:
+                data[f2] = True
+
+        fs = ['project', 'proj_add']
+        for i in fs:
+            if i in data and data[i] is not None:
+                if re.search('scattered', data[i], re.IGNORECASE) is not None:
+                    data[f2] = True
+                    # This will force 'scattered_sites' to be True, even if it
+                    # is already explicitly False.
 
     @pre_load
     def transform_ints_to_strings(self, data):

@@ -148,6 +148,7 @@ def link_records_into_index():
             'property_street_address', 'municipality_name', 'city', 'zip_code', 'units',
             'latitude', 'longitude',
             'census_tract',
+            'scattered_sites',
             'contract_id', # mf_subsidy_ac
             'fha_loan_id',
             'normalized_state_id',
@@ -340,6 +341,8 @@ def link_records_into_index():
     # Sort master_list to make it easier to compare files.
     sorted_master_list = multikeysort(master_list, ['crowdsourced_id', 'pmindx', 'development_code', 'normalized_state_id', 'property_id'])
     ic(len(sorted_master_list))
+    ########################
+
     ########################
     write_to_csv(index_filename, sorted_master_list, fields_to_write + ['source_file'])
 

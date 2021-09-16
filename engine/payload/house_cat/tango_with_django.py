@@ -60,6 +60,7 @@ class PropertyIndexSchema(pl.BaseSchema):
     city = fields.String(load_from='city'.lower(), dump_to='city')
     zip_code = fields.String(load_from='zip_code'.lower(), dump_to='zip_code', allow_none=True)
     units = fields.String(load_from='units'.lower(), dump_to='units', allow_none=True)
+    scattered_sites = fields.Boolean(load_from='scattered_sites'.lower(), dump_to='scattered_sites', allow_none=True)
     #source_file = fields.String(load_from='source_file'.lower(), dump_to='source_file')
     #index = fields.Integer(load_from='index'.lower(), dump_to='index')
     latitude = fields.String(load_from='latitude'.lower(), dump_to='latitude', allow_none=True)

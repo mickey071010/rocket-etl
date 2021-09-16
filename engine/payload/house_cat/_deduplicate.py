@@ -184,7 +184,7 @@ def fix_some_records(record_1, record_2, merged_record, verbose):
         merged_record['property_street_address'] = '537 Oak Hill Drive'
         merged_record['latitude'] = '40.4437629990001'
         merged_record['longitude'] = '-79.970113'
-        merged_record['scattered_sites'] = True # This may not be necessary, but setting property_street_address is
+        merged_record['scattered_sites'] = "TRUE" # This may not be necessary, but setting property_street_address is
         # obscuring the fact that one table has SCATTERED SITES as the address.
 
     elif 'TC1994-0155' in [record_1['normalized_state_id'], record_2['normalized_state_id']]:
@@ -237,6 +237,16 @@ def merge(record_1, record_2, verbose):
             merged_record[key] = value
         elif value in [None, '']:
             merged_record[key] = other_value
+        elif key == 'scattered_sites':
+            if value == other_value:
+                merged_record[key] = value
+            elif set([value, other_value]) == set(["TRUE", "FALSE"]):
+                merged_record[key] = "TRUE"
+            else:
+                ic(value, other_value)
+                ic(record_1)
+                ic(record_2)
+                assert 0
         elif value.upper() == other_value.upper():
             merged_record[key] = value
         elif key == 'source_file':
@@ -283,6 +293,7 @@ fields_to_get = ['hud_property_name',
         'normalized_state_id',
         'pmindx',
         'units',
+        'scattered_sites',
         'latitude', 'longitude',
         'census_tract',
         'status'
