@@ -97,7 +97,7 @@ class HFALIHTCSchema(pl.BaseSchema):
 
     @pre_load
     def trim_strings(self, data):
-        fs = ['project_name']
+        fs = ['property_name']
         for f in fs:
             if f in data and data[f] is not None:
                 data[f] = data[f].strip()
