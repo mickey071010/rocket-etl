@@ -240,7 +240,78 @@ def fix_some_records(record_1, record_2, merged_record, verbose):
         merged_record['property_street_address'] = '242 FERN ST'
         merged_record['latitude'] = '40.47097'
         merged_record['longitude'] = '-79.9348'
+    elif '800018474' in [record_1['property_id'], record_2['property_id']]:
+        # Choose an address for geooding
+        if merged_record['property_street_address'] == '1513-1521 CRUCIBLE ST':
+            merged_record['property_street_address'] = '1513 CRUCIBLE ST'
+    elif '800018716' in [record_1['property_id'], record_2['property_id']]:
+        # Choose an address for geooding
+        if merged_record['property_street_address'] == '1300 BRIGHTON RD|1414 BRIGHTON RD':
+            merged_record['property_street_address'] = '1414 BRIGHTON RD'
+    elif '800018393' in [record_1['property_id'], record_2['property_id']]:
+        # Choose an address for geooding
+        if merged_record['property_street_address'] == '7021 KELLY ST|7057 FLETCHER WY': # 7021 KELLY is the AHRCO office
+            # (as is clear from Google Street View). Two other projects are associated with
+            # the same address, so I'm switching to alternate addresses for the map marker.
+            merged_record['property_street_address'] = '7057 FLETCHER WY|7021 KELLY ST'
+
     return merged_record
+
+def fix_single_record(record):
+    if '800018680' == record['property_id']:
+        record['property_street_address'] = re.sub('MIDWY', 'MIDWAY', record['property_street_address'])
+    elif '10630' == record['pmindx']:
+        record['zip_code'] == re.sub('^18212', '15212', record['zip_code'])
+    elif '10186' == record['pmindx']:
+        # Choose an address for geooding
+        #if merged_record['hud_property_name'] == 'MIDDLE HILL':
+        record['hud_property_name'] = 'MIDDLE HILL (ADDISON TERRACE PHASE 3)'
+        if record['property_street_address'] == 'LOTS BEDFORD ERIN TRENT':
+            record['property_street_address'] = 'Lots: Bedford, Erin, Trent, Wooster and Webster Aves'
+            # Obtained from https://www.phfa.org/forms/multifamily_news/awards/2015/2015_app_log_1.pdf
+    elif '800018530' == record['property_id']:
+        # Choose an address for geooding
+        if record['property_street_address'] == '331 EAST 9TH AND 339 EAST 12TH AVE':
+            record['property_street_address'] = '331 EAST 9TH AVE'
+    elif '10223' == record['pmindx']:
+        assert record['property_street_address'] == 'SCATTERED SITES'
+        record['property_street_address'] = '2520 Wadsworth St|Allequippa Place and Wadsworth Street (Scattered Sites?)'
+        # Maybe this is not scattered sites? Oakland Affordable Living appears to be an apartment building.
+        record['zip_code'] = '15213'
+        record['city'] = 'Pittsburgh'
+        record['latitude'] = '40.4428'
+        record['longitude'] = '-79.9675'
+        record['census_tract'] = '42003040200' # 2020 Census tract - looked up through geo.census.gov
+    elif '10390' == record['pmindx']:
+        assert record['property_street_address'] == '3300-3350 PENN AVE'
+        record['property_street_address'] = '3350 PENN AVE'
+        record['latitude'] = '40.4623'
+        record['longitude'] = '-79.9672'
+        #record['census_tract'] = '' # 2020 Census tract - looked up through geo.census.gov
+        # Lookup is failing
+
+    elif '10504' == record['pmindx']:
+        assert record['property_street_address'] == 'STOEBNER WY, WINSLOW ST,'
+        record['hud_property_name'] = "LARIMER / EAST LIBERTY CHOICE NEIGHBORHOODS INITIATIVE"
+        # https://www.ura.org/pages/larimer-east-liberty-choice-neighborhood-initiative
+        # East Liberty and Larimer Neighborhoods near the intersection of Larimer Avenue and East Liberty Blvd
+        record['property_street_address'] = 'East Liberty and Larimer Neighborhoods near the intersection of Larimer Avenue and East Liberty Blvd'
+        # The proposed 25-acre Larimer/East Liberty Park spans from Station Street and Larimer Avenue to the northern corner of the Larimer Neighborhood at Orphan Street and Larimer Avenue. The park will serve 4,177 residents who live within a five-minute walk.
+        #    "334 units of high quality, mixed-income housing built in four phases over the next four years.
+        #Phase I was completed in 2016 and consisted of 85 units in 18 buildings
+        #Phase II began in October 2017 and consists of 150 units
+        #Phases III & IV completes the final 99 units by 2021"
+        record['latitude'] = '40.4634'
+        record['longitude'] = '-79.9175'
+        record['census_tract'] = '42003111500' # 2020 Census tract - looked up through geo.census.gov
+    elif '800112244' == record['property_id']:
+        assert record['property_street_address'] == '5653 BRD ST'
+        record['property_street_address'] = '5653 BROAD ST'
+
+    if False:
+        record = try_to_geocode(record)
+    return record
+
 
 def compare_decimal_strings(value_1, value_2, digits):
     if '|' in value_1 or '|' in value_2: # Handle lists.
@@ -466,7 +537,7 @@ def deduplicate_records(deduplicated_index_filepath, verbose=False):
         for value, index in remainder.items():
             if index not in added and index not in eliminated_indices:
                 added.append(index)
-                deduplicated_master_list.append(master_list[index])
+                deduplicated_master_list.append(fix_single_record(master_list[index]))
 
     write_to_csv(deduplicated_index_filepath, deduplicated_master_list, fields_to_write + [house_cat_id_name, 'source_file', 'index'])
     return master_list, deduplicated_master_list
