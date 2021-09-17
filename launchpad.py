@@ -185,6 +185,14 @@ def is_job_code(candidate_code, job_dicts):
             return True
     return False
 
+def is_job_code_prefix(candidate_code, job_dicts):
+    if candidate_code[-1] == '-':
+        code_prefix = candidate_code[:-1]
+        for job_dict in job_dicts:
+            if re.match(code_prefix, job_dict['job_code']):
+                return True
+    return False
+
 def select_jobs_by_code(selected_job_codes, job_dicts):
     """This function takes some job codes and from a list of job dicts
     returns the selected jobs (in object format)."""
