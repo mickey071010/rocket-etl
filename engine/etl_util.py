@@ -4,6 +4,7 @@ from datetime import datetime
 # > sudo su -c "sftp -i /home/sds25/keys/pitt_ed25519 pitt@ftp.pittsburghpa.gov" sds25
 from engine.wprdc_etl import pipeline as pl
 from engine.wprdc_etl.pipeline.schema import NullSchema
+from engine.leash_util import fill_bowl
 from engine.parameters.remote_parameters import TEST_PACKAGE_ID
 from engine.parameters.local_parameters import SETTINGS_FILE
 
@@ -394,6 +395,8 @@ def post_process(resource_id, job, **kwparameters):
         update_etl_timestamp(package, resource)
         add_time_field(package, resource, job)
         set_resource_description(job, **kwparameters)
+        if job.make_datastore_queryable:
+            fill_bowl(resource_id)
 
 def lookup_parcel(parcel_id):
     """Accept parcel ID for Allegheny County parcel and return geocoordinates."""
@@ -482,6 +485,8 @@ class Job:
         self.connector_config_string = job_dict['connector_config_string'] if 'connector_config_string' in job_dict else ''
         self.compressed_file_to_extract = job_dict['compressed_file_to_extract'] if 'compressed_file_to_extract' in job_dict else None
         self.custom_processing = job_dict['custom_processing'] if 'custom_processing' in job_dict else (lambda *args, **kwargs: None)
+        self.custom_parameters = job_dict['custom_parameters'] if 'custom_parameters' in job_dict else {}
+        self.make_datastore_queryable = job_dict['make_datastore_queryable'] if 'make_datastore_queryable' in job_dict else False
         self.custom_post_processing = job_dict['custom_post_processing'] if 'custom_post_processing' in job_dict else (lambda *args, **kwargs: None)
         self.schema = job_dict['schema'] if 'schema' in job_dict and job_dict['schema'] is not None else NullSchema
         self.filters = job_dict['filters'] if 'filters' in job_dict else []

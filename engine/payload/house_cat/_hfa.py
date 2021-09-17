@@ -283,6 +283,7 @@ job_dicts = [
         'resource_name': 'LIHTC Data from PHFA (Allegheny County)',
         'upload_method': 'insert',
         'resource_description': 'Derived from a file sent by the PHFA',
+        'make_datastore_queryable': True,
         #'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
     },
     {
@@ -296,6 +297,7 @@ job_dicts = [
         'resource_name': 'Demographics by Housing Project from PHFA (Allegheny County)',
         'upload_method': 'insert',
         'resource_description': 'Derived from a file sent by the PHFA',
+        'make_datastore_queryable': True,
         #'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
     },
     {
@@ -309,6 +311,7 @@ job_dicts = [
         'resource_name': 'Apartment Distributions, Income Limits, and Subsidies by Housing Project from PHFA (Allegheny County)',
         'upload_method': 'insert',
         'resource_description': 'Derived from a file sent by the PHFA',
+        'make_datastore_queryable': True,
         #'custom_post_processing': check_for_empty_table, # This is necessary since an upstream change to filter values can easily result in zero-record tables.
     },
 ]

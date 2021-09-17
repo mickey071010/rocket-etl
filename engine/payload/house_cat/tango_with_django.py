@@ -333,6 +333,7 @@ job_dicts = [
         # gets the 'id' values where available and otherwise synthesizes new ones, creates
         # the correct CSV file to fuel this job, and updates the job.target attribute to
         # point to it.
+        'make_datastore_queryable': True,
     },
 #    { # I think this job has been completely folded into hunt_and_peck.
 #        'job_code': PropertyIndexSchema().job_code, # 'update_index'
@@ -350,6 +351,7 @@ job_dicts = [
 #        'package': housecat_tango_with_django_package_id,
 #        'resource_name': 'house_cat_projectindex',
 #        'upload_method': 'upsert',
+#        'make_datastore_queryable': True,
 #    },
 ]
 
@@ -366,6 +368,7 @@ job_dict_template = \
         'destination': 'ckan',
         'package': housecat_tango_with_django_package_id,
         'upload_method': 'insert',
+        'make_datastore_queryable': True,
     }
 
 from engine.payload.house_cat._deduplicate import possible_keys
