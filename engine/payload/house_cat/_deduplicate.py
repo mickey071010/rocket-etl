@@ -1,4 +1,4 @@
-import re, csv, copy
+import re, csv, copy, requests, time
 from pprint import pprint
 from icecream import ic
 from collections import defaultdict
@@ -71,6 +71,40 @@ def standardize_field(x, fieldname):
     if fieldname in ['municipality_name', 'city']:
         return standardize_city(x)
     return standardize_string(x)
+
+def geocode_address_with_geomancer(address):
+    url = "https://tools.wprdc.org/geo/geocode?addr={}".format(address)
+    r = requests.get(url)
+    result = r.json()
+    time.sleep(0.1)
+    if result['data']['status'] == "OK":
+        longitude, latitude = result['data']['geom']['coordinates']
+        return longitude, latitude
+    print(f"Unable to geocode {address}, failing with status code '{result['data']['status']}'"
+    return None, None
+
+def try_to_geocode(merged_record):
+    if merged_record['latitude'] == '':
+        if merged_record.get('property_street_address', None) in ['', None, 'SCATTERED SITES',
+                'SCATTERED SITES IN GARFIELD', 'MULTIPLE PARCELS (19)']:
+            return merged_record
+        address = merged_record['property_street_address']
+        if '|' in address: # Pick the first of several addresses to geocode
+            address = address.split('|')[0]
+
+        if merged_record.get('city', None) in [None, '']:
+            return merged_record
+        address += f", {merged_record['city']}, PA "
+        if merged_record.get('zip_code', '') not in ['']:
+            address += merged_record['zip_code']
+        print(f"Trying to geocode {address}.")
+        longitude, latitude = geocode_address_with_geomancer(address)
+        if latitude is not None:
+            merged_record['latitude'] = latitude
+            merged_record['longitude'] = longitude
+            print(f"   Changed coordinates to ({latitude}, {longitude}).")
+
+    return merged_record
 
 def fix_some_records(record_1, record_2, merged_record, verbose):
     if '800030192' in [record_1['property_id'], record_2['property_id']]:
