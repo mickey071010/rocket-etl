@@ -323,8 +323,177 @@ def fix_single_record(record):
     elif '800112244' == record['property_id']:
         assert record['property_street_address'] == '5653 BRD ST'
         record['property_street_address'] = '5653 BROAD ST'
+    elif 'TC1989-0042' == record['normalized_state_id']:
+        record['status'] = 'Closed'
+        record['property_street_address'] = '2561 Allequippa St'
+        record['city'] = 'Pittsburgh'
+        record['zip_code'] = '15213'
+        # Was the address missing because this is Closed or just because the location is old?
+    elif 'TC1989-0248' == record['normalized_state_id']:
+        record['property_street_address'] = '1717 WEILER ST'
+        record['city'] = 'NORTH BRADDOCK'
+        record['latitude'] = '40.3999'
+        record['longitude'] = '-79.8430'
+        record['census_tract'] = '42003512000' # 2020 Census tract - looked up through geo.census.gov
+        record['census_tract_2020'] = '42003512000'
+    elif 'TC1989-0248' == record['normalized_state_id']:
+        #record['property_street_address'] = '701 Swissvale Ave'
+        record['scattered_sites'] = 'TRUE'
+    elif 'TC1991-0100' == record['normalized_state_id']:
+        record['municipality'] = 'SWISSVALE'
+        record['city'] = 'PITTSBURGH'
+        record['zip_code'] = '15218'
+    elif '6428' == record['pmindx']:
+        record['property_street_address'] = '1220 SHEFFIELD ST'
+    elif '8892' == record['pmindx']:
+        # "Negley Neighbors is located in the East Liberty area of Pittsburgh, providing affordable housing in 11 buildings scattered throughout the neighborhood. All apartments have been renovated and provide a full appliance package, blinds, and carpeting, while maintaining the old world charm with 1, 2 and 3 bedrooms available. Income Restricted."
+        # https://ndcassetmanagement.com/property/negley-neighbors/
+        record['property_street_address'] = '744 NORTH NEGLEY AVE'
+        record['hud_property_name'] = 'NEGLEY NEIGHBORHOOD APTS (a.k.a. NEGLEY NEIGHBORS)'
+    elif 'TC2006-0428' == record['normalized_state_id']:
+        # https://ndcassetmanagement.com/property/east-braddock-apartments-mvi/
+        # "A 17 unit affordable apartment community located in Braddock and East Pittsburgh. The Braddock area is undergoing a major revitalization and most of our units are within walking distance of all the exciting changes. This property includes 1 and 2 bedroom apartments and 3 bedroom townhouses."
+        record['property_street_address'] = '633 COREY AVE'
+        record['zip_code'] = '15104'
+        record['latitude'] = '40.4042'
+        record['longitude'] = '-79.8683'
 
-    if False:
+    elif '9941' == record['pmindx']:
+        # The real cordinates are not known yet.
+        record['latitude'] = '40.462'
+        record['longitude'] = '-79.920'
+    elif '800018254' == record['property_id']:
+        record['property_street_address'] = '479 BANK ST'
+        record['latitude'] = '40.3572'
+        record['longitude'] = '-80.1120'
+        record['census_tract'] = '42003457100' # 2020 Census tract from gecoding.geo.census.gov
+        record['census_tract_2010'] = '42003457100'
+    elif '800018792' == record['property_id']:
+        record['property_street_address'] = '111 RIDGEMEAD FIELDS DR'
+    elif '10541' == record['pmindx']:
+        record['property_street_address'] = '2007 CENTER AVE' # This is an approximate address, as the construction is not done yet.
+        record['latitude'] = '40.444'
+        record['longitude'] = '-79.980'
+    elif '7076' == record['pmindx']:
+        record['latitude'] = '40.4642'
+        record['longitude'] = '-79.8972'
+
+    elif '10523' == record['pmindx']:
+        record['latitude'] = '40.4636'
+        record['longitude'] = '-79.9262'
+        # Coordinates estimated from this planning PDF: https://www.eastliberty.org/wp-content/uploads/2019/12/2019.10.04-HBH.Draft-Plans.pdf
+        # [ ] This project has applied for LIHTC funding, but it's not known whether it was awarded as of 2021-09-18.
+    elif '10423' == record['pmindx']:
+        record['latitude'] = '40.4641'
+        record['longitude'] = '-79.9262'
+        # Coordinates estimated from this PDF: https://www.eastliberty.org/wp-content/uploads/2019/12/Mellons-Orchard-Investor-Set_Plans-pages-deleted_compressed-1.pdf
+        #There are 5 buildings, the eastmost two of which are labelled as "live/work apartments".
+        # [ ] This project has received LIHTC funding, but there is no record of it in our LIHTC data as of 2021-09-18.
+    elif '10363' == record['pmindx']:
+        record['latitude'] = '40.4564'
+        record['longitude'] = '-79.9010'
+        record['census_tract'] = '42003130800' #2020 Census tract from gecoding.geo.census.gov
+        record['census_tract_2010'] = '42003130300'
+    elif '10300' == record['pmindx']:
+        record['latitude'] = '40.4295'
+        record['longitude'] = '-79.9235'
+        record['census_tract'] = '42003141400'  #2020 Census tract from gecoding.geo.census.gov
+        record['census_tract_2010'] = '42003141400'
+    elif '800018210' == record['property_id']:
+        record['latitude'] = '40.3728'
+        record['longitude'] = '-80.0329'
+        record['census_tract'] = '42003473300' #2020 Census tract from gecoding.geo.census.gov
+        record['census_tract_2010'] = '42003473300'
+    elif '800018375' == record['property_id']:
+        record['property_street_address'] = '479 BANK ST'
+        record['latitude'] = '40.3572'
+        record['longitude'] = '-80.1120'
+        record['census_tract'] = '42003457100' # 2020 Census tract from gecoding.geo.census.gov
+        record['census_tract_2010'] = '42003457100'
+    elif '800018381' == record['property_id']:
+        record['latitude'] = '40.3821'
+        record['longitude'] = '-79.8277'
+        record['census_tract'] = '42003504100' # 2020 Census tract from gecoding.geo.census.gov
+        record['census_tract_2010'] = '42003504100'
+    elif '800018470' == record['property_id']:
+        record['latitude'] = '40.4269'
+        record['longitude'] = '-79.9430'
+        record['census_tract'] = '42003151600' # 2020 Census tract from gecoding.geo.census.gov
+        record['census_tract_2010'] = '42003151600'
+    elif '800018496' == record['property_id']:
+        record['property_street_address'] = '2006 BROADVIEW BLVD'
+        if record['hud_property_name'] == 'HARRISON HIRISE':
+            record['hud_property_name'] == 'HARRISON HI-RISE'
+    elif '800018540' == record['property_id']:
+        record['latitude'] = '40.4758'
+        record['longitude'] = '-79.9599'
+        record['census_tract'] = '42003090100' # 2020 Census tract from gecoding.geo.census.gov
+        record['census_tract_2010'] = '42003090100'
+    elif '800018669' == record['property_id']:
+        record['latitude'] = '40.3507'
+        record['longitude'] = '-79.8620'
+        record['census_tract'] = '42003551900'
+        record['census_tract_2010'] = '42003551900'
+    elif '800018944' == record['property_id']:
+        record['latitude'] = '40.46713'
+        record['longitude'] = '-79.9936'
+        record['census_tract'] = '42003262000'
+        record['census_tract_2010'] = '42003262000'
+    elif '800214916' == record['property_id']: # Miller Ave (Senior) Apartments
+        record['hud_property_name'] = 'MILLER AVENUE SENIOR APARTMENTS' # Not to be confused with Miller Ave Apts at 15 Miller Ave.
+        record['property_street_address'] = '16 MILLER AVE' # Changed from "1600 MILLER AVE" based on Google Maps + Street View
+        record['latitude'] = '40.3834'
+        record['longitude'] = '-79.8599'
+        record['census_tract'] = '42003486700'
+        record['census_tract_2010'] = '42003486700'
+    elif '800214963' == record['property_id']:
+        record['latitude'] = '40.39121'
+        record['longitude'] = '-80.0151'
+        record['census_tract'] = '42003191800'
+        record['census_tract_2010'] = '42003191800'
+    elif '800217778' == record['property_id']:
+        record['latitude'] = '40.4143'
+        record['longitude'] = '-79.9919'
+        record['census_tract'] = '42003300100'
+        record['census_tract_2010'] = '42003300100'
+
+
+
+# Allequippa Terrace Phase 1B
+# PAA00000014
+# The 36 acres in dispute are where the dilapidated Allequippa Terrace public housing complex stood. It was torn down in the late 1990s and replaced by what is called Oak Hill phase one -- 632 rental units, some with rent subsidized for lower-income people and some at market rate, along with seven for-sale houses.
+# https://old.post-gazette.com/neigh_city/20030528oakhillc2.asp
+
+# Hawthorne Place Apartments (TC1994-0155)
+# should be changed to this range:
+# 2253-2271 1/2 Hawthorne Ave.
+# "Hawthorne Place is a 20 unit community that is all 2 bedroom units. Located in Swissvale this property is within walking distance of the busway and the near by Edgewood Town Center. This property is also located near the parkway east."
+
+# Grant Street Renaissance (TC1994-0075)
+# should be changed to this range:
+# 221, 227, 301, & 302 Grant St.
+# 307 Sarah Street
+#https://ndcassetmanagement.com/property/grant-street-renaissance-mvi/
+
+# Falconhurst Restoration
+# TC2015-0408
+# c/o Cresent Apartments
+#736-738 Rebecca St.
+#
+#724 Kelly Ave.
+#
+#Mulberry St.
+#
+#Wilkinsburg, PA 15221
+# Falconhurst is a multi-family Tax Credit scattered Community. We have 6 buildings that make of Falconhurst all located in Wilkinsburg. We offer 1, 2 and 3 bedrooms
+
+
+# Crescent Apartments
+# 736 & 738 Rebecca St.
+# The restoration of these two buildings brought 27 units of affordable housing back to Wilkinsburg, with 23 units in the Crescent Apartments and 4 units in the Wilson House.
+# https://ndcassetmanagement.com/property/crescent-apartments/
+
+    if True:
         record = try_to_geocode(record)
     return record
 
