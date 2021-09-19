@@ -74,13 +74,20 @@ def standardize_field(x, fieldname):
 
 def geocode_address_with_geomancer(address):
     url = "https://tools.wprdc.org/geo/geocode?addr={}".format(address)
-    r = requests.get(url)
+    import requests
+    sess = requests.Session()
+    adapter = requests.adapters.HTTPAdapter(max_retries = 20)
+    sess.mount('http://', adapter)
+
+    #r = requests.get(url) # Switched to sess.get because of a
+    # "EOF occurred in violation of protocol" error.
+    r = sess.get(url)
     result = r.json()
     time.sleep(0.1)
     if result['data']['status'] == "OK":
         longitude, latitude = result['data']['geom']['coordinates']
         return longitude, latitude
-    print(f"Unable to geocode {address}, failing with status code '{result['data']['status']}'"
+    print(f"Unable to geocode {address}, failing with status code '{result['data']['status']}'")
     return None, None
 
 def try_to_geocode(merged_record):
