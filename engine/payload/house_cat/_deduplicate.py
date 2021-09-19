@@ -101,11 +101,20 @@ def try_to_geocode(merged_record):
 
         if merged_record.get('city', None) in [None, '']:
             return merged_record
+        if 'municipality' in merged_record and merged_record['municipality'] not in [None, '']:
+            alternate_address = f"{address}, {merged_record['municipality']}, PA "
+            no_municipality = False
+        else:
+            no_municipality = True
         address += f", {merged_record['city']}, PA "
         if merged_record.get('zip_code', '') not in ['']:
             address += merged_record['zip_code']
+            if not no_municipality:
+                alternate_address += merged_record['zip_code']
         print(f"Trying to geocode {address}.")
         longitude, latitude = geocode_address_with_geomancer(address)
+        if latitude is None and not no_municipality:
+            longitude, latitude = geocode_address_with_geomancer(alternate_address)
         if latitude is not None:
             merged_record['latitude'] = latitude
             merged_record['longitude'] = longitude
