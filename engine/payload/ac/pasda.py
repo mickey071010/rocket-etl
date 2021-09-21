@@ -162,7 +162,7 @@ class AddressPointsSchema(pl.BaseSchema):
     municipali = fields.String(load_from='MUNICIPALI'.lower(), dump_to='municipality')
     county = fields.String(load_from='COUNTY'.lower(), dump_to='county')
     state = fields.String(load_from='STATE'.lower(), dump_to='state')
-    zip_code = fields.String(load_from='ZIP_CODE'.lower(), dump_to='zip_code')
+    zip_code = fields.String(load_from='ZIP_CODE'.lower(), dump_to='zip_code', allow_none=True)
     comment = fields.String(load_from='COMMENT'.lower(), dump_to='comment', allow_none=True)
     edit_date = fields.Date(load_from='EDIT_DATE'.lower(), dump_to='edit_date', allow_none=True)
     edit_user = fields.String(load_from='EDIT_USER'.lower(), dump_to='edit_user', allow_none=True)
