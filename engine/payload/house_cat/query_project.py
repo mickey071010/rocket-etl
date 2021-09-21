@@ -114,7 +114,121 @@ def generate_housing_project_file_from_multitable_query(job, **kwparameters):
             row['value'] = '|'.join([str(v) for v in value_list]) # Serialize lists of results for CSV output
             all_rows_with_values.append(dict(row))
 
+        ic(other_path)
         write_to_csv(other_path, all_rows_with_values)
+
+def pull_fields_for_project(project, fields_to_query_by_resource_id, table_details_by_resource_id, id_fields_and_values, fill):
+    from engine.credentials import site, API_key
+    from engine.leash_util import fill_bowl
+    for resource_id, fields in fields_to_query_by_resource_id.items():
+        # For each resource_id, figure out which fields to query and do a
+        # SELECT [list of fields] FROM {resource_id}
+        if fields != []:
+            table_details = table_details_by_resource_id[resource_id]
+            print(f"Querying {table_details['job_code']}...")
+            source_name = table_details['source_name']
+            table_id_fields = table_details['id_fields']
+            # Find a matching id_field.
+
+
+            fields_to_pull = fields + table_id_fields
+            if fill:
+                fill_bowl(resource_id)
+
+            where_clauses = []
+            for id_f, id_value in id_fields_and_values:
+                if id_f in table_id_fields:
+                    # Combine clauses to eliminate duplicates.
+                    where_clauses.append(f"{id_f} = '{id_value}'")
+
+            if len(where_clauses) > 0:
+                q = f"SELECT {', '.join(fields_to_pull)}, '{source_name}' as source FROM \"{resource_id}\" WHERE {' OR '.join(where_clauses)}"
+
+            #query_housing_project(id_field_name, id_field_value) already does something similar
+                results = query_resource(site, q, API_key)
+                # Merge each query result with the project dict.
+                #if len(results) == 1:
+                #    project = {**project, **results[0]}
+                if len(results) > 0:
+                    pipe_delimited_dict = dict(results[0])
+                    for result in results[1:]:
+                        for k, v in result.items():
+                            if k not in ['source'] + table_id_fields:
+                                pipe_delimited_dict[k] = str(pipe_delimited_dict[k]) + '|' + str(v)
+
+                    project = {**project, **pipe_delimited_dict}
+    return project
+
+def query_all_projects(job, **kwparameters):
+    # Join house_cat_projectindex with a few other fields
+    # like subsidy_expiration_date, program_type, and subsidy_data_source (all connected to make subsidies_ac.csv)
+    # [subsidy_expiration_date and program_type from mf_subsidy_loans and ] table name converts to subsidy_data_source
+    # but also LIHTC dates
+    # and inspection scores
+    # since these are the fields that Bob wants,
+    # but collected for ALL properties.
+
+    # Get field names (interactively)
+    field_names_string = input("Enter a space-delimited list of field names to query: ").strip()
+    field_names = field_names_string.split(' ')
+
+    # Where do we get each field from?
+    # Review fields.csv to find out where they can be found.
+
+    #write_to_csv(job.target, rows_with_values)
+    #other_path = re.sub('fields', 'ordered_fields', job.target)
+
+    table_details_by_resource_id = defaultdict(dict)
+    fields_to_query_by_resource_id = defaultdict(list)
+    source_name_by_resource_id = {}
+    with open('/Users/drw/WPRDC/etl/rocket-etl/output_files/house_cat/fields.csv') as g:
+        reader = csv.DictReader(g)
+        #value_list_by_job_code_and_field = query_fields(field_names)
+        all_rows_with_values = []
+        for row in reader:
+            resource_id = row['resource_id']
+            d = {'id_fields': row['id_fields'].split('|'),
+                'source_name': row['source_name'],
+                'job_code': row['job_code']}
+            table_details_by_resource_id[resource_id] = d
+            field = row['field']
+            if field in field_names:
+                fields_to_query_by_resource_id[resource_id].append(row['field'])
+            source_name_by_resource_id[resource_id] = row['source_name']
+
+    # Iterate through deduplicated_index.csv and use all those ID fields to query the tables
+    # pulling the relevant code out of query_housing_project.
+    from engine.payload.house_cat.data_sources import id_fields_by_code
+    utilized_ids_fields = list(set([item for sublist in id_fields_by_code.values() for item in sublist]))
+
+    with open('/Users/drw/WPRDC/etl/rocket-etl/engine/payload/house_cat/deduplicated_index.csv') as g:
+        reader = csv.DictReader(g)
+        results = []
+        fill = True
+        customized_records = []
+        for n, project in enumerate(reader):
+            pipe_delimited_id_fields_and_values = [(k,v) for k,v in project.items() if k in utilized_ids_fields and v != '']
+            id_fields_and_values = []
+            for id_f, id_v in pipe_delimited_id_fields_and_values:
+                if re.match('|', id_v) is not None:
+                    id_values = id_v.split('|')
+                else:
+                    id_values = [id_v]
+                for value in id_values:
+                    id_fields_and_values.append( (id_f, value) )
+
+            result = pull_fields_for_project(project, fields_to_query_by_resource_id, table_details_by_resource_id, id_fields_and_values, fill)
+
+            ic(result)
+            time.sleep(0.05)
+            customized_records.append(result)
+            fill = False
+            print(n)
+
+    ic(job.destination_file_path)
+    write_to_csv(job.destination_file_path, customized_records)
+
+    print("Next step: Fix the 'source' and 'source_file' fields, which I think are being overwritten by the latest query, rather than accumulating across queries.")
 
 from engine.payload.house_cat._parameters import housecat_tango_with_django_package_id #'3f6411c8-d03d-45b2-8225-673841e5c2b3'
 
@@ -124,7 +238,7 @@ job_dicts = [
         # those jobs need CKAN's upsert capabilites (or at least a local SQLite database) to work correctly,
         # so it's really not simple. Another option would be a post-processing step that pulls the table
         # back down to the output directory, as that would take care of getting the file name right.
-        'job_code': FieldsAndQuerySchema().job_code, # 'query_results'
+        'job_code': FieldsAndQuerySchema().job_code, # 'query_one_project'
         'source_type': 'local',
         'source_file': 'fields_with_values.csv',
         'schema': FieldsAndQuerySchema,
@@ -134,6 +248,18 @@ job_dicts = [
         'always_wipe_data': True, # This can be wiped since this is a local-only job.
         'destination': 'file',
         'destination_file': 'housing_project_sample.csv',
+    },
+    { # A terribly inefficient way to query all housing projects for certain fields.
+        'job_code': 'query_all_projects',
+        'source_type': 'local',
+        'source_file': 'fields_with_values.csv',
+        #'schema': FieldsAndQuerySchema,
+        #'filters': [['property_id', '!=', None]], # Might it be necessary to iterate through all the property fields
+        # like this, upserting on each one?
+        'custom_processing': query_all_projects,
+        'always_wipe_data': True, # This can be wiped since this is a local-only job.
+        'destination': 'file',
+        'destination_file': 'custom_table.csv',
     }
 ]
 
