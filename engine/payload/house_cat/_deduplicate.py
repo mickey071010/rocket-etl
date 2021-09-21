@@ -1,4 +1,5 @@
 import re, csv, copy, requests, time
+from datetime import datetime
 from pprint import pprint
 from icecream import ic
 from collections import defaultdict
@@ -456,7 +457,115 @@ def fix_single_record(record):
         record['longitude'] = '-79.9919'
         record['census_tract'] = '42003300100'
         record['census_tract_2010'] = '42003300100'
+    elif '800219089' == record['property_id']:
+        record['latitude'] = '40.4644'
+        record['longitude'] = '-79.9301'
+        record['census_tract'] = '42003111500'
+        record['census_tract_2010'] = '42003111500'
+    elif '800222535' == record['property_id']:
+        record['latitude'] = '40.6451'
+        record['longitude'] = '-80.0824'
+        record['census_tract'] = '42003410000'
+        record['census_tract_2010'] = '42003410000'
+    elif '800224938' == record['property_id']:
+        record['hud_property_name'] = 'VANTAGE COURT SENIOR HOUSING'
+        record['latitude'] = '40.4075'
+        record['longitude'] = '-79.9090'
+        record['census_tract'] = '42003483800'
+        record['census_tract_2010'] = '42003483800'
+    elif 'TC1990-0181' == record['normalized_state_id']:
+        record['scattered_sites'] = 'TRUE'
+        # Kenyon Properties II appears to be a LIHTC-funded, 28-unit
+        # housing project in Wilkinsburg.
+        # Some web sites say that it scattered-site:
+        # https://affordablehousingonline.com/housing-search/Pennsylvania/Wilkinsburg/Kenyon-Properties-II/10075716
 
+        # Kenyon Properties I has the same LIHTC configuration but has
+        # a property_street_address of 701 Swissvale Ave, Wilkinsburg.
+        # That building does not look like it can hold 28 apartments, so
+        # I suspect that this is also a scattered-site project.
+        # I'm just going to put Kenyon Properties II near Kenyon Properties I
+        # with large error bars (low precision).
+        record['latitude'] = '40.44'
+        record['longitude'] = '-79.88'
+        record['census_tract'] = '42003564700'
+        record['census_tract_2010'] = '42003561000'
+
+    elif 'TC1990-0180' == record['normalized_state_id']:
+        record['scattered_sites'] = 'TRUE'
+    elif '10285' == record['pmindx']:
+        record['latitude'] = '40.4406'
+        record['longitude'] = '-79.9831'
+        record['census_tract'] = '42003030500'
+        record['census_tract_2010'] = '42003030500'
+    elif '10186' == record['pmindx']:
+        record['latitude'] = '40.446'
+        record['longitude'] = '-79.979'
+        record['census_tract'] = '42003050100'
+        record['census_tract_2010'] = '42003050100'
+    elif '10517' == record['pmindx']:
+        # https://bloomfield-garfield.org/wp-content/uploads/2021/01/BGC-Affordable-Housing-Initiatives.pdf
+        # "Garfield Highlands – Proposed new construction of 25 scattered-site homes in 5300 block of
+        # Kincaid St., 5300 and 5400 blocks of Rosetta St., 200, 300 and 400 blocks of N. Aiken Avenue,
+        # 5300 block of Hillcrest St. Would be a mix of two- and three-bedroom homes, affordable to
+        # families earning less than $48,000/year. Awaiting a decision from PA Housing Finance Agency
+        # on allocation of federal tax credits for the project. Will need U.R.A. to furnish a loan for $1
+        # million+. Construction could be underway by summer 2021; "
+        if datetime.now().year == '2021':
+            record['status'] = 'Under construction'
+        record['scattered_sites'] = 'TRUE'
+        if 'units' not in record or record['units'] in [None, '']:
+            record['units'] = '25'
+        record['latitude'] = '40.4670' # This is just the interscetion of N. Aiken and Rosetta, which
+        record['longitude'] = '-79.9350' # seems like a decent centroid.
+        record['census_tract'] = '42003111400'
+        record['census_tract_2010'] = '42003111400'
+    elif '9573' == record['pmindx']: # Garfield Glen
+        # https://bloomfield-garfield.org/wp-content/uploads/2021/01/BGC-Affordable-Housing-Initiatives.pdf
+        # BGC carries out the role of owner or partner in the following developments:
+        # Garfield Glen I and II – 64 rental homes built between N. Mathilda and N. Pacific Aves
+        # ● Partnered with S & A Homes on both developments – Managed by NDC Real Estate
+        # ● BGC reviews major management decisions around rental policies, evictions, and
+        # additional investments in the homes.
+        # ● BGC is the first point of contact for tenants or neighbors wishing to speak with the
+        # owners.
+        # ● At the end of initial 15-year leasing period, BGC will control 51% of the ownership
+        # interest in the developments, and S & A 49%. Tenants will have the option to buy
+        # their homes outright in year 16.
+        record['scattered_sites'] = 'TRUE'
+        record['hud_property_name'] = 'SCATTERED SITES IN GARFIELD BETWEEN N. MATHILDA AND N. PACIFIC AVES'
+        record['latitude'] = '40.46683'
+        record['longitude'] = '-79.94242'
+        record['census_tract'] = '42003101900'
+        record['census_tract_2010'] = '42003101700'
+    elif '9324' == record['pmindx']:
+        record['property_street_address'] = re.sub('\|SCHENLEYFERN & COLUMBO STS', '', record['property_street_address'])
+    elif '800233043' == record['property_id']:
+        record['property_street_address'] = '6201 BROAD ST'
+        record['hud_property_name'] = 'FAIRFIELD APTS (PREVIOUSLY LIBERTY PARK)'
+    elif '800241361' == record['property_id']:
+        record['property_street_address'] = re.sub('BRDVIEW', 'BROADVIEW', record['property_street_address'])
+    elif '800018460' == record['property_id']:
+        record['hud_property_name'] = 'HILLSBORO PLAZA (PREVIOUSLY GOODWILL PLAZA)'
+        # https://st-residential.com/hillsboro-plaza
+        # Hillsboro Plaza is a 62 and over, income based independent living facility located in the Sheraden neighborhood.
+        # The eight-story building consists of 72, efficiency and one bedroom apartments, a community room and laundry room.
+        # 72 Senior Apartment Homes with Section 8 rental assistance
+    elif '800018889' == record['property_id']:
+        record['hud_property_name'] = 'ST AUGUSTINE PLAZA'
+    elif '800018984' == record['property_id']:
+        record['property_street_address'] = re.sub('RAILRD', 'RAILROAD', record['property_street_address'])
+    elif '9946' == record['pmindx']:
+        assert record['property_street_address'] == 'SCATTERED SITES'
+        record['property_street_address'] = re.sub('SCATTERED SITES', 'SCATTERED SITES (DINWIDDIE AND MILLER STREETS)', record['property_street_address'])
+        # From https://www.phfa.org/forms/multifamily_news/awards/2015/2015_app_log_1.pdf
+    elif '10178' == record['pmindx']: # MORNINGSIDE CROSSING
+        record['units'] = '46' # https://www.phfa.org/forms/multifamily_news/awards/2015/2015_app_log_1.pdf
+
+# Brighton Place (TC1991-0087)
+# It's completely unclear where this project is/was; somewhere in Pittsburgh is all the data tells us.
+# Since there's a separate, seemingly newer project called "NORTHSIDE COALITION" which is located at 1500 Brighton Place,
+# there's reason to suspect that the first became the second at some point.
 
 
 # Allequippa Terrace Phase 1B
