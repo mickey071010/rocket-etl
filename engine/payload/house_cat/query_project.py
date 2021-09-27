@@ -101,7 +101,7 @@ def generate_housing_project_file_from_multitable_query(job, **kwparameters):
     id_field_value = input(f"Search for {id_field_name} = ")
 
     value_list_by_job_code_and_field = query_housing_project(id_field_name, id_field_value)
-    write_to_csv(job.target, rows_with_values)
+    #write_to_csv(job.target, rows_with_values)
     other_path = re.sub('fields', 'ordered_fields', job.target)
 
     with open('/Users/drw/WPRDC/etl/rocket-etl/output_files/house_cat/fields.csv') as g:
@@ -226,7 +226,23 @@ def query_all_projects(job, **kwparameters):
             print(n)
 
     ic(job.destination_file_path)
-    write_to_csv(job.destination_file_path, customized_records)
+    actual_destination_file_path = '/'.join(job.destination_file_path.split('/')[:-1]) + '/custom_table.csv'
+
+    ordered_keys = ['index', 'hud_property_name', 'property_street_address', 'municipality_name', 'city', 'zip_code']
+    ordered_keys += ['latitude', 'longitude', 'census_tract', 'units', 'scattered_sites']
+    ordered_keys += ['property_id', 'normalized_state_id', 'development_code', 'pmindx', 'lihtc_project_id']
+    ordered_keys += ['contract_id', 'fha_loan_id', 'crowdsourced_id', 'status']
+    ordered_keys += field_names
+    ordered_keys += ['source', 'source_file']
+
+    extant_keys = set()
+    for record in customized_records:
+        extant_keys.update(list(record.keys()))
+
+    for key in ordered_keys:
+        assert key in extant_keys
+
+    write_to_csv(actual_destination_file_path, customized_records, ordered_keys)
 
     print("Next step: Fix the 'source' and 'source_file' fields, which I think are being overwritten by the latest query, rather than accumulating across queries.")
 
@@ -259,7 +275,7 @@ job_dicts = [
         'custom_processing': query_all_projects,
         'always_wipe_data': True, # This can be wiped since this is a local-only job.
         'destination': 'file',
-        'destination_file': 'custom_table.csv',
+        'destination_file': 'empty_file.csv',
     }
 ]
 
