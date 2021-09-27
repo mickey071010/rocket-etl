@@ -285,6 +285,10 @@ def fix_single_record(record):
         record['hud_property_name'] = 'MIDDLE HILL (ADDISON TERRACE PHASE 3)'
         if record['property_street_address'] == 'LOTS BEDFORD ERIN TRENT':
             record['property_street_address'] = 'Lots: Bedford, Erin, Trent, Wooster and Webster Aves'
+            record['latitude'] = '40.446'
+            record['longitude'] = '-79.979'
+            record['census_tract'] = '42003050100'
+            record['census_tract_2010'] = '42003050100'
             # Obtained from https://www.phfa.org/forms/multifamily_news/awards/2015/2015_app_log_1.pdf
     elif '800018530' == record['property_id']:
         # Choose an address for geooding
@@ -406,11 +410,12 @@ def fix_single_record(record):
         record['census_tract'] = '42003473300' #2020 Census tract from gecoding.geo.census.gov
         record['census_tract_2010'] = '42003473300'
     elif '800018375' == record['property_id']:
-        record['property_street_address'] = '479 BANK ST'
-        record['latitude'] = '40.3572'
-        record['longitude'] = '-80.1120'
-        record['census_tract'] = '42003457100' # 2020 Census tract from gecoding.geo.census.gov
-        record['census_tract_2010'] = '42003457100'
+        #record['property_street_address'] = '
+        record['status'] = 'Either closed or renamed/moved'
+        record['latitude'] = '40.461'
+        record['longitude'] = '-79.920'
+        record['census_tract'] = '42003111500' # 2020 Census tract from gecoding.geo.census.gov
+        record['census_tract_2010'] = '42003111500'
     elif '800018381' == record['property_id']:
         record['latitude'] = '40.3821'
         record['longitude'] = '-79.8277'
@@ -498,11 +503,6 @@ def fix_single_record(record):
         record['longitude'] = '-79.9831'
         record['census_tract'] = '42003030500'
         record['census_tract_2010'] = '42003030500'
-    elif '10186' == record['pmindx']:
-        record['latitude'] = '40.446'
-        record['longitude'] = '-79.979'
-        record['census_tract'] = '42003050100'
-        record['census_tract_2010'] = '42003050100'
     elif '10517' == record['pmindx']:
         # https://bloomfield-garfield.org/wp-content/uploads/2021/01/BGC-Affordable-Housing-Initiatives.pdf
         # "Garfield Highlands – Proposed new construction of 25 scattered-site homes in 5300 block of
@@ -561,6 +561,18 @@ def fix_single_record(record):
         # From https://www.phfa.org/forms/multifamily_news/awards/2015/2015_app_log_1.pdf
     elif '10178' == record['pmindx']: # MORNINGSIDE CROSSING
         record['units'] = '46' # https://www.phfa.org/forms/multifamily_news/awards/2015/2015_app_log_1.pdf
+    elif '7089' == record['pmindx']: # LAMBETH APTS which closed, but has been replaced by YORK COMMONS.
+        record['status'] = 'Closed'
+    elif '800244735' == record['property_id']: # OAK HILL BRACKENRIDGE
+        # looks to be still under construction based on
+        # page 2 of this PDF (a map)
+        # and Google Maps aerial photos (circa 2021)
+        # AND the fact that the HUD data says that it has zero units.
+        if record['units'] in ['0', 0]:
+            record['status'] = 'Under construction'
+
+    elif '10506' == record['pmindx']:
+        record['hud_property_name'] = re.sub(' CNI ', 'CHOICE NEIGHBORHOODS INITIATIVE ', record['hud_property_name'])
 
 # Brighton Place (TC1991-0087)
 # It's completely unclear where this project is/was; somewhere in Pittsburgh is all the data tells us.
