@@ -217,7 +217,7 @@ job_dicts = [
         'primary_key_fields': ['facility_id'],
         'destination': 'ckan',
         'package': vaccinations_package_id,
-        'resource_name': ' Long-Term Care Facilites COVID-19 Cases and Vaccinations Data',
+        'resource_name': 'DOH Long-Term Care Facilites COVID-19 Cases and Vaccinations Data',
         'upload_method': 'upsert',
         'resource_description': f'Derived from https://data.pa.gov/api/views/iwiy-rwzp/rows.csv?accessType=DOWNLOAD&api_foundry=true and https://www.pasda.psu.edu/spreadsheet/DOH_NursingHome201806.csv',
     },
