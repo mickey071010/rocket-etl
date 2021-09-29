@@ -13,7 +13,6 @@ from engine.parameters.local_parameters import SOURCE_DIR, REFERENCE_DIR
 
 from bs4 import BeautifulSoup
 from openpyxl import load_workbook
-import pandas as pd
 from fuzzywuzzy import fuzz
 
 try:
@@ -105,9 +104,9 @@ class CovidData:
 
         for facility in self.ltcfdf:
             for index, doh_row in enumerate(self.dohdf):
-                if doh_row['FACID'] == facility['FACILITY_I']:
-                    facility['ALL_BEDS'] = doh_row['ALL_BEDS']
-                    facility['CURRENT_CENSUS'] = doh_row['CURRENT_CENSUS']
+                if doh_row['Facil'] == facility['FACILITY_I']:
+                    facility['ALL_BEDS'] = doh_row['ALL BEDS'] #doh_row['ALL_BEDS']
+                    facility['CURRENT_CENSUS'] = doh_row['CURRENT CENSUS'] #doh_row['CURRENT_CENSUS']
                     facility['Resident_Cases_to_Display'] = doh_row['Resident Cases to Display']
                     facility['Resident_Deaths_to_Display'] = doh_row['Resident Deaths to Display']
                     facility['Staff_Cases_to_Display'] = doh_row['Staff Cases to Display']
@@ -155,6 +154,22 @@ class CovidData:
         print("output file: "),
         print(output_path)
 
+def sheet_to_csv(ws, filename):
+    list_of_dicts = []
+    field_names = []
+    for col_index in range(ws.max_column):
+        field_names.append(ws.cell(1, col_index+1).value)
+
+    for row_index, row in enumerate(ws):
+        if row_index > 0:
+            d = {}
+            cells = list(row)
+            for col_index in range(len(cells)):
+                d[field_names[col_index]] = cells[col_index].value
+            list_of_dicts.append(d)
+
+    write_to_csv(filename, list_of_dicts, field_names)
+
 def get_raw_data_and_save_to_local_csv_file(jobject, **kwparameters):
     if not kwparameters['use_local_input_file']:
         r = requests.get("https://www.health.pa.gov/topics/disease/coronavirus/Pages/LTCF-Data.aspx")
@@ -181,12 +196,8 @@ def get_raw_data_and_save_to_local_csv_file(jobject, **kwparameters):
         open('DOH_Data.xlsx', 'wb').write(r.content)
         wb = load_workbook('DOH_Data.xlsx')
         ws = wb['Sheet1']
-        df = pd.DataFrame(ws.values)
-        df.rename(columns={0: u"FACID", 1: u"NAME", 2: u"CITY", 3: u"COUNTY", 4: u"ALL_BEDS", 5: u"CURRENT_CENSUS",
-                                           6: u"Resident Cases to Display",
-                                           7: u"Resident Deaths to Display", 8: u"Staff Cases to Display"}, inplace=True)
-        df = df.iloc[1:]
-        df.to_csv("DOH_Data.csv", encoding='utf-8')
+
+        sheet_to_csv(ws, 'DOH_Data.csv')
 
         a = CovidData("PASDA_LTCF.csv", 'DOH_Data.csv', 'FPP_Data.csv', soup)
         a.writeToFile(jobject.target)
