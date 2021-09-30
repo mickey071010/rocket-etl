@@ -120,7 +120,7 @@ def scientific_notation_to_integer(s):
     # used to convert such strings to integers.
     return int(decimal.Decimal(s))
 
-def add_datatable_view(resource):
+def add_datatable_view(resource, job):
     r = requests.post(
         BASE_URL + 'resource_create_default_resource_views',
         json={
@@ -130,19 +130,20 @@ def add_datatable_view(resource):
         headers={
             'Authorization': API_KEY,
             'Content-Type': 'application/json'
-        }
+        },
+        verify=job.verify_requests
     )
     print(r.json())
     return r.json()['result']
 
-def configure_datatable(view):
+def configure_datatable(view, job):
     # setup new view
     view['col_reorder'] = True
     view['export_buttons'] = True
     view['responsive'] = False
-    r = requests.post(BASE_URL + 'resource_view_update', json=view, headers={"Authorization": API_KEY})
+    r = requests.post(BASE_URL + 'resource_view_update', json=view, headers={"Authorization": API_KEY}, verify=job.verify_requests)
 
-def reorder_views(resource, views):
+def reorder_views(resource, views, job):
     resource_id = resource['id']
 
     temp_view_list = [view_item['id'] for view_item in views if
@@ -150,7 +151,7 @@ def reorder_views(resource, views):
 
     new_view_list = [datatable_view['id']] + temp_view_list
     r = requests.post(BASE_URL + 'resource_view_reorder', json={'id': resource_id, 'order': new_view_list},
-                      headers={"Authorization": API_KEY})
+                      headers={"Authorization": API_KEY}, verify=job.verify_requests)
 
 def deactivate_datastore(resource):
     from engine.credentials import site, API_key
@@ -205,7 +206,7 @@ def delete_datatable_views(resource_id):
                         print(f"Deleting the view with name {view['title']} and type {view['view_type']}.")
                         ckan.action.resource_view_delete(id = view['id'])
 
-def create_data_table_view(resource):
+def create_data_table_view(resource, job):
 #    [{'col_reorder': False,
 #      'description': '',
 #      'export_buttons': False,
@@ -251,7 +252,7 @@ def create_data_table_view(resource):
     if resource['format'].lower() == 'csv' and resource['url_type'] in ('datapusher', 'upload') and resource['datastore_active']:
         if 'datatables_view' not in [v['view_type'] for v in extant_views]:
             print("Adding view for {}".format(resource['name']))
-            datatable_view = add_datatable_view(resource)[0]
+            datatable_view = add_datatable_view(resource, job)[0]
             # A view will be described like this:
             #    {'col_reorder': False,
             #    'description': '',
@@ -265,9 +266,9 @@ def create_data_table_view(resource):
             #    'title': 'Data Table',
             #    'view_type': 'datatables_view'}
             if 'id' in datatable_view.keys():
-                configure_datatable(datatable_view)
+                configure_datatable(datatable_view, job)
 
-            # reorder_views(resource, views)
+            # reorder_views(resource, views, job)
 
     # [ ] Integrate previous attempt which avoids duplicating views with the same name:
     #if title not in [v['title'] for v in extant_views]:
@@ -365,7 +366,7 @@ def get_package_by_id(package_id):
     ckan = ckanapi.RemoteCKAN(site, apikey=API_key)
     return ckan.action.package_show(id=package_id)
 
-def create_data_table_view_if_needed(resource_id):
+def create_data_table_view_if_needed(resource_id, job):
     """Create a DataTable view if the resource has a datastore."""
     import time
     try:
@@ -379,7 +380,7 @@ def create_data_table_view_if_needed(resource_id):
             resource = None
     if resource is not None:
         package_id = resource['package_id']
-        create_data_table_view(resource)
+        create_data_table_view(resource, job)
         try:
             package = get_package_by_id(package_id)
         except ckanapi.errors.NotFound:
@@ -389,7 +390,7 @@ def create_data_table_view_if_needed(resource_id):
     return None, None
 
 def post_process(resource_id, job, **kwparameters):
-    package, resource = create_data_table_view_if_needed(resource_id)
+    package, resource = create_data_table_view_if_needed(resource_id, job)
     if resource is not None and package is not None:
         add_tag(package, '_etl')
         update_etl_timestamp(package, resource)
@@ -766,7 +767,8 @@ class Job:
                       resource_name = self.resource_name,
                       clear_first = clear_first,
                       wipe_data = wipe_data,
-                      method = self.upload_method).run()
+                      method = self.upload_method,
+                      verify_requests = self.verify_requests).run()
         except FileNotFoundError:
             if self.ignore_if_source_is_missing:
                 print("The source file for this job wasn't found, but that's not surprising.")

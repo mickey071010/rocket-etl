@@ -67,6 +67,7 @@ class CKANLoader(Loader):
         self.key = kwargs.get('ckan_api_key')
         self.package_id = kwargs.get('package_id')
         self.resource_name = kwargs.get('resource_name')
+        self.verify_requests = kwargs.get('verify_requests', True)
         self.resource_id = kwargs.get('resource_id',
                                       self.get_resource_id(self.package_id, self.resource_name))
         self.file_format = kwargs.get('file_format').lower()
@@ -90,7 +91,8 @@ class CKANLoader(Loader):
             },
             data=json.dumps({
                 'id': package_id
-            })
+            }),
+            verify=self.verify_requests
         )
         # todo: handle bad request
         response_json = response.json()
@@ -138,7 +140,8 @@ class CKANLoader(Loader):
                 'name': resource_name,
                 'url_type': 'datapusher',
                 'format': self.file_format, # This has previously always been hard-coded as 'CSV'!
-            })
+            }),
+            verify=self.verify_requests
         )
 
         response_json = response.json()
@@ -177,7 +180,8 @@ class CKANLoader(Loader):
                 'content-type': 'application/json',
                 'authorization': self.key
             },
-            data=json.dumps(kwparameters)
+            data=json.dumps(kwparameters),
+            verify=self.verify_requests
         )
         return update.status_code
 
@@ -407,7 +411,8 @@ class CKANDatastoreLoader(CKANLoader):
                 'fields': fields,
                 'primary_key': self.key_fields if hasattr(self, 'key_fields') else None,
                 'indexes': self.indexes if hasattr(self, 'indexes') else None
-            })
+            }),
+            verify=self.verify_requests
         )
         # Note that
         #   https://github.com/ckan/ckan/blob/7fd6ca6439e3a7db60787283148652f895b02920/ckanext/datastore/tests/test_create.py
@@ -494,7 +499,8 @@ class CKANDatastoreLoader(CKANLoader):
             data=json.dumps({
                 'resource_id': resource_id,
                 'force': True
-            })
+            }),
+            verify=self.verify_requests
         )
         return delete.status_code
 
@@ -519,7 +525,8 @@ class CKANDatastoreLoader(CKANLoader):
                 'method': method,
                 'force': True,
                 'records': data
-            })
+            }),
+            verify=self.verify_requests
         )
         if upsert.status_code != 200:
             print(f"Attempted upsert returned with status code {upsert.status_code}, reason '{upsert.reason}', and also this explanation:\n{upsert.text}\n")
