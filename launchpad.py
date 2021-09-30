@@ -321,6 +321,8 @@ if __name__ == '__main__':
             e = sys.exc_info()[0]
             if e == FileNotFoundError and kwargs['wake_me_when_found']:
                 print("As expected, this script threw an exception because the ETL framework could not find a source file.")
+            elif e == KeyboardInterrupt:
+                print("(Suppressing Slack notification for keyboard interrupt.)")
             else:
                 exc_type, exc_value, exc_traceback = sys.exc_info()
                 lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
