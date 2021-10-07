@@ -105,8 +105,16 @@ class CovidData:
         for facility in self.ltcfdf:
             for index, doh_row in enumerate(self.dohdf):
                 if doh_row['Facil'] == facility['FACILITY_I']:
-                    facility['ALL_BEDS'] = doh_row['ALL BEDS'] #doh_row['ALL_BEDS']
-                    facility['CURRENT_CENSUS'] = doh_row['CURRENT CENSUS'] #doh_row['CURRENT_CENSUS']
+                    if 'ALL_BEDS' in doh_row:   # The state changes back and forth
+                        beds_field = 'ALL_BEDS' # between underscored
+                    else:                       # and non-underscored
+                        beds_field = 'ALL BEDS' # field names.
+                    facility['ALL_BEDS'] = doh_row[beds_field]
+                    if 'CURRENT_CENSUS' in doh_row:
+                        census_field = 'CURRENT_CENSUS'
+                    else:
+                        census_field = 'CURRENT CENSUS'
+                    facility['CURRENT_CENSUS'] = doh_row[census_field]
                     facility['Resident_Cases_to_Display'] = doh_row['Resident Cases to Display']
                     facility['Resident_Deaths_to_Display'] = doh_row['Resident Deaths to Display']
                     facility['Staff_Cases_to_Display'] = doh_row['Staff Cases to Display']
