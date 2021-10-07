@@ -100,21 +100,28 @@ class ACPoolInspectionsSchema(pl.BaseSchema):
         if f_i not in data or data[f_i] in [None, '']:
             data[f_o] = None
         else:
-            pattern = "(?:FREE|F)\s*(?:CHLORINE|CL|C)\s*(?::|=|-|)?\s*(\d+.\d)\s*(?:PPM)?"
-            result = re.search(pattern, data[f_i], re.IGNORECASE)
-            if result is None:
-                # Fallback search ("Cl" instead of "Free Cl")
-
-                # Good clarity, safety equipment, permit, BPM.  pH 7.4, cl 4.0, cc 0, 150 GPM
-                pattern = "(?:CHLORINE|CL|C)\s*(?::|=|-|)?\s*(\d+.\d)\s*(?:PPM)?"
-                result = re.search(pattern, data[f_i], re.IGNORECASE)
-            if result is None:
+            pattern = re.compile("(?:FREE|F)\s*(?:CHLORINE|CL|C)\s*(?::|=|-|)?\s*(\d+.\d)\s*(?:PPM)?", re.IGNORECASE)
+            matches = pattern.findall(data[f_i])
+            failed = False
+            if matches == [] and not failed:
                 # Deal with this possibility:
                 # Chlorine
                 #   Free 5.0ppm
                 #   Combined <0.2ppm
-                pattern = "(?:CHLORINE|CL|C)\s*(?:FREE)\s*(?::|=|-|)?\s*(\d+.\d)\s*(?:PPM)?"
-                result = re.search(pattern, data[f_i], re.IGNORECASE)
+                pattern = re.compile("(?:CHLORINE|CL|C)\s*(?:FREE)\s*(?::|=|-|)?\s*(\d+.\d)\s*(?:PPM)?", re.IGNORECASE)
+                matches = pattern.findall(data[f_i])
+            if matches== [] and re.search('free', data[f_i], re.IGNORECASE) and not failed:
+                # Failed to extract free chlorine value even though the word "free"
+                # is present.
+                print(f"Failed to extract free chlorine value even though the word 'free' is present in the text: {data[f_i]}.")
+                data[f_o] = None
+                failed = True
+            if matches == [] and not failed:
+                # Fallback search ("Cl" instead of "Free Cl")
+
+                # Good clarity, safety equipment, permit, BPM.  pH 7.4, cl 4.0, cc 0, 150 GPM
+                pattern = re.compile("(?:CHLORINE|CL|C)\s*(?::|=|-|)?\s*(\d+.\d)\s*(?:PPM)?", re.IGNORECASE)
+                matches = pattern.findall(data[f_i])
 
 
 
@@ -122,7 +129,7 @@ class ACPoolInspectionsSchema(pl.BaseSchema):
             # PH: 7.2 shallow 7.4 deep, FC:3.8 (SE)  3.4 (DE) CC:0 Flow
 
 
-            if result is None:
+            if matches == [] and not failed:
                 # Try splitting string on commas and parsing substrings to handle cases like these:
                     # Good clarity, permit, bac-T reports, safety equipment and 1st aid kit, BPM.  pH 7.6, cl 5, cc 0.
                     #Good clarity,permit,1st aid kit,aed,saety equipment.  7.2 pH, 5.0 cl, 0.2 cc, 180 gpm.
@@ -140,11 +147,13 @@ class ACPoolInspectionsSchema(pl.BaseSchema):
                         data[f_o] = potential_values[0]
                     else:
                         print(f'Multiple matches found in "{data[f_i]}": {potential_values}')
-            else:
-                if len(result.groups()) > 1:
+            elif not failed:
+                if len(matches) > 1:
                     print(f'Multiple matches found in "{data[f_i]}"')
                 else:
-                    data[f_o] = result.group(1)
+                    data[f_o] = matches[0]
+            if f_o in data and data[f_o] is not None:
+                assert len(data[f_o]) < 6
 
         # FREE CHLORINE: 7.2 PPM FLOW RATE: 70 GPM
         #POOL READINGS: FREE CL 1.0 COMBINED CL 0.0 TOTAL CL 1.0...
