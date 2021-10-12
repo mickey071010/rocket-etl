@@ -162,17 +162,19 @@ class CovidData:
         print("output file: "),
         print(output_path)
 
-def sheet_to_csv(ws, filename):
+def sheet_to_csv(ws, filename, rows_to_skip=0):
     list_of_dicts = []
     field_names = []
     for col_index in range(ws.max_column):
-        field_names.append(ws.cell(1, col_index+1).value)
+        field_name = ws.cell(1+rows_to_skip, col_index+1).value
+        if field_name is not None:
+            field_names.append(field_name)
 
     for row_index, row in enumerate(ws):
-        if row_index > 0:
+        if row_index > rows_to_skip:
             d = {}
             cells = list(row)
-            for col_index in range(len(cells)):
+            for col_index in range(len(field_names)): # previously len(cells)
                 d[field_names[col_index]] = cells[col_index].value
             list_of_dicts.append(d)
 
