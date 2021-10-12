@@ -13,8 +13,8 @@ from engine.parameters.local_parameters import SOURCE_DIR, REFERENCE_DIR
 
 from bs4 import BeautifulSoup
 from openpyxl import load_workbook
-import pandas as pd
 from fuzzywuzzy import fuzz
+from engine.payload.wprdc.ltcf_vaccinations import sheet_to_csv
 
 try:
     from icecream import ic
@@ -30,13 +30,13 @@ def write_to_csv(filename, list_of_dicts, keys):
 class DHSNursingHomeVaccinationsSchema(pl.BaseSchema):
     job_code = 'nursing_homes'
     #survey_id_ = fields.Integer(load_from='SURVEY_ID_'.lower(), dump_to='survey_id_')
-    facility_n = fields.String(load_from='Facility Name'.lower(), dump_to='facility_name', allow_none=True)
-    service_type = fields.String(load_from='Type of Service'.lower(), dump_to='type_of_service')
+    facility_name = fields.String(load_from='Facility Name'.lower(), dump_to='facility_name', allow_none=True)
+    type_of_service = fields.String(load_from='Type of Service'.lower(), dump_to='type_of_service')
     county = fields.String(load_from='County'.lower(), dump_to='county', allow_none=True)
     license = fields.String(load_from='License'.lower(), dump_to='license', allow_none=True)
-    resident_cases_to_display = fields.String(load_from='COVID-19 Positive Residents'.lower(), dump_to='resident_cases_to_display', allow_none=True)
-    resident_deaths_to_display = fields.String(load_from='COVID-19 Resident Deaths'.lower(), dump_to='resident_deaths_to_display', allow_none=True)
-    staff_cases_to_display = fields.String(load_from='COVID-19 Positive Staff'.lower(), dump_to='staff_cases_to_display', allow_none=True)
+    covid_19_positive_residents = fields.String(load_from='COVID-19 Positive Residents'.lower(), dump_to='resident_cases_to_display', allow_none=True)
+    covid_19_resident_deaths = fields.String(load_from='COVID-19 Resident Deaths'.lower(), dump_to='resident_deaths_to_display', allow_none=True)
+    covid_19_positive_staff = fields.String(load_from='COVID-19 Positive Staff'.lower(), dump_to='staff_cases_to_display', allow_none=True)
     dhs_data_last_updated = fields.Date(load_from='DHS_Data_Last_Updated'.lower(), dump_to='dhs_data_last_updated', allow_none=True)
     facility_name_fpp = fields.String(load_from='Facility Name FPP'.lower(), dump_to='facility_name_fpp', allow_none=True)
     federal_pharmacy_partner = fields.String(load_from='Federal Pharmacy Partner'.lower(), dump_to='federal_pharmacy_partner', allow_none=True)
@@ -86,6 +86,8 @@ class CovidData:
             tempStr = str(fpp['Long Term Care Facility Name'])
 
             for i, facility in enumerate(self.dhsdf):
+                facility['COVID-19 Positive Residents'] = facility[' COVID-19 Positive Residents'] # Dealing with
+                # an unnecessary leading space.
                 Str1 = str(facility['Facility Name'])
                 ratio = fuzz.ratio(Str1.lower(), tempStr.lower())
                 if (ratio >= 90):
@@ -112,15 +114,13 @@ class CovidData:
 
                     
         print("Done Adding FPP Data")
-        #self.writeToFile(output_path?)
 
     def writeToFile(self, output_path):
         #self.ltcfdf.drop('GEOCODING_', inplace=True, axis=1) # We don't need to drop any columns
         #self.ltcfdf.drop('LAT', inplace=True, axis=1) # since the ETL schema will just pluck out
         #self.ltcfdf.drop('LNG', inplace=True, axis=1) # the columns it needs and ignore the others.
         write_to_csv(output_path, self.dhsdf, list(self.fields))
-        print("output file: "),
-        print(output_path)
+        print(f"CovidData is writing to the output file at {output_path}")
 
 def get_raw_data_and_save_to_local_csv_file(jobject, **kwparameters):
     r = requests.get("https://www.health.pa.gov/topics/disease/coronavirus/Pages/LTCF-Data.aspx")
@@ -145,16 +145,8 @@ def get_raw_data_and_save_to_local_csv_file(jobject, **kwparameters):
 
     wb2 = load_workbook('DHS_Data.xlsx')
 
-    wb2 = load_workbook('DHS_Data.xlsx')
     ws2 = wb2['Master List']
-
-    df2 = pd.DataFrame(ws2.values)
-    df2 = df2.iloc[3:]
-
-    df2.columns = [ "Type of Service", "County", "License", "Facility Name",
-                   "COVID-19 Positive Residents", "COVID-19 Resident Deaths",
-                   "Covid-19 Positive Staff", "", "", "",""]
-    df2.to_csv("DHS_Data.csv", encoding='utf-8')
+    sheet_to_csv(ws2, 'DHS_Data.csv', 2)
 
     a = CovidData('DHS_Data.csv', 'FPP_Data.csv', soup)
     ic(jobject.target)
@@ -170,11 +162,13 @@ job_dicts = [
         'source_file': 'COVID-19_Vaccine_Data_LTCF.csv',
         'custom_processing': get_raw_data_and_save_to_local_csv_file,
         'schema': DHSNursingHomeVaccinationsSchema,
+        'filters': [['type_of_service', '!=', 'STATE TOTAL']],
         #'always_wipe_data': True,
         'primary_key_fields': ['license'],
         'destination': 'ckan',
+        'destination_file': 'DHS_COVID-19_Vaccine_Data_LTCF.csv',
         'package': vaccinations_package_id,
-        'resource_name': 'Long-Term Care Facilites COVID-19 Cases and Vaccinations DHS',
+        'resource_name': 'DHS Long-Term Care Facilites COVID-19 Cases and Vaccinations',
         'upload_method': 'upsert',
         'resource_description': f'Derived from "https://data.pa.gov/api/views/iwiy-rwzp/rows.csv?accessType=DOWNLOAD&api_foundry=true" and "https://www.health.pa.gov/topics/disease/coronavirus/Pages/LTCF-Data.aspx" ',
     },
