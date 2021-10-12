@@ -188,10 +188,10 @@ def get_raw_data_and_save_to_local_csv_file(jobject, **kwparameters):
         doc_urls = []
         doh_dates = []
         for link in soup.find_all('a'):
-                url = link.get('href', 'No Link Found')
-                if re.search('xlsx', url) is not None:
-                        doh_dates.append(link.next_sibling)
-                        doc_urls.append(url)
+            url = link.get('href', 'No Link Found')
+            if re.search('xlsx', url) is not None:
+                doh_dates.append(link.next_sibling)
+                doc_urls.append(url)
 
         assert len(doc_urls) == 4  # Verify that the web site only lists four XSLX files.
         fullurl = "https://www.health.pa.gov" + doc_urls[0]
