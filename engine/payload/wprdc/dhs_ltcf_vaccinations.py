@@ -123,34 +123,34 @@ class CovidData:
         print(f"CovidData is writing to the output file at {output_path}")
 
 def get_raw_data_and_save_to_local_csv_file(jobject, **kwparameters):
-    r = requests.get("https://www.health.pa.gov/topics/disease/coronavirus/Pages/LTCF-Data.aspx")
-    soup = BeautifulSoup(r.text, 'html.parser')
-    doc_urls = []
-    dhs_dates = []
-    for link in soup.find_all('a'):
-        url = link.get('href', 'No Link Found')
-        if re.search('xlsx', url) is not None:
-            dhs_dates.append(link.next_sibling)
-            doc_urls.append(url)
+    if not kwparameters['use_local_input_file']:
+        r = requests.get("https://www.health.pa.gov/topics/disease/coronavirus/Pages/LTCF-Data.aspx")
+        soup = BeautifulSoup(r.text, 'html.parser')
+        doc_urls = []
+        dhs_dates = []
+        for link in soup.find_all('a'):
+            url = link.get('href', 'No Link Found')
+            if re.search('xlsx', url) is not None:
+                dhs_dates.append(link.next_sibling)
+                doc_urls.append(url)
 
-    assert len(doc_urls) == 4  # Verify that the web site only lists four XSLX files.
-    dhs_last_updated = dhs_dates[2]
-    fullurl = "https://www.health.pa.gov" + doc_urls[2]
+        assert len(doc_urls) == 4  # Verify that the web site only lists four XSLX files.
+        dhs_last_updated = dhs_dates[2]
+        fullurl = "https://www.health.pa.gov" + doc_urls[2]
 
-    r = requests.get(fullurl)
-    open('DHS_Data.xlsx', 'wb').write(r.content)
+        r = requests.get(fullurl)
+        open('DHS_Data.xlsx', 'wb').write(r.content)
 
-    r = requests.get("https://data.pa.gov/api/views/iwiy-rwzp/rows.csv?accessType=DOWNLOAD&api_foundry=true")
-    open('FPP_Data.csv', 'wb').write(r.content)
+        r = requests.get("https://data.pa.gov/api/views/iwiy-rwzp/rows.csv?accessType=DOWNLOAD&api_foundry=true")
+        open('FPP_Data.csv', 'wb').write(r.content)
 
-    wb2 = load_workbook('DHS_Data.xlsx')
+        wb2 = load_workbook('DHS_Data.xlsx')
 
-    ws2 = wb2['Master List']
-    sheet_to_csv(ws2, 'DHS_Data.csv', 2)
+        ws2 = wb2['Master List']
+        sheet_to_csv(ws2, 'DHS_Data.csv', 2)
 
-    a = CovidData('DHS_Data.csv', 'FPP_Data.csv', soup)
-    ic(jobject.target)
-    a.writeToFile(jobject.target)
+        a = CovidData('DHS_Data.csv', 'FPP_Data.csv', soup)
+        a.writeToFile(jobject.target)
 
 vaccinations_package_id = 'b0ecab9a-d056-4855-9992-bdfca608632b'
 
