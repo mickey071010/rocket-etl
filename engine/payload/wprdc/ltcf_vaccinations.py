@@ -77,6 +77,11 @@ class NursingHomeVaccinationsSchema(pl.BaseSchema):
     class Meta:
         ordered = True
 
+    @pre_load
+    def fix_current_census(self, data):
+        f = 'current_census'
+        if f in data and data[f] in ['Yes', 'No']:
+            data[f] = None
 # dfg
 
 class CovidData:
