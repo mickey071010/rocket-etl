@@ -110,16 +110,16 @@ class MultifamilyProductionInitialCommitmentSchema(pl.BaseSchema):
     fha_loan_id = fields.String(load_from='fha_number', dump_to='fha_loan_id')
     city = fields.String(load_from='PROJECT_CITY'.lower(), dump_to='city')
     state = fields.String(load_from='PROJECT_STATE'.lower(), dump_to='state')
-    date_of_initial_endorsement = fields.Date(load_from='Date of Initial Endorsement'.lower(), dump_to='initial_endorsement_date')
-    mortgage_at_initial_endorsement = fields.Integer(load_from='Mortgage at Initial Endorsement'.lower(), dump_to='original_mortgage_amount')
+    date_of_ie = fields.Date(load_from='Date of IE'.lower(), dump_to='initial_endorsement_date')
+    mortgage_at_ie = fields.Integer(load_from='Mortgage at IE'.lower(), dump_to='original_mortgage_amount')
     program_category = fields.String(load_from='Program Category'.lower())
-    unit_or_bed_count = fields.Integer(load_from='Unit or Bed Count'.lower(), dump_to='units')
-    basic_fha_risk_share_or_other = fields.String(load_from='basic_fha,_risk_share,_or_other', dump_to='basic_fha_risk_share_or_other')
+    units_at_ie = fields.Integer(load_from='Units at IE'.lower(), dump_to='units')
+    program_type = fields.String(load_from='Program Type', dump_to='basic_fha_risk_share_or_other')
     current_status = fields.String(load_from='Current Status'.lower(), dump_to='current_status_of_loan')
-    date_of_firm_issue = fields.Date(load_from='Date of Firm Issue'.lower(), dump_to='date_of_firm_issue')
-    firm_commitment_lender = fields.String(load_from='Firm Commitment Lender'.lower(), dump_to='firm_commitment_lender')
-    final_endorsement_lender = fields.String(load_from='Final Endorsement Lender'.lower(), dump_to='holder_name', allow_none=True)
-    hope_vi_designation = fields.Boolean(load_from='HOPE VI Designation'.lower(), dump_to='hope_vi_designation', allow_none=True)
+    firm_issued_date = fields.Date(load_from='Firm Issued Date'.lower(), dump_to='date_of_firm_issue')
+    lender_at_firm = fields.String(load_from='Lender at Firm'.lower(), dump_to='firm_commitment_lender', allow_none=True)
+    lender_at_final_endorsement = fields.String(load_from='Lender at Final Endorsement'.lower(), dump_to='holder_name', allow_none=True)
+    hope_vi = fields.Boolean(load_from='HOPE VI'.lower(), dump_to='hope_vi_designation', allow_none=True)
 
     class Meta:
         ordered = True
@@ -132,7 +132,7 @@ class MultifamilyProductionInitialCommitmentSchema(pl.BaseSchema):
 
     @pre_load
     def fix_hope_vi_designation(self, data):
-        f = 'hope_vi_designation'
+        f = 'hope_vi'
         if f in data:
             if data[f] == 'Y':
                 data[f] = True
@@ -148,7 +148,7 @@ class MultifamilyProductionInitialCommitmentSchema(pl.BaseSchema):
         https://github.com/marshmallow-code/marshmallow/issues/656
         So this is a workaround.
         """
-        date_fields = ['date_of_firm_issue', 'date_of_initial_endorsement']
+        date_fields = ['firm_issued_date', 'date_of_ie']
         for f in date_fields:
             data[f] = data[f].date().isoformat()
 
@@ -1066,12 +1066,14 @@ job_dicts = [
     {
         'job_code': MultifamilyProductionInitialCommitmentSchema().job_code, # 'mf_init_commit'
         'source_type': 'http',
-        'source_file': 'Initi_Endores_Firm%20Comm_DB_FY21_Q1.xlsx',
+        'source_file': 'FHA MF and OHP Firm Commitments and Endorsements Database FY01_FY21 Q4.xlsx', #'Initi_Endores_Firm%20Comm_DB_FY21_Q1.xlsx',
+        # Everything seems to change when this file updates: filename, some field names, and the number of Excel files on the scraped page.
         #'source_full_url': 'https://www.hud.gov/sites/dfiles/Housing/documents/Initi_Endores_Firm%20Comm_DB_FY21_Q1.xlsx',
-        'source_full_url': scrape_nth_link('https://www.hud.gov/program_offices/housing/mfh/mfdata/mfproduction', 'xlsx', 0, 2, 'Q'),
+        'source_full_url': scrape_nth_link('https://www.hud.gov/program_offices/housing/mfh/mfdata/mfproduction', 'xlsx', 0, 1, 'Q'),
         'updates': 'Quarterly',
         'encoding': 'binary',
-        'rows_to_skip': 3,
+        'rows_to_skip': 7,
+        'sheet_name': 'Initial Endorsements',
         'schema': MultifamilyProductionInitialCommitmentSchema,
         'filters': [['project_state', '==', 'PA']], # No county field. Just city and state. (And Pittsburgh is misspelled as "Pittsburg".)
         'always_wipe_data': True,

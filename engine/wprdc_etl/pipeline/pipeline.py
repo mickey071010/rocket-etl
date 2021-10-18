@@ -2,6 +2,7 @@ import os
 import json
 import sqlite3
 import time
+from icecream import ic
 
 from engine.wprdc_etl.pipeline.exceptions import (
     IsHeaderException, InvalidConfigException, DuplicateFileException, MissingStatusDatabaseError

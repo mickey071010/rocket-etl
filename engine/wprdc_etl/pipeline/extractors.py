@@ -10,6 +10,7 @@ import csv, sys
 csv.field_size_limit(sys.maxsize) # This is designed to overcome this error:
 #_csv.Error: field larger than field limit (131072)
 # https://stackoverflow.com/questions/15063936/csv-error-field-larger-than-field-limit-131072
+from icecream import ic
 
 class Extractor(object):
     def __init__(self, connection):
@@ -238,9 +239,21 @@ class ExcelExtractor(TableExtractor):
         super(ExcelExtractor, self).__init__(connection, *args, **kwargs)
         self.firstline_headers = kwargs.get('firstline_headers', True)
         self.sheet_index = kwargs.get('sheet_index', 0)
+        self.sheet_name = kwargs.get('sheet_name', None)
         self.rows_to_skip = kwargs.get('rows_to_skip', 0)
         self.datemode = None
         self.set_headers()
+
+    def select_sheet(self):
+        self.connection.seek(0) # This line doesn't seem to do anything for an Excel file.
+        workbook = load_workbook(self.connection, read_only=True, data_only=True)
+        # openpyxl's load_workbook function prefers to be sent a filename
+        # or a file-like object open in binary mode e.g., zipfile.ZipFile.
+        if self.sheet_name is not None:
+            sheet = workbook[self.sheet_name]
+        else:
+            sheet = workbook.worksheets[self.sheet_index]
+        return sheet
 
     def set_headers(self, headers=None):
         '''Sets headers from file or passed headers
@@ -269,11 +282,7 @@ class ExcelExtractor(TableExtractor):
             self.schema_headers = self.headers
             return
         elif self.firstline_headers:
-            self.connection.seek(0) # This line doesn't seem to do anything for an Excel file.
-            workbook = load_workbook(self.connection, read_only=True, data_only=True)
-            # openpyxl's load_workbook function prefers to be sent a filename
-            # or a file-like object open in binary mode e.g., zipfile.ZipFile.
-            sheet = workbook.worksheets[self.sheet_index]
+            sheet = self.select_sheet()
             self.headers = [cell.value for cell in sheet[1 + self.rows_to_skip]] # The first row in an Excel file is row 1.
             self.schema_headers = self.create_schema_headers(self.headers)
         else:
@@ -281,9 +290,7 @@ class ExcelExtractor(TableExtractor):
 
     def process_connection(self):
         data = []
-        self.connection.seek(0) # This line doesn't seem to do anything for an Excel file.
-        workbook = load_workbook(self.connection, read_only=True, data_only=True)
-        sheet = workbook.worksheets[self.sheet_index]
+        sheet = self.select_sheet()
         rows = sheet.rows
         data = []
         for k, row in enumerate(rows):

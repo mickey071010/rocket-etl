@@ -483,6 +483,7 @@ class Job:
         self.verify_requests = not job_dict['ignore_certificate_errors'] if 'ignore_certificate_errors' in job_dict else True
         self.encoding = job_dict['encoding'] if 'encoding' in job_dict else 'utf-8' # wprdc-etl/pipeline/connectors.py also uses UTF-8 as the default encoding.
         self.rows_to_skip = job_dict['rows_to_skip'] if 'rows_to_skip' in job_dict else 0 # Necessary when extracting from poorly formatted Excel files.
+        self.sheet_name = job_dict['sheet_name'] if 'sheet_name' in job_dict else None # To identify an Excel sheet by name.
         self.connector_config_string = job_dict['connector_config_string'] if 'connector_config_string' in job_dict else ''
         self.compressed_file_to_extract = job_dict['compressed_file_to_extract'] if 'compressed_file_to_extract' in job_dict else None
         self.custom_processing = job_dict['custom_processing'] if 'custom_processing' in job_dict else (lambda *args, **kwargs: None)
@@ -756,7 +757,7 @@ class Job:
         try:
             curr_pipeline = pl.Pipeline(self.job_code + ' pipeline', self.job_code + ' Pipeline', log_status=False, chunk_size=1000, settings_file=SETTINGS_FILE, retry_without_last_line = retry_without_last_line, ignore_empty_rows = ignore_empty_rows, filters = self.filters) \
                 .connect(self.source_connector, self.target, config_string=self.connector_config_string, encoding=self.encoding, local_cache_filepath=self.local_cache_filepath, verify_requests=self.verify_requests, fallback_host=self.source_site) \
-                .extract(self.extractor, firstline_headers=True, rows_to_skip=self.rows_to_skip, compressed_file_to_extract=self.compressed_file_to_extract) \
+                .extract(self.extractor, firstline_headers=True, rows_to_skip=self.rows_to_skip, sheet_name=self.sheet_name, compressed_file_to_extract=self.compressed_file_to_extract) \
                 .schema(self.schema) \
                 .load(self.loader, self.loader_config_string,
                       filepath = self.destination_file_path,
