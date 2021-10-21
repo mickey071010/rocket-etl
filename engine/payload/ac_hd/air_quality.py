@@ -114,8 +114,8 @@ class MeasurementSites(pl.BaseSchema):
                 else:
                     data[k] == (data[k].lower() == 'true')
 
-air_quality_package_id = '4659f303-d189-489c-8c94-87e1fb7407cf' # Test version of air-quality data package
-#air_quality_package_id = 'c7b3266c-adc6-41c0-b19a-8d4353bfcdaf' # Production version of air-quality data package
+#air_quality_package_id = '4659f303-d189-489c-8c94-87e1fb7407cf' # Test version of air-quality data package
+air_quality_package_id = 'c7b3266c-adc6-41c0-b19a-8d4353bfcdaf' # Production version of air-quality data package
 
 job_dicts = [
     {
@@ -132,21 +132,21 @@ job_dicts = [
         'package': air_quality_package_id,
         'resource_name': f'Daily AQI Data'
     },
-    {
-        'job_code': 'aqi_daily_historic',
-        'source_type': 'sftp',
-        'source_dir': 'Health Department',
-        'source_file': f'aqi_daily_historic_2021_10_19.csv',
-        'connector_config_string': 'sftp.county_sftp',
-        'encoding': 'utf-8-sig',
-        'schema': HistoricAQIDailySchema,
-        'primary_key_fields': ['date', 'site', 'parameter'],
-        'always_wipe_data': False,
-        'upload_method': 'upsert',
-        'destination_file': f'aqi_daily.csv',
-        'package': air_quality_package_id,
-        'resource_name': f'Daily AQI Data'
-    },
+#    {
+#        'job_code': 'aqi_daily_historic',
+#        'source_type': 'sftp',
+#        'source_dir': 'Health Department',
+#        'source_file': f'aqi_daily_historic_2021_10_19.csv',
+#        'connector_config_string': 'sftp.county_sftp',
+#        'encoding': 'utf-8-sig',
+#        'schema': HistoricAQIDailySchema,
+#        'primary_key_fields': ['date', 'site', 'parameter'],
+#        'always_wipe_data': False,
+#        'upload_method': 'upsert',
+#        'destination_file': f'aqi_daily.csv',
+#        'package': air_quality_package_id,
+#        'resource_name': f'Daily AQI Data'
+#    },
     {
         'job_code': 'air_hourly',
         'source_type': 'sftp',
