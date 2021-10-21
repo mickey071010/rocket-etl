@@ -156,6 +156,7 @@ job_dicts = [
         'connector_config_string': 'sftp.county_sftp',
         'encoding': 'utf-8-sig',
         'schema': AQIHourlySchema,
+        'filters': [['parametername', 'not in', ['Sound', 'RCL TEMP']]], # Edit out some experimental fields.
         'primary_key_fields': ['datetime_est', 'site', 'parameter'],
         'always_wipe_data': False,
         'upload_method': 'upsert',
