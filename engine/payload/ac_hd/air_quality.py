@@ -162,7 +162,7 @@ job_dicts = [
         'upload_method': 'upsert',
         'destination_file': f'air_hourly.csv',
         'package': air_quality_package_id,
-        'resource_name': f'Hourly Air Quality Data (new format)'
+        'resource_name': f'Hourly Air Quality Data'
     },
     {
         'job_code': 'measurement_sites',
