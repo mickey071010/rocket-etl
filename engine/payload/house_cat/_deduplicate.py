@@ -735,12 +735,13 @@ def deduplicate_records(deduplicated_index_filepath, verbose=False):
     eliminated_indices = []
 
     # Index all records by all key fields
-    master_by = defaultdict(lambda: defaultdict(int)) # master_by['property_id']['80000000'] = index of some record in master_list
+    default_index = -1
+    master_by = defaultdict(lambda: defaultdict(lambda: default_index)) # master_by['property_id']['80000000'] = index of some record in master_list
     for n, record in enumerate(master_list):
         for key in possible_keys:
             if key in record:
                 if record[key] not in ['', None]:
-                    if master_by[key][record[key]] != 0: # Sound COLLISION.
+                    if master_by[key][record[key]] != default_index: # Sound COLLISION.
                         if verbose:
                             print(f'Found another instance of key = {key}, value = {record[key]} already in the master list.')
                         already_indexed_n = master_by[key][record[key]]
