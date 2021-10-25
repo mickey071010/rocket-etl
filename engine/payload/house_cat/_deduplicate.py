@@ -755,15 +755,16 @@ def deduplicate_records(deduplicated_index_filepath, verbose=False):
                             # being careful to think through what happens when field values from two records get listed
                             # in the merged record.
                             for key_i in possible_keys:
-                                index_n_i = master_by[key_i][record_1[key_i]]
-                                if index_n_i not in [0, n]: # We found a different
-                                    # field that has already been indexed.
-                                    # That index pointer needs to be adjusted
-                                    # to point to the merged record:
-                                    id_string = record_1[key_i]
-                                    for id_j in id_string.split('|'): # Deserialize IDs.
-                                        master_by[key_i][id_j] = n # Repoint all these references to position n
-                                        # in the master_list since that's where the merged record is going to go.
+                                if record_1[key_i] != '': # Don't index null IDs.
+                                    index_n_i = master_by[key_i][record_1[key_i]]
+                                    if index_n_i not in [0, n]: # We found a different
+                                        # field that has already been indexed.
+                                        # That index pointer needs to be adjusted
+                                        # to point to the merged record:
+                                        id_string = record_1[key_i]
+                                        for id_j in id_string.split('|'): # Deserialize IDs.
+                                            master_by[key_i][id_j] = n # Repoint all these references to position n
+                                            # in the master_list since that's where the merged record is going to go.
 
                             master_list[already_indexed_n] = None
                             master_list[n] = record = merged_record
@@ -773,8 +774,9 @@ def deduplicate_records(deduplicated_index_filepath, verbose=False):
 
                     else:
                         id_string = record[key]
-                        for id_j in id_string.split('|'): # Deserialize IDs.
-                            master_by[key][id_j] = n  # This is the row number in the master list.
+                        if id_string != '':
+                            for id_j in id_string.split('|'): # Deserialize IDs.
+                                master_by[key][id_j] = n  # This is the row number in the master list.
 
     with open(f'unidirectional_links.csv', 'r') as g:
         reader = csv.DictReader(g)
