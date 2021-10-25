@@ -743,13 +743,15 @@ def deduplicate_records(deduplicated_index_filepath, verbose=False):
                     if master_by[key][record[key]] != 0: # Sound COLLISION.
                         if verbose:
                             print(f'Found another instance of key = {key}, value = {record[key]} already in the master list.')
-                        if True: # merging routine
+                        already_indexed_n = master_by[key][record[key]]
+                        assert already_indexed_n not in eliminated_indices
+                        if already_indexed_n != n: # merging routine
+                            record_1 = master_list[already_indexed_n]
                             if verbose:
                                 print(f'Attempting to merge these two records:')
-                            already_indexed_n = master_by[key][record[key]]
-                            record_1 = master_list[already_indexed_n]
-                            #pprint(record_1)
-                            #pprint(record)
+                                pprint(record_1)
+                                pprint(record)
+
                             merged_record = merge(record_1, record, verbose)
 
                             if verbose:
@@ -760,13 +762,8 @@ def deduplicate_records(deduplicated_index_filepath, verbose=False):
                             #ic(master_list[already_indexed_n])
                             #ic(merged_record)
                         else:
-                            already_indexed_n = master_by[key][record[key]]
-                            record_1 = master_list[already_indexed_n]
-                            if verbose:
-                                pprint(record_1)
-                                pprint(record)
-                        #assert False
-                            raise ValueError("DO SOMETHING ABOUT THIS ONE! "*8)
+                            pass # If already_indexed_n == n, this record has already been handled.
+
                     #assert master_by[key][record[key]] == 0 # I think this might be fairly critical actually.
                     else:
                         master_by[key][record[key]] = n # This is the row number in the master list.
