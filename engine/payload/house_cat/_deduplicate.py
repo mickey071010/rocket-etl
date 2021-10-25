@@ -326,8 +326,8 @@ def fix_single_record(record):
         record['longitude'] = '-79.9175'
         record['census_tract'] = '42003111500' # 2020 Census tract - looked up through geo.census.gov
     elif '800112244' == record['property_id']:
-        assert record['property_street_address'] == '5653 BRD ST'
-        record['property_street_address'] = '5653 BROAD ST'
+        if re.search('5653 BRD ST', record['property_street_address']):
+            record['property_street_address'] = re.sub('5653 BRD ST', '5653 BROAD ST', record['property_street_address'])
     elif 'TC1989-0042' == record['normalized_state_id']:
         record['status'] = 'Closed'
         record['property_street_address'] = '2561 Allequippa St'
