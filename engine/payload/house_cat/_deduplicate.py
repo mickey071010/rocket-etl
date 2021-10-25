@@ -748,11 +748,6 @@ def deduplicate_records(deduplicated_index_filepath, verbose=False):
                         assert already_indexed_n not in eliminated_indices
                         if already_indexed_n != n: # merging routine
                             record_1 = master_list[already_indexed_n]
-                            if verbose:
-                                print(f'Attempting to merge these two records:')
-                                pprint(record_1)
-                                pprint(record)
-
                             merged_record = merge(record_1, record, verbose)
 
                             # When this merge happens, the code should compensate by reviewing the master_by mapping for any
@@ -765,8 +760,10 @@ def deduplicate_records(deduplicated_index_filepath, verbose=False):
                                     # field that has already been indexed.
                                     # That index pointer needs to be adjusted
                                     # to point to the merged record:
-                                    master_by[key_i][record_1[key_i]] = n # Repoint all these references to position n
-                                    # in the master_list since that's where the merged record is going to go.
+                                    id_string = record_1[key_i]
+                                    for id_j in id_string.split('|'): # Deserialize IDs.
+                                        master_by[key_i][id_j] = n # Repoint all these references to position n
+                                        # in the master_list since that's where the merged record is going to go.
 
                             master_list[already_indexed_n] = None
                             master_list[n] = record = merged_record
@@ -774,9 +771,10 @@ def deduplicate_records(deduplicated_index_filepath, verbose=False):
                         else:
                             pass # If already_indexed_n == n, this record has already been handled.
 
-                    #assert master_by[key][record[key]] == 0 # I think this might be fairly critical actually.
                     else:
-                        master_by[key][record[key]] = n # This is the row number in the master list.
+                        id_string = record[key]
+                        for id_j in id_string.split('|'): # Deserialize IDs.
+                            master_by[key][id_j] = n  # This is the row number in the master list.
 
     with open(f'unidirectional_links.csv', 'r') as g:
         reader = csv.DictReader(g)
