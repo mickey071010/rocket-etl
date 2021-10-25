@@ -754,27 +754,29 @@ def deduplicate_records(deduplicated_index_filepath, verbose=False):
 
                             merged_record = merge(record_1, record, verbose)
 
-                            if verbose:
-                                ic(already_indexed_n)
-                                #ic(master_list[already_indexed_n])
-                            master_list[already_indexed_n] = merged_record
-                            eliminated_indices.append(n)
-                            #ic(master_list[already_indexed_n])
-                            #ic(merged_record)
+                            # When this merge happens, the code should compensate by reviewing the master_by mapping for any
+                            # other fields in the records TO BE merged, and ensuring that they point to the new index,
+                            # being careful to think through what happens when field values from two records get listed
+                            # in the merged record.
+                            for key_i in possible_keys:
+                                index_n_i = master_by[key_i][record_1[key_i]]
+                                if index_n_i not in [0, n]: # We found a different
+                                    # field that has already been indexed.
+                                    # That index pointer needs to be adjusted
+                                    # to point to the merged record:
+                                    master_by[key_i][record_1[key_i]] = n # Repoint all these references to position n
+                                    # in the master_list since that's where the merged record is going to go.
+
+                            master_list[already_indexed_n] = None
+                            master_list[n] = record = merged_record
+                            eliminated_indices.append(already_indexed_n)
                         else:
                             pass # If already_indexed_n == n, this record has already been handled.
 
                     #assert master_by[key][record[key]] == 0 # I think this might be fairly critical actually.
                     else:
                         master_by[key][record[key]] = n # This is the row number in the master list.
-                    #if record['fha_loan_id'] == '03332013' and record['zip_code'] == '51212':
-                    #    print("JUST SKIPPING THIS COLLISION FOR NOW!!!")
-                    #    pass
-                    #else:
-                    #    assert master_by[key][record[key]] == 0 # I think this might be fairly critical actually.
-                    #    master_by[key][record[key]] = n # This is the row number in the master list.
 
-    # Load file that gives instructions for linking records based on IDs
     with open(f'unidirectional_links.csv', 'r') as g:
         reader = csv.DictReader(g)
         for row in reader:
