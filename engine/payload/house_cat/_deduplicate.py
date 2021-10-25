@@ -805,36 +805,38 @@ def deduplicate_records(deduplicated_index_filepath, verbose=False):
                 # Merge these two records
                 index_1 = master_by[source_field][source_value]
                 index_2 = master_by[target_field][target_value]
-                if index_1 in eliminated_indices:
-                    if verbose:
-                        ic(index_1, source_field, source_value)
-                        ic(row)
-                #assert index_1 not in eliminated_indices # This seems like it's necessary because ic(master_by['lihtc_project_id']['PAA20133006'])
-                #assert index_2 not in eliminated_indices # does not have the same information as ic(master_by['state_id']['TC20110313'])
-                                                         # after the merging, though it should.
+                if index_1 != index_2: # Since we don't need to merge a record with itself.
 
-                # Just try skipping these:
-                if index_1 in eliminated_indices:
-                    if verbose:
-                        print(f'index_1 = {index_1} has already been taken care of.')
-                if index_2 in eliminated_indices:
-                    if verbose:
-                        print(f'index_2 = {index_2} has already been taken care of.')
-                if index_1 in eliminated_indices or index_2 in eliminated_indices:
-                    if verbose:
-                        ic(row)
-                else:
-                    record_1 = master_list[index_1]
-                    record_2 = master_list[index_2]
+                    if index_1 in eliminated_indices:
+                        if verbose:
+                            ic(index_1, source_field, source_value)
+                            ic(row)
+                    #assert index_1 not in eliminated_indices # This seems like it's necessary because ic(master_by['lihtc_project_id']['PAA20133006'])
+                    #assert index_2 not in eliminated_indices # does not have the same information as ic(master_by['state_id']['TC20110313'])
+                                                             # after the merging, though it should.
 
-                    merged_record = merge(record_1, record_2, verbose)
+                    # Just try skipping these:
+                    if index_1 in eliminated_indices:
+                        if verbose:
+                            print(f'index_1 = {index_1} has already been taken care of.')
+                    if index_2 in eliminated_indices:
+                        if verbose:
+                            print(f'index_2 = {index_2} has already been taken care of.')
+                    if index_1 in eliminated_indices or index_2 in eliminated_indices:
+                        if verbose:
+                            ic(row)
+                    else:
+                        record_1 = master_list[index_1]
+                        record_2 = master_list[index_2]
 
-                    master_list[index_1] = master_list[index_2] = merged_record
-                    master_by[source_field][source_value] = min(index_1, index_2)
-                    master_by[target_field][target_value] = min(index_1, index_2)
-                    eliminated_indices.append(max(index_1, index_2))
-                if verbose:
-                    print("============")
+                        merged_record = merge(record_1, record_2, verbose)
+
+                        master_list[index_1] = master_list[index_2] = merged_record
+                        master_by[source_field][source_value] = max(index_1, index_2)
+                        master_by[target_field][target_value] = max(index_1, index_2)
+                        eliminated_indices.append(min(index_1, index_2))
+                    if verbose:
+                        print("============")
 
 
     deduplicated_master_list = []
