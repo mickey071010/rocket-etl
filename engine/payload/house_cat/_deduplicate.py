@@ -644,6 +644,7 @@ def merge(record_1, record_2, verbose):
 
         if key == 'index':
             merged_record[key] = min(value, other_value)
+            merged_record['all_keys'] = '|'.join(str(value).split('|') + str(other_value).split('|'))
         elif other_value in [None, '']:
             merged_record[key] = value
         elif value in [None, '']:
