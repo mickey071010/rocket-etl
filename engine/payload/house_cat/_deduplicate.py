@@ -802,7 +802,7 @@ def deduplicate_records(deduplicated_index_filepath, verbose=False):
     eliminated_indices = []
 
     # Index all records by all key fields
-    default_index = -1
+    default_index = None
     master_by = defaultdict(lambda: defaultdict(lambda: default_index)) # master_by['property_id']['80000000'] = index of some record in master_list
     for n, record in enumerate(master_list):
         for key in possible_keys:
@@ -824,7 +824,7 @@ def deduplicate_records(deduplicated_index_filepath, verbose=False):
                             for key_i in possible_keys:
                                 if record_1[key_i] != '': # Don't index null IDs.
                                     index_n_i = master_by[key_i][record_1[key_i]]
-                                    if index_n_i not in [0, n]: # We found a different
+                                    if index_n_i not in [default_index, n]: # We found a different
                                         # field that has already been indexed.
                                         # That index pointer needs to be adjusted
                                         # to point to the merged record:
@@ -911,7 +911,7 @@ def deduplicate_records(deduplicated_index_filepath, verbose=False):
     added = []
     for field, remainder in master_by.items():
         for value, index in remainder.items():
-            if index not in added and index not in eliminated_indices:
+            if index not in added and index not in eliminated_indices and index != default_index:
                 added.append(index)
                 deduplicated_master_list.append(fix_single_record(master_list[index]))
 
