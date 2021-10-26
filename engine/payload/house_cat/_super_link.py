@@ -181,7 +181,7 @@ def link_records_into_index():
 
         write_to_csv('files_by_fha_loan_id.csv', fha_loan_id_files_list, [id_field, 'file_list', 'city'])
 
-    # The results look like this:
+    # The OLD results look like this:
     #file_list                                  count   percent
     #mf_mortgages_pa.csv                        311     75.12
     #mf_loans_ac.csv|mf_mortgages_pa.csv        85      20.53
@@ -202,8 +202,6 @@ def link_records_into_index():
     # and adds no obvious value). The only thing worth noting is that it CAN be looked up in
     # those other two files.)
 
-    # IMPORTANT NOTE: In 91% of records, fha_loan_id == associated_fha_laon_id
-
     # Add fha_loan_id-based properties to master list.
 
     ###ac_by_id = defaultdict(dict)
@@ -221,12 +219,69 @@ def link_records_into_index():
     ###                add_row_to_linking_dict(f, row, id_field, fields_to_get, ac_by_id)
     ###
     ###master_list += [v for k, v in ac_by_id.items()]
+    ## Instead of adding this, let's just tack on the filenames to the associated record.
 
-    # Instead of adding this, let's just tack on the filenames to the associated record.
+    #for r in master_list:
+    #    if r.get('fha_loan_id', None) == '03332013': # River Vue Apartments
+    #        r['source_file'] += '|mf_mortgages_pa.csv|mf_init_commit_pa.csv'
 
-    for r in master_list:
-        if r.get('fha_loan_id', None) == '03332013': # River Vue Apartments
-            r['source_file'] += '|mf_mortgages_pa.csv|mf_init_commit_pa.csv'
+    ## IMPORTANT NOTE: In 91% of records, fha_loan_id == associated_fha_laon_id
+    #### DIVISION BETWEEN OLD (one quarter) AND NEW (20 years of Initial Commits (or whatever))
+    #file_list	                                                                            count
+    #mf_init_commit_pa.csv|mf_mortgages_pa.csv	                                            304
+    #mf_init_commit_pa.csv	                                                            228
+    #mf_init_commit_pa.csv|mf_loans_ac.csv|mf_mortgages_pa.csv	                            63
+    #mf_init_commit_pa.csv|mf_loans_ac.csv|mf_mortgages_pa.csv|phfa_pgh_demographics.csv    22
+    #phfa_pgh_demographics.csv	                                                            14
+    #mf_loans_ac.csv	                                                                    9
+    #mf_mortgages_pa.csv	                                                            8
+    #mf_init_commit_pa.csv|phfa_pgh_demographics.csv	                                    4
+    #crowdsourced_records.csv|phfa_pgh_demographics.csv                                     1
+
+    ### Now there's a ton of mf_init_commit-only records that need to be pulled in. I guess
+    ### we're pulling in mf_mortgages_pa also (even though they were left out before).
+    ### The previous analysis was done before phfa_pgh_demographics.csv was added or
+    ### crowdsourced_records.csv. It should be noted that crowdsourced_records.csv has the
+    ### field fha_loan_id but no actual value for the single record it currently contains,
+    ### so this histogram method no longer jibes with all the file formats.
+
+    # Add fha_loan_id-based properties to master list.
+
+    ac_by_id = defaultdict(dict)
+    id_field = 'fha_loan_id'
+
+    fha_files = ['mf_init_commit_pa.csv', 'mf_mortgages_pa.csv']
+    for f in fha_files:
+        assert f in files
+
+    ac_cities = ['Pittsburgh', 'McKeesport', 'Monroeville', 'Bethel Park']
+    ac_cities += ['Turtle Creek', 'Pittsburg', 'Wilkinsburg', 'Coraopolis']
+    ac_cities += ['Crafton', 'Jefferson Hills', 'Forest Hills', 'Oakdale']
+    ac_cities += ['Verona', 'McKees Rocks', 'Harmar Township', 'Bridgeville']
+    ac_cities += ['South Park', 'Brackenridge', 'Oakmont', 'Cheswick']
+    ac_cities += ['Moon', 'Etna', 'Upper St. Clair', 'Sharpsburg']
+    ac_cities += ['Borough of Avalon', 'Pitcairn', 'Wilmerding', 'Leetsdale']
+    ac_cities += ['Plum', 'McCandless', 'Munhall', 'West Mifflin']
+    ac_cities += ['East Pittsburgh', 'Port Vue', 'Braddock', 'Duquesne']
+    ac_cities += ['Moon Township']
+    # Whitehall is deliberately left off this list since there is another
+    # Whitehall, PA where the actual FHA properties all are.
+    AC_CITIES = [c.upper() for c in ac_cities]
+    for f in fha_files:
+        with open(f'{path}/{f}', 'r') as g:
+            reader = csv.DictReader(g)
+            for row in reader:
+                if row['city'] == 'Pittsburg':
+                    row['city'] = 'Pittsburgh'
+                elif row['city'] == 'Moon Township':
+                    row['city'] = 'Moon'
+                in_allegheny_county = row['city'] in ac_cities
+                in_allegheny_county = in_allegheny_county or row['city'].upper() in AC_CITIES
+                #if row[id_field] == '03332013': # River Vue Apartments
+                if in_allegheny_county:
+                    add_row_to_linking_dict(f, row, id_field, fields_to_get, ac_by_id)
+
+    master_list += [v for k, v in ac_by_id.items()]
 
     #########################
     # Add LIHTC to master_list
