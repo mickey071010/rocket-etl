@@ -572,7 +572,74 @@ def fix_single_record(record):
             record['status'] = 'Under construction'
 
     elif '10506' == record['pmindx']:
-        record['hud_property_name'] = re.sub(' CNI ', 'CHOICE NEIGHBORHOODS INITIATIVE ', record['hud_property_name'])
+        record['hud_property_name'] = re.sub(' CNI ', ' CHOICE NEIGHBORHOODS INITIATIVE ', record['hud_property_name'])
+    elif '03335246' in record['fha_loan_id']:
+        record['hud_property_name'] = re.sub('H.J. HEINZ LOFTS|H.J.HEINZ LOFTS', 'H.J. HEINZ LOFTS', record['hud_property_name'])
+        record['property_street_address'] = '300 HEINZ ST'
+        record['zip_code'] = '15212'
+        record['latitude'] = '40.4540'
+        record['longitude'] = '-79.9910'
+        record['census_tract'] = record['census_tract_2020'] = '42003241300'
+    elif '800030516' == record['property_id']:
+        record['hud_property_name'] = "HARMAR VILLAGE CARE CENTER"
+    elif '03311141' == record['fha_loan_id']:
+        record['property_street_address'] = '1001 PARKVIEW BLVD'
+        record['zip_code'] = '15217'
+        record['municipality_name'] = 'PITTSBURGH'
+        record['latitude'] = '40.4247'
+        record['longitude'] = '-79.9099'
+        record['census_tract'] = record['census_tract_2020'] = '42003141400'
+    elif '03322094' == record['fha_loan_id']:
+        record['property_street_address'] = '5347 BRIGHTWOOD RD'
+        record['zip_code'] = '15102'
+        record['status'] = 'Closed'
+    elif '03335264' in record['fha_loan_id']:
+        record['property_street_address'] = '7237 BEACON HILL DR'
+        record['municipality_name'] = 'WILKINSBURG'
+        record['zip_code'] = '15221'
+        record['latitude'] = '40.4432'
+        record['longitude'] = '-79.8644'
+        record['census_tract'] = record['census_tract_2020'] = '42003561500'
+    elif '03335240' in record['fha_loan_id']: # DAVISON SQUARE APTS
+        record['property_street_address'] = '265 46TH ST'
+        record['zip_code'] = '15201'
+        record['latitude'] = '40.4713'
+        record['longitude'] = '-79.9567'
+        record['census_tract'] = record['census_tract_2020'] = '42003090200'
+    elif '03311111' in record['fha_loan_id']: # HERITAGE HILLS
+        record['property_street_address'] = '1250 VILLAGE GREEN DR'
+        record['zip_code'] = '15025'
+        record['latitude'] = '40.3196'
+        record['longitude'] = '-79.9520'
+        record['census_tract'] = record['census_tract_2020'] = '420034911011'
+    elif '03335282' in record['fha_loan_id']: # WATERFORD LANDING APTS # This is a neighborhood.
+        record['property_street_address'] = '1200 LANDING LN'
+        record['zip_code'] = '15108'
+        record['latitude'] = '40.525'
+        record['longitude'] = '-80.226'
+    elif '03310014' in record['fha_loan_id']: # HIGHLAND PARK CARE CENTER
+        record['property_street_address'] = '745 N HIGHLAND AVE'
+        record['zip_code'] = '15206'
+        record['latitude'] = '40.4691'
+        record['longitude'] = '-79.9213'
+        record['census_tract'] = '42003111300'
+    elif '03322037' in record['fha_loan_id']: # WOODCLIFFE MANOR ASSISTED LIVING FACILITY
+        record['property_street_address'] = '5347 BRIGHTWOOD RD'
+        record['zip_code'] = '15102'
+        record['status'] = 'Closed'
+    elif '03322033' in record['fha_loan_id']: # LOCUST GROVE
+        record['property_street_address'] = '4043 IRENE ST'
+        record['zip_code'] = '15122'
+        record['latitude'] = '40.3911'
+        record['longitude'] = '-79.8800'
+        record['census_tract'] = '42003488200'
+    elif '03311050' in record['fha_loan_id']: # MT VERNON APARTMENTS
+        record['property_street_address'] = '2300 SURREY LN'
+        record['zip_code'] = '15135'
+        record['latitude'] = '40.2916'
+        record['longitude'] = '-79.8256'
+        record['census_tract'] = '42003496200'
+
 
 # Brighton Place (TC1991-0087)
 # It's completely unclear where this project is/was; somewhere in Pittsburgh is all the data tells us.
