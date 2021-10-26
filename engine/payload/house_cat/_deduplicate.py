@@ -849,6 +849,8 @@ def deduplicate_records(deduplicated_index_filepath, verbose=False):
         reader = csv.DictReader(g)
         for row in reader:
             source_field = row['source_field']
+            if source_field[0] == '#': # Treat these lines as
+                continue               # commented out.
             source_value = row['source_value']
             target_field = row['target_field']
             target_value = row['target_value']
