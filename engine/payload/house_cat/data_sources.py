@@ -146,16 +146,29 @@ def scrape_rocket_jobs(job, **kwparameters):
     if 'only_these_job_codes' in job.custom_parameters:
         scraped_job_dicts = [d for d in scraped_job_dicts if d['job_code'] in job.custom_parameters['only_these_job_codes']]
 
+
+    key_id_field_by_code = {
+            'mf_mortgages': 'fha_loan_id',
+            'mf_init_commit': 'fha_loan_id',
+            'lihtc': 'normalized_state_id', # normalized_state_id represents the project, while lihtc_project_id represents the funding,
+            # so there are cases where there are multiple LIHTC records, with different lihtc_project_id values, under the same
+            # normalized_state_id.
+            'lihtc_building': 'normalized_state_id',
+            'housing_inspections': 'development_code',
+            'hud_public_housing_projects': 'development_code',
+            'hud_public_housing_buildings': 'development_code',
+            'mf_subsidy_loans': 'property_id', #, 'contract_id'],
+            'mf_subsidy_8': 'property_id',
+            'mf_contracts_8': 'property_id', #, 'contract_id'],
             # I'm leaving out contract_id since so far, any table
             # that has contract_id also has property_id.
-            'mf_loans': ['property_id', 'fha_loan_id'],
-            'mf_inspections_1': ['property_id'],
-            'hfa_lihtc': ['pmindx'],
-            'hfa_demographics': ['property_id', 'pmindx', 'normalized_state_id', 'fha_loan_id'],
-            'hfa_apartment_distributions': ['pmindx'],
-            'hunt_and_peck': ['property_id', 'pmindx', 'fha_loan_id', 'lihtc_project_id', 'normalized_state_id', 'development_code'], # This is the deduplicated index, which is
-            # really supposed to be linked with Django magic to all the other key values,
-            # so maybe really everything should be listed here (even contract_id?).
+            'mf_loans': 'property_id',
+            'mf_inspections_1': 'property_id',
+            'hfa_lihtc': 'pmindx',
+            'hfa_demographics': 'pmindx',
+            'hfa_apartment_distributions': 'pmindx',
+            'hunt_and_peck': 'id', # id is the index we've made up as a unique identifier for
+            # projects in the deduplicated index.
             }
 
     for scraped_job_dict in scraped_job_dicts:
@@ -188,7 +201,8 @@ def scrape_housecat_tables(job, **kwparameters):
                 list_of_dicts.append(dict(row))
         from engine.etl_util import write_to_csv
         write_to_csv(output_path, list_of_dicts)
-    ## 4) Change job.target to point to that output file
+
+    # Also, maybe make that cross-linking Django-magic table?
 
 # dfg
 
