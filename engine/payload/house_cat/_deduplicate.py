@@ -245,9 +245,6 @@ def fix_some_records(record_1, record_2, merged_record, verbose):
         merged_record['longitude'] = '-79.88773' # Added manually
         merged_record['units'] = 126
         assert str(merged_record['units']) in record_1['units'].split('|') + record_2['units'].split('|') # Guard against units drift.
-#    elif '800018175' in [record_1['property_id'], record_2['property_id']]:
-#        #merged_record['units'] = 126 # [ ] Need to distinguish between 130 and 136 units.
-#        #assert str(merged_record['units']) in record_1['units'].split('|') + record_2['units'].split('|') # Guard against units drift.
     elif '800246670' in [record_1['property_id'], record_2['property_id']]:
 #        merged_record['census_tract'] = '42003130700' # Added from census.gov (2020 tract)
 #        merged_record['latitude'] = '40.4528969990001' # Chosen from two very close sets
@@ -712,7 +709,25 @@ def fix_single_record(record):
         record['latitude'] = '40.3608'
         record['longitude'] = '-80.0678'
         record['census_tract'] = record['census_tract_2020'] = '42003473602'
-
+    elif '800224287' == record['property_id']:
+        record['hud_property_name'] = 'INDEPENDENCE COURT OF MONROEVILLE'
+    elif '800030495' == record['property_id']:
+        record['hud_property_name'] = 'PRESBYTERIAN MEDICAL CENTER OF OAKMONT'
+#    elif '800018175' in [record_1['property_id'], record_2['property_id']]:
+#        #merged_record['units'] = 126 # [ ] Need to distinguish between 130 and 136 units.
+#        #assert str(merged_record['units']) in record_1['units'].split('|') + record_2['units'].split('|') # Guard against units drift.
+    elif '800018175' == record['property_id']:
+        record['hud_property_name'] = 'ALLEGHENY COMMONS EAST'
+    elif '800244929' == record['property_id']:
+        record['hud_property_name'] = 'LARIMER / EAST LIBERTY PHASE II'
+    elif '800018598' == record['property_id']:
+        record['hud_property_name'] = 'LEETSDALE HI-RISE'
+    elif '800018903' == record['property_id']:
+        record['hud_property_name'] = 'ST. THERESE PLAZA'
+    elif '800240553' == record['property_id']:
+        record['hud_property_name'] = 'THE OAKS RETIREMENT RESIDENCE'
+    elif '800030501' == record['property_id']:
+        record['hud_property_name'] = 'HIGHLAND PARK CARE CENTER'
 
 # Brighton Place (TC1991-0087)
 # It's completely unclear where this project is/was; somewhere in Pittsburgh is all the data tells us.
@@ -996,7 +1011,7 @@ def deduplicate_records(deduplicated_index_filepath, verbose=False):
     return master_list, deduplicated_master_list
 
 if __name__ == '__main__':
-    verbose = True
+    verbose = False
     index_list, deduplicated_index = deduplicate_records(deduplicated_index_filename, verbose)
     ic(len(index_list))
     ic(len(deduplicated_index))
