@@ -643,7 +643,7 @@ def fix_single_record(record):
         record['zip_code'] = '15206'
         record['latitude'] = '40.4691'
         record['longitude'] = '-79.9213'
-        record['census_tract'] = '42003111300'
+        record['census_tract'] = record['census_tract_2020'] = '42003111300'
     elif '03322037' in record['fha_loan_id']: # WOODCLIFFE MANOR ASSISTED LIVING FACILITY
         record['property_street_address'] = '5347 BRIGHTWOOD RD'
         record['zip_code'] = '15102'
@@ -653,13 +653,65 @@ def fix_single_record(record):
         record['zip_code'] = '15122'
         record['latitude'] = '40.3911'
         record['longitude'] = '-79.8800'
-        record['census_tract'] = '42003488200'
+        record['census_tract'] = record['census_tract_2020'] = '42003488200'
     elif '03311050' in record['fha_loan_id']: # MT VERNON APARTMENTS
         record['property_street_address'] = '2300 SURREY LN'
         record['zip_code'] = '15135'
         record['latitude'] = '40.2916'
         record['longitude'] = '-79.8256'
-        record['census_tract'] = '42003496200'
+        record['census_tract'] = record['census_tract_2020'] = '42003496200'
+    elif '03311038' in record['fha_loan_id']: # The Flats at Fox Hill Apartments (4 buildings)
+        record['hud_property_name'] = 'THE FLATS AT FOX HILL APARTMENTS (4 BUILDINGS)'
+        record['property_street_address'] = '1120 FOX HILL DR'
+        record['zip_code'] = '15146'
+        record['latitude'] = '40.4404'
+        record['longitude'] = '-79.7830'
+        record['census_tract'] = record['census_tract_2020'] = record['census_tract_2010'] = '42003521200'
+
+        record['building_count'] = 4
+    elif '03335257' in record['fha_loan_id']: # HEP PARK VILLAGE APTS - close to LGAR
+        record['property_street_address'] = '342 KENYON STREET'
+        record['zip_code'] = '15145'
+        record['latitude'] = '40.4106'
+        record['longitude'] = '-79.8231'
+        record['census_tract'] = record['census_tract_2020'] = record['census_tract_2010'] = '42003509400'
+    elif '03335251' in record['fha_loan_id']: # WESTPOINTE APTS I AND II
+        record['property_street_address'] = '2000 WESTPOINTE DR'
+        record['zip_code'] = '15205'
+        record['latitude'] = '40.4518'
+        record['longitude'] = '-80.1532'
+        record['census_tract'] = record['census_tract_2020'] = record['census_tract_2010'] = '42003459201'
+    elif '03335253' in record['fha_loan_id']: # SOUTHPOINTE TOWERS (constructed in 1976 and has 157 units)
+        record['property_street_address'] = '100 CERASI DR'
+        record['municipality_name'] = 'WEST MIFFLIN'
+        record['zip_code'] = '15122'
+        record['latitude'] = '40.3310'
+        record['longitude'] = '-79.9404'
+        record['census_tract'] = record['census_tract_2020'] = '42003489001'
+    elif '03322029' in record['fha_loan_id']: # LEMINGTON HOME FOR THE AGED (Closed in 2005. Under redevelopment as a 54 one-bedroom units for senior citizens.)
+        record['property_street_address'] = '1625 LINCOLN AVE'
+        record['zip_code'] = '15206'
+        record['latitude'] = '40.4721'
+        record['longitude'] = '-79.8933'
+        record['census_tract'] = record['census_tract_2020'] = '42003561900'
+        record['status'] = 'Closed (but being redeveloped as affordable housing)'
+    elif '03343110' == record['fha_loan_id']: # AMBER HOLLOW
+        record['status'] = 'Unfindable' # Is this the same as AMBER GLEN?
+    elif '03335252' == record['fha_loan_id']: # SOUTH PARK APTS
+        record['status'] = 'Unfindable' # It's not clear where this is.
+    elif '03310010' == record['fha_loan_id']:  # AMBER WOODS AT HARMARVILLAGE
+        record['property_street_address'] = '715 FREEPORT RD'
+        record['city'] = 'CHESWICK'
+        record['municipality_name'] = 'CHESWICK'
+        record['zip_code'] = '15024'
+        record['latitude'] = '40.5427'
+        record['longitude'] = '-79.8191'
+        record['census_tract'] = record['census_tract_2020'] = '42003419000'
+    elif '800018743' == record['property_id']: # ST. CLAIR WOODS APTS
+        record['city'] = 'PITTSBURGH'
+        record['latitude'] = '40.3608'
+        record['longitude'] = '-80.0678'
+        record['census_tract'] = record['census_tract_2020'] = '42003473602'
 
 
 # Brighton Place (TC1991-0087)
