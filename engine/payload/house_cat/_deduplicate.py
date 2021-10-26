@@ -1,8 +1,19 @@
-import re, csv, copy, requests, time
+import re, csv, copy, requests, time, json
 from datetime import datetime
 from pprint import pprint
 from icecream import ic
 from collections import defaultdict
+
+GEOCACHE_FILE = 'geocache.json'
+def load_geocache():
+    with open(GEOCACHE_FILE, 'r') as f:
+        global cached_geocodings
+        cached_geocodings = json.load(f)
+
+def save_geocache():
+    with open(GEOCACHE_FILE, 'w') as g:
+        global cached_geocodings
+        g.write(json.dumps(cached_geocodings))
 
 def write_to_csv(filename, list_of_dicts, keys):
     with open(filename, 'w') as output_file:
@@ -91,6 +102,16 @@ def geocode_address_with_geomancer(address):
     print(f"Unable to geocode {address}, failing with status code '{result['data']['status']}'")
     return None, None
 
+def geocode(address):
+    global cached_geocodings
+    if address in cached_geocodings:
+        return cached_geocodings[address]
+
+    geocoordinates = geocode_address_with_geomancer(address)
+    if geocoordinates != (None, None):
+        cached_geocodings[address] = geocoordinates
+    return geocoordinates
+
 def try_to_geocode(merged_record):
     if merged_record['latitude'] == '':
         if merged_record.get('property_street_address', None) in ['', None, 'SCATTERED SITES',
@@ -113,9 +134,9 @@ def try_to_geocode(merged_record):
             if not no_municipality:
                 alternate_address += merged_record['zip_code']
         print(f"Trying to geocode {address}.")
-        longitude, latitude = geocode_address_with_geomancer(address)
+        longitude, latitude = geocode(address)
         if latitude is None and not no_municipality:
-            longitude, latitude = geocode_address_with_geomancer(alternate_address)
+            longitude, latitude = geocode(alternate_address)
         if latitude is not None:
             merged_record['latitude'] = latitude
             merged_record['longitude'] = longitude
@@ -784,6 +805,7 @@ index_filename = 'master_list.csv'
 deduplicated_index_filename = 'deduplicated_index.csv'
 
 def deduplicate_records(deduplicated_index_filepath, verbose=False):
+    load_geocache()
     fields_to_write = fields_to_get
     for f in possible_keys:
         if f not in fields_to_write:
@@ -918,6 +940,7 @@ def deduplicate_records(deduplicated_index_filepath, verbose=False):
                 deduplicated_master_list.append(fix_single_record(master_list[index]))
 
     write_to_csv(deduplicated_index_filepath, deduplicated_master_list, fields_to_write + [house_cat_id_name, 'source_file', 'index'])
+    save_geocache()
     return master_list, deduplicated_master_list
 
 if __name__ == '__main__':
