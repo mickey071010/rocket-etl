@@ -77,7 +77,8 @@ def add_to_master_list(id_field, sources, available_files, fields_to_get, master
 def link_records_into_index():
     generate_intermediate_files = False
     all_files = get_files_in_folder(path)
-    files = [f for f in all_files if f[-3:].lower() == 'csv']
+    excluded_files = ['deduplicated_index.csv', 'example-affordable-housing-projects--fields-merged.csv', 'example-affordable-housing-projects--fields-sorted.csv', 'phfa_pgh_demographics--not-in-our-master-list-2021-05.csv', 'temp-backup-of-example-affordable-housing-projects--fields-merged.csv']
+    files = [f for f in all_files if f[-3:].lower() == 'csv' and f not in excluded_files and f[:2] != 'eg']
     keys_by_file = defaultdict(list)
     files_by_key = defaultdict(list)
 
