@@ -105,7 +105,8 @@ def standard_arcgis_job_dicts(data_json_url, data_json_content, arcgis_dataset_t
             {
                 'job_code': f'{base_job_code}_api',
                 'source_type': 'http',
-                'source_full_url': get_arcgis_data_url(data_json_url, arcgis_dataset_title, 'Esri Rest API', ag_dataset, True)[0],
+                #'source_full_url': get_arcgis_data_url(data_json_url, arcgis_dataset_title, 'Esri Rest API', ag_dataset, True)[0],
+                'source_full_url': get_arcgis_data_url(data_json_url, arcgis_dataset_title, 'ArcGIS GeoService', ag_dataset, True)[0], # It looks like this got changed. Sure, why not?
                 'encoding': 'utf-8',
                 'destination': 'ckan_link',
                 'package': package_id,
@@ -135,7 +136,7 @@ def standard_arcgis_job_dicts(data_json_url, data_json_content, arcgis_dataset_t
             {
                 'job_code': f'{base_job_code}_api',
                 'source_type': 'http',
-                'source_full_url': get_arcgis_data_url(data_json_url, arcgis_dataset_title, 'Esri Rest API', ag_dataset, True)[0],
+                'source_full_url': get_arcgis_data_url(data_json_url, arcgis_dataset_title, 'ArcGIS GeoService', ag_dataset, True)[0],
                 'encoding': 'utf-8',
                 'destination': 'ckan_link',
                 'package': package_id,
