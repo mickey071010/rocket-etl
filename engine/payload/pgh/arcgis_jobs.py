@@ -132,5 +132,80 @@ seeds.append({
 
 job_dicts += standard_arcgis_job_dicts(data_json_url, data_json_content, **seeds[-1])
 
+#####
+class HistoricDistrictsSchema(pl.BaseSchema):
+    _objectid = fields.String(load_from='\ufeffobjectid'.lower(), dump_to='objectid')
+    _type = fields.String(load_from='type'.lower(), dump_to='type')
+    historic_name = fields.String(load_from='historic_name'.lower(), dump_to='historic_name')
+    created_user = fields.String(load_from='created_user'.lower(), dump_to='created_user')
+    created_date = fields.String(load_from='created_date'.lower(), dump_to='created_date')
+    last_edited_user = fields.String(load_from='last_edited_user'.lower(), dump_to='last_edited_user')
+    last_edited_date = fields.String(load_from='last_edited_date'.lower(), dump_to='last_edited_date')
+    guideline_link = fields.String(load_from='guideline_link'.lower(), dump_to='guideline_link', allow_none=True)
+    shape__area = fields.Float(load_from='Shape__Area'.lower(), dump_to='shape_area')
+    shape__length = fields.Float(load_from='Shape__Length'.lower(), dump_to='shape_length')
+
+    class Meta:
+        ordered = True
+
+    @pre_load
+    def fix_datetimes(self, data):
+        for f in ['created_date', 'last_edited_date']:
+            if data[f] not in ['', 'NA', None]:
+                data[f] = parser.parse(data[f]).isoformat()
+
+seeds.append({
+        'arcgis_dataset_title': 'City Designated Historic Districts',
+        'base_job_code': 'historic_districts',
+        'package_id': '8f92ae09-4cfa-4e0d-9c46-779a66d93d1e', # Production package ID for City Designated Historic Districts
+        'schema': HistoricDistrictsSchema,
+        'new_wave_format': False
+        })
+
+job_dicts += standard_arcgis_job_dicts(data_json_url, data_json_content, **seeds[-1])
+
+#####
+class ParksSchema(pl.BaseSchema):
+    _objectid_1 = fields.String(load_from='\ufeffobjectid_1'.lower(), dump_to='objectid_1')
+    objectid = fields.String(load_from='objectid'.lower(), dump_to='objectid')
+    acreage = fields.Float(load_from='acreage'.lower(), dump_to='acreage')
+    sqft = fields.Float(load_from='sqft'.lower(), dump_to='sqft')
+    final_cat = fields.String(load_from='final_cat'.lower(), dump_to='final_cat')
+    type_ = fields.String(load_from='type_'.lower(), dump_to='type')
+    sector = fields.Integer(load_from='sector'.lower(), dump_to='sector', allow_none=True)
+    origpkname = fields.String(load_from='origpkname'.lower(), dump_to='origpkname', allow_none=True)
+    updatepknm = fields.String(load_from='updatepknm'.lower(), dump_to='updatepknm')
+    alterntnam = fields.String(load_from='alterntnam'.lower(), dump_to='alterntnam', allow_none=True)
+    divname = fields.String(load_from='divname'.lower(), dump_to='divname', allow_none=True)
+    shape_leng = fields.Float(load_from='shape_leng'.lower(), dump_to='shape_leng', allow_none=True)
+    globalid = fields.String(load_from='globalid'.lower(), dump_to='globalid', allow_none=True)
+    created_user = fields.String(load_from='created_user'.lower(), dump_to='created_user')
+    created_date = fields.String(load_from='created_date'.lower(), dump_to='created_date')
+    last_edited_user = fields.String(load_from='last_edited_user'.lower(), dump_to='last_edited_user')
+    last_edited_date = fields.String(load_from='last_edited_date'.lower(), dump_to='last_edited_date')
+    maintenanceresponsibility = fields.String(load_from='maintenanceresponsibility'.lower(), dump_to='maintenanceresponsibility', allow_none=True)
+    dpw_ac = fields.String(load_from='dpw_ac'.lower(), dump_to='dpw_ac')
+    global_iD_2 = fields.String(load_from='GlobalID_2'.lower(), dump_to='globalid_2')
+    shape__area = fields.String(load_from='Shape__Area'.lower(), dump_to='shape_area')
+    shape__length = fields.Float(load_from='Shape__Length'.lower(), dump_to='shape_length')
+
+    class Meta:
+        ordered = True
+
+    @pre_load
+    def fix_datetimes(self, data):
+        for f in ['created_date', 'last_edited_date']:
+            if data[f] not in ['', 'NA', None]:
+                data[f] = parser.parse(data[f]).isoformat()
+
+seeds.append({
+        'arcgis_dataset_title': 'Parks',
+        'base_job_code': 'parks',
+        'package_id': 'e298e2ae-07c0-4aa4-a2ca-2c8db845b552', # Production package ID for Pittsburgh Parks
+        'schema': ParksSchema,
+        'new_wave_format': False
+        })
+
+job_dicts += standard_arcgis_job_dicts(data_json_url, data_json_content, **seeds[-1])
 
 assert len(job_dicts) == len({d['job_code'] for d in job_dicts}) # Verify that all job codes are unique.
