@@ -78,7 +78,7 @@ job_dicts += standard_arcgis_job_dicts(data_json_url, data_json_content, **seeds
 
 ##########
 class LandslidesSchema(pl.BaseSchema):
-    fid = fields.Integer(load_from='FID'.lower(), dump_to='fid')
+    fid = fields.String(load_from='\ufeffFID'.lower(), dump_to='fid')
     code = fields.String(load_from='code'.lower(), dump_to='code')
     acres = fields.Float(load_from='acres'.lower(), dump_to='acres')
     sqmiles = fields.Float(load_from='sqmiles'.lower(), dump_to='sqmiles')
