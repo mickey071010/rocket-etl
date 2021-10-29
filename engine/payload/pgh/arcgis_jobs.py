@@ -208,4 +208,198 @@ seeds.append({
 
 job_dicts += standard_arcgis_job_dicts(data_json_url, data_json_content, **seeds[-1])
 
+#####
+class WardsSchema(pl.BaseSchema):
+    _fid = fields.String(load_from='\ufeffFID'.lower(), dump_to='fid')
+    ward = fields.String(load_from='ward'.lower(), dump_to='ward')
+    acres = fields.Float(load_from='acres'.lower(), dump_to='acres')
+    sqmiles = fields.Float(load_from='sqmiles'.lower(), dump_to='sqmiles')
+    wardtext = fields.String(load_from='wardtext'.lower(), dump_to='wardtext')
+    county_ward = fields.String(load_from='county_ward'.lower(), dump_to='county_ward')
+    ward_county = fields.String(load_from='ward_county'.lower(), dump_to='ward_county')
+    municode = fields.String(load_from='municode'.lower(), dump_to='municode')
+    municode2 = fields.String(load_from='municode2'.lower(), dump_to='municode2')
+    shape_length = fields.Float(load_from='SHAPE_Length'.lower(), dump_to='shape_length')
+    shape_area = fields.String(load_from='SHAPE_Area'.lower(), dump_to='shape_area')
+
+    class Meta:
+        ordered = True
+
+#    @pre_load
+#    def fix_datetimes(self, data):
+#        for f in ['created_date', 'last_edited_date']:
+#            if data[f] not in ['', 'NA', None]:
+#                data[f] = parser.parse(data[f]).isoformat()
+
+seeds.append({
+        'arcgis_dataset_title': 'Wards',
+        'base_job_code': 'wards',
+        'package_id': '766bbec2-e744-408e-9c8c-a58b662b6007', # Production package ID for Wards
+        'schema': WardsSchema,
+        'new_wave_format': False
+        })
+
+job_dicts += standard_arcgis_job_dicts(data_json_url, data_json_content, **seeds[-1])
+#####
+class GreenwaysSchema(pl.BaseSchema):
+    _fid = fields.String(load_from='\ufeffFID'.lower(), dump_to='fid')
+    objectid = fields.String(load_from='objectid'.lower(), dump_to='objectid', allow_none=True)
+    area = fields.Float(load_from='area'.lower(), dump_to='area')
+    perimeter = fields.Float(load_from='perimeter'.lower(), dump_to='perimeter')
+    greenway_ = fields.Integer(load_from='greenway_'.lower(), dump_to='greenway', allow_none=True)
+    greenway_i = fields.Integer(load_from='greenway_i'.lower(), dump_to='greenway_i', allow_none=True)
+    name = fields.String(load_from='name'.lower(), dump_to='name')
+    acres = fields.Float(load_from='acres'.lower(), dump_to='acres')
+    sqmiles = fields.Float(load_from='sqmiles'.lower(), dump_to='sqmiles')
+    nhood = fields.String(load_from='nhood'.lower(), dump_to='nhood', allow_none=True)
+    dpwdiv = fields.Integer(load_from='dpwdiv'.lower(), dump_to='dpwdiv', allow_none=True)
+    shape_leng = fields.Float(load_from='shape_leng'.lower(), dump_to='shape_leng', allow_none=True)
+    date_resol = fields.String(load_from='date_resol'.lower(), dump_to='date_resol')
+    label = fields.String(load_from='label'.lower(), dump_to='label')
+    shape_length = fields.Float(load_from='SHAPE_Length'.lower(), dump_to='shape_length')
+    shape_area = fields.Float(load_from='SHAPE_Area'.lower(), dump_to='shape_area')
+
+    class Meta:
+        ordered = True
+
+    @pre_load
+    def fix_datetimes(self, data):
+        for f in ['date_resol']:
+            if data[f] not in ['', 'NA', None]:
+                data[f] = parser.parse(data[f]).isoformat()
+
+seeds.append({
+        'arcgis_dataset_title': 'Greenways',
+        'base_job_code': 'greenways',
+        'package_id': '8820c384-1424-45dd-a2bb-366a6a7c6d1b', # Production package ID for Greeways
+        'schema': GreenwaysSchema,
+        'new_wave_format': False
+        })
+
+job_dicts += standard_arcgis_job_dicts(data_json_url, data_json_content, **seeds[-1])
+
+#####
+class PlanningSectorsSchema(pl.BaseSchema):
+    _objectid = fields.String(load_from='\ufeffOBJECTID'.lower(), dump_to='objectid')
+    area = fields.Integer(load_from='area'.lower(), dump_to='area')
+    perimeter = fields.String(load_from='perimeter'.lower(), dump_to='perimeter')
+    plansect_ = fields.String(load_from='plansect_'.lower(), dump_to='plansect')
+    plansect_i = fields.String(load_from='plansect_i'.lower(), dump_to='plansect_i')
+    sectors = fields.Integer(load_from='sectors'.lower(), dump_to='sectors')
+    label = fields.String(load_from='label'.lower(), dump_to='label')
+    planner = fields.String(load_from='planner'.lower(), dump_to='planner')
+    acres = fields.String(load_from='acres'.lower(), dump_to='acres', allow_none=True)
+    shape__area = fields.Float(load_from='Shape__Area'.lower(), dump_to='shape_area')
+    shape__length = fields.Float(load_from='Shape__Length'.lower(), dump_to='shape_length')
+
+    class Meta:
+        ordered = True
+
+seeds.append({
+        'arcgis_dataset_title': 'Planning Sectors',
+        'base_job_code': 'planning',
+        'package_id': 'd0611e28-edb1-4b3e-9147-60002942d27d', # Production package ID for Planning Sectors
+        'schema': PlanningSectorsSchema,
+        'new_wave_format': False
+        })
+
+job_dicts += standard_arcgis_job_dicts(data_json_url, data_json_content, **seeds[-1])
+
+#####
+class ZoningSchema(pl.BaseSchema):
+    _objectid = fields.String(load_from='\ufeffobjectid'.lower(), dump_to='objectid')
+    area = fields.Float(load_from='area'.lower(), dump_to='area')
+    perimeter = fields.Float(load_from='perimeter'.lower(), dump_to='perimeter')
+    zoning_ = fields.String(load_from='zoning_'.lower(), dump_to='zoning', allow_none=True)
+    zoning_id = fields.String(load_from='zoning_id'.lower(), dump_to='zoning_id', allow_none=True)
+    zon_new = fields.String(load_from='zon_new'.lower(), dump_to='zon_new')
+    shape_leng = fields.String(load_from='shape_leng'.lower(), dump_to='shape_leng', allow_none=True)
+    correctionlabel = fields.String(load_from='correctionlabel'.lower(), dump_to='correctionlabel', allow_none=True)
+    full_zoning_type = fields.String(load_from='full_zoning_type'.lower(), dump_to='full_zoning_type')
+    legendtype = fields.String(load_from='legendtype'.lower(), dump_to='legendtype')
+    municode = fields.String(load_from='municode'.lower(), dump_to='municode', allow_none=True)
+    status = fields.String(load_from='status'.lower(), dump_to='status')
+    created_user = fields.String(load_from='created_user'.lower(), dump_to='created_user')
+    created_date = fields.String(load_from='created_date'.lower(), dump_to='created_date')
+    last_edited_user = fields.String(load_from='last_edited_user'.lower(), dump_to='last_edited_user')
+    last_edited_date = fields.String(load_from='last_edited_date'.lower(), dump_to='last_edited_date')
+    shape__area = fields.Float(load_from='Shape__Area'.lower(), dump_to='shape_area')
+    shape__length = fields.Float(load_from='Shape__Length'.lower(), dump_to='shape_length')
+
+    class Meta:
+        ordered = True
+
+    @pre_load
+    def fix_datetimes(self, data):
+        for f in ['created_date', 'last_edited_date']:
+            if data[f] not in ['', 'NA', None]:
+                data[f] = parser.parse(data[f]).isoformat()
+
+seeds.append({
+        'arcgis_dataset_title': 'Zoning',
+        'base_job_code': 'zoning',
+        'package_id': '01773197-baba-4f5e-aa77-ae87a04afafc', # Production package ID for Zoning
+        'schema': ZoningSchema,
+        'new_wave_format': False
+        })
+
+job_dicts += standard_arcgis_job_dicts(data_json_url, data_json_content, **seeds[-1])
+#####
+class HistoricSitesSchema(pl.BaseSchema):
+    _objectid = fields.String(load_from='\ufeffobjectid'.lower(), dump_to='objectid')
+    historic_i = fields.String(load_from='historic_i'.lower(), dump_to='historic_i')
+    lotblock = fields.String(load_from='lotblock'.lower(), dump_to='lotblock')
+    street = fields.String(load_from='street'.lower(), dump_to='street')
+    address = fields.String(load_from='address'.lower(), dump_to='address')
+    shape_leng_1 = fields.Float(load_from='shape_leng_1'.lower(), dump_to='shape_leng_1', allow_none=True)
+    shape_area_1 = fields.Float(load_from='shape_area_1'.lower(), dump_to='shape_area_1', allow_none=True)
+    alternativ = fields.String(load_from='alternativ'.lower(), dump_to='alternativ', allow_none=True)
+    name = fields.String(load_from='name'.lower(), dump_to='name')
+    provided_a = fields.String(load_from='provided_a'.lower(), dump_to='provided_a', allow_none=True)
+    shape__area = fields.Float(load_from='Shape__Area'.lower(), dump_to='shape_area')
+    shape__length = fields.Float(load_from='Shape__Length'.lower(), dump_to='shape_length')
+
+    class Meta:
+        ordered = True
+
+seeds.append({
+        'arcgis_dataset_title': 'City Designated Individual Historic Sites',
+        'base_job_code': 'historic_sites',
+        'package_id': '2ee7c48c-6fcf-407a-a8ca-477bdcfffda7', # Production package ID for Historic Sites
+        'schema': HistoricSitesSchema,
+        'new_wave_format': False
+        })
+
+job_dicts += standard_arcgis_job_dicts(data_json_url, data_json_content, **seeds[-1])
+#####
+class CouncilDistricts2012Schema(pl.BaseSchema):
+    _fid = fields.Integer(load_from='\ufeffFID'.lower(), dump_to='fid')
+    council = fields.String(load_from='council'.lower(), dump_to='council')
+    transparency = fields.Integer(load_from='transparency'.lower(), dump_to='transparency')
+    created_user = fields.String(load_from='created_user'.lower(), dump_to='created_user')
+    created_date = fields.DateTime(load_from='created_date'.lower(), dump_to='created_date')
+    last_edited_user = fields.String(load_from='last_edited_user'.lower(), dump_to='last_edited_user')
+    last_edited_date = fields.DateTime(load_from='last_edited_date'.lower(), dump_to='last_edited_date')
+    council_district = fields.String(load_from='council_district'.lower(), dump_to='council_district')
+    shape_length = fields.Float(load_from='SHAPE_Length'.lower(), dump_to='shape_length')
+    shape_area = fields.Float(load_from='SHAPE_Area'.lower(), dump_to='shape_area')
+
+    class Meta:
+        ordered = True
+
+    @pre_load
+    def fix_datetimes(self, data):
+        for f in ['created_date', 'last_edited_date']:
+            if data[f] not in ['', 'NA', None]:
+                data[f] = parser.parse(data[f]).isoformat()
+
+seeds.append({
+        'arcgis_dataset_title': 'City Council Districts 2012',
+        'base_job_code': 'council_districts_2012',
+        'package_id': '8249c8b6-37c6-4849-abe7-c9abbcdf6197', # Production package ID for City Council Districts 2012
+        'schema': CouncilDistricts2012Schema,
+        'new_wave_format': False
+        })
+
+job_dicts += standard_arcgis_job_dicts(data_json_url, data_json_content, **seeds[-1])
 assert len(job_dicts) == len({d['job_code'] for d in job_dicts}) # Verify that all job codes are unique.
