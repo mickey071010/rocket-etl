@@ -47,14 +47,23 @@ def get_arcgis_data_url(data_json_url, dataset_title, file_format, dataset=None,
             url = distribution['accessURL']
             if link:
                 return url, None
-            url_without_query_string, query_string = url.split('?')
-            # The query string is being stripped because a) it makes the file extension no
-            # longer the last thing in the filename component and b) in this case being
-            # used for testing, the outSR parameter given in the data.json file specifies
-            # a non-useful projection, whereas removing that query string results in
-            # usable latitude and longitude values.
-            _, filename_and_query_string = re.findall(r'(.*)\/(.*)', url, re.I)[0]
-            filename, query_string = filename_and_query_string.split('?')
+            url_parts = url.split('?')
+            if len(url_parts) == 2:
+                url_without_query_string, query_string = url.split('?')
+                # The query string is being stripped because a) it makes the file extension no
+                # longer the last thing in the filename component and b) in this case being
+                # used for testing, the outSR parameter given in the data.json file specifies
+                # a non-useful projection, whereas removing that query string results in
+                # usable latitude and longitude values.
+                # example url:
+                # https://pghgishub-pittsburghpa.opendata.arcgis.com/datasets/e67592c2904b497b83ccf876fced7979_0.zip?outSR=%7B%22latestWkid%22%3A2272%2C%22wkid%22%3A102729%7D
+                _, filename_and_query_string = re.findall(r'(.*)\/(.*)', url, re.I)[0]
+                filename, query_string = filename_and_query_string.split('?')
+            elif len(url_parts) == 1:
+                url_without_query_string = url
+                filename = url_without_query_string.split('/')[-1]
+            else:
+                raise ValueError(f'Too many question marks in the url: {url}')
             return url_without_query_string, filename
     raise ValueError(f"Unable to find title file of type {file_format} and the '{dataset_title}' dataset in {data_json_url}.")
 
