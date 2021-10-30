@@ -380,7 +380,7 @@ class MultifamilyProjectsSubsidySection8Schema(pl.BaseSchema):
         for f in fields:
             if data[f] is not None:
                 if f == 'county_code': # Standardize county_fips_code.
-                    data[f] = str(42000 + data[f])
+                    data[f] = str(42000 + int(data[f]))
                 else:
                     data[f] = str(data[f])
 
