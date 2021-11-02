@@ -402,4 +402,201 @@ seeds.append({
         })
 
 job_dicts += standard_arcgis_job_dicts(data_json_url, data_json_content, **seeds[-1])
+#####
+class FireZonesSchema(pl.BaseSchema):
+    _fid = fields.String(load_from='\ufeffFID'.lower(), dump_to='fid')
+    area = fields.String(load_from='area'.lower(), dump_to='area', allow_none=True)
+    perimeter = fields.Float(load_from='perimeter'.lower(), dump_to='perimeter', allow_none=True)
+    firezones_ = fields.String(load_from='firezones_'.lower(), dump_to='firezones_', allow_none=True)
+    firezones_id = fields.String(load_from='firezones_id'.lower(), dump_to='firezones_id', allow_none=True)
+    dist_zone = fields.String(load_from='dist_zone'.lower(), dump_to='dist_zone')
+    olddist_zone = fields.String(load_from='olddist_zone'.lower(), dump_to='olddist_zone', allow_none=True)
+    mapbook = fields.String(load_from='mapbook'.lower(), dump_to='mapbook', allow_none=True)
+    pagerotate = fields.Integer(load_from='pagerotate'.lower(), dump_to='pagerotate', allow_none=True)
+    firezones = fields.String(load_from='firezones'.lower(), dump_to='firezones', allow_none=True)
+    shape_length = fields.Float(load_from='SHAPE_Length'.lower(), dump_to='shape_length')
+    shape_area = fields.Float(load_from='SHAPE_Area'.lower(), dump_to='shape_area')
+
+    class Meta:
+        ordered = True
+
+seeds.append({
+        'arcgis_dataset_title': 'Fire Zones',
+        'base_job_code': 'fire_zones',
+        'package_id': 'fd2f4880-e245-4c46-8071-5a364efa0abf', # Production package ID for Fire Zones
+        'schema': FireZonesSchema,
+        'new_wave_format': False
+        })
+
+job_dicts += standard_arcgis_job_dicts(data_json_url, data_json_content, **seeds[-1])
+#####
+class DPWDivisions2018to2020Schema(pl.BaseSchema):
+    _objectid = fields.String(load_from='\ufeffobjectid'.lower(), dump_to='objectid')
+    perimeter = fields.Float(load_from='perimeter'.lower(), dump_to='perimeter')
+    dpwdivs_ = fields.String(load_from='dpwdivs_'.lower(), dump_to='dpwdivs', allow_none=True)
+    dpwdivs_id = fields.String(load_from='dpwdivs_id'.lower(), dump_to='dpwdivs_id', allow_none=True)
+    division = fields.String(load_from='division'.lower(), dump_to='division')
+    unique_id = fields.String(load_from='unique_id'.lower(), dump_to='unique_id')
+    shape__area = fields.Float(load_from='Shape__Area'.lower(), dump_to='shape_area')
+    shape__length = fields.Float(load_from='Shape__Length'.lower(), dump_to='shape_length')
+
+    class Meta:
+        ordered = True
+
+seeds.append({
+        'arcgis_dataset_title': '2018 to 2020 DPW Divisions',
+        'base_job_code': 'dpw_2018',
+        'package_id': '4a86cee6-033f-41d2-bc56-6a9480819117', # Production package ID for 2018-2020 DPW Divisions
+        'schema': DPWDivisions2018to2020Schema,
+        'new_wave_format': False
+        })
+
+job_dicts += standard_arcgis_job_dicts(data_json_url, data_json_content, **seeds[-1])
+#####
+class UnderminedAreasSchema(pl.BaseSchema):
+    _fid = fields.String(load_from='\ufeffFID'.lower(), dump_to='fid')
+    und_aa_field = fields.String(load_from='und_aa_field'.lower(), dump_to='und_aa_field')
+    created_user = fields.String(load_from='created_user'.lower(), dump_to='created_user')
+    created_date = fields.DateTime(load_from='created_date'.lower(), dump_to='created_date')
+    last_edited_user = fields.String(load_from='last_edited_user'.lower(), dump_to='last_edited_user')
+    last_edited_date = fields.DateTime(load_from='last_edited_date'.lower(), dump_to='last_edited_date')
+    undermined = fields.String(load_from='undermined'.lower(), dump_to='undermined')
+    shape_length = fields.Float(load_from='SHAPE_Length'.lower(), dump_to='shape_length')
+    shape_area = fields.Float(load_from='SHAPE_Area'.lower(), dump_to='shape_area')
+
+    class Meta:
+        ordered = True
+
+    @pre_load
+    def fix_datetimes(self, data):
+        for f in ['created_date', 'last_edited_date']:
+            if data[f] not in ['', 'NA', None]:
+                data[f] = parser.parse(data[f]).isoformat()
+
+seeds.append({
+        'arcgis_dataset_title': 'Undermined Areas',
+        'base_job_code': 'undermined',
+        'package_id': 'ea849f53-0aa9-4621-b9fb-e8dc323d3a9e', # Production package ID for Undermined Areas
+        'schema': UnderminedAreasSchema,
+        'new_wave_format': False
+        })
+
+job_dicts += standard_arcgis_job_dicts(data_json_url, data_json_content, **seeds[-1])
+####(This one is completely new.)
+class DPWEnvironmentalServicesDivisionsSchema(pl.BaseSchema):
+    _objectid = fields.String(load_from='\ufeffobjectid'.lower(), dump_to='objectid')
+    area = fields.Integer(load_from='area'.lower(), dump_to='area')
+    perimeter = fields.Float(load_from='perimeter'.lower(), dump_to='perimeter')
+    env_serv_ = fields.String(load_from='env_serv_'.lower(), dump_to='env_serv')
+    env_serv_i = fields.String(load_from='env_serv_i'.lower(), dump_to='env_serv_i')
+    acreage = fields.Integer(load_from='acreage'.lower(), dump_to='acreage')
+    sq_miles = fields.Float(load_from='sq_miles'.lower(), dump_to='sq_miles')
+    division = fields.String(load_from='division'.lower(), dump_to='division')
+    unique_id = fields.String(load_from='unique_id'.lower(), dump_to='unique_id')
+    shape__area = fields.Float(load_from='Shape__Area'.lower(), dump_to='shape_area')
+    shape__length = fields.Float(load_from='Shape__Length'.lower(), dump_to='shape_length')
+
+    class Meta:
+        ordered = True
+
+seeds.append({
+        'arcgis_dataset_title': 'DPW Environmental Services Divisions',
+        'base_job_code': 'dpw_divs',
+        'package_id': 'f626afa5-bc88-44d2-8e1c-b586de9fe941', # Production package ID for DPW Environmental Services Divisions
+        'schema': DPWEnvironmentalServicesDivisionsSchema,
+        'new_wave_format': True
+        })
+
+job_dicts += standard_arcgis_job_dicts(data_json_url, data_json_content, **seeds[-1])
+#####
+class SlopesSchema(pl.BaseSchema):
+    _objectid_1 = fields.String(load_from='\ufeffobjectid_1'.lower(), dump_to='objectid_1')
+    objectid = fields.String(load_from='objectid'.lower(), dump_to='objectid')
+    created_us = fields.String(load_from='created_us'.lower(), dump_to='created_user')
+    created_da = fields.DateTime(load_from='created_da'.lower(), dump_to='created_date')
+    last_edite = fields.String(load_from='last_edite'.lower(), dump_to='last_edited_user')
+    last_edi_1 = fields.DateTime(load_from='last_edi_1'.lower(), dump_to='last_edited_date')
+    slope25 = fields.String(load_from='slope25'.lower(), dump_to='slope25')
+    shape__are = fields.Float(load_from='shape__are'.lower(), dump_to='shape_are')
+    shape__len = fields.Float(load_from='shape__len'.lower(), dump_to='shape_len')
+    shape__area = fields.Float(load_from='Shape__Area'.lower(), dump_to='shape_area')
+    shape__length = fields.Float(load_from='Shape__Length'.lower(), dump_to='shape_length')
+
+    class Meta:
+        ordered = True
+
+    @pre_load
+    def fix_datetimes(self, data):
+        for f in ['created_da', 'last_edi_1']:
+            if data[f] not in ['', 'NA', None]:
+                data[f] = parser.parse(data[f]).isoformat()
+
+seeds.append({
+        'arcgis_dataset_title': '25% or Greater Slope',
+        'base_job_code': 'slopes',
+        'package_id': '0f643c56-1c53-4c88-824d-3a3876c0d3a0', # Production package ID for 25% or Greater Slope
+        'schema': SlopesSchema,
+        'new_wave_format': False
+        })
+
+job_dicts += standard_arcgis_job_dicts(data_json_url, data_json_content, **seeds[-1])
+##########3
+# DONE
+#Dataset         Note      Service URL
+# Pittsburgh Steps (Removed)
+#               Removed from HUB, service no longer exists, Republishing this as a new service with same data, see one line below
+#                        http://maps.pittsburghpa.gov/arcgis/rest/services/OpenData/PGHODSteps/FeatureServer
+# Pittsburgh Steps (Created)
+#               New Service Created to replace the broken Steps Service
+#                        https://services1.arcgis.com/YZCmUqbcsUpOKfj7/arcgis/rest/services/PittsburghSteps/FeatureServer
+# Pittsburgh Landslide Prone Areas (Removed)
+#                Service No longer exists, removed it from our HUB page since there were 2 copies of Landslide data there and the other service still works
+#                        http://maps.pittsburghpa.gov/arcgis/rest/services/OpenData/PGHODLandslideProne/FeatureServer
+# Pittsburgh City Facilities (Removed)
+#               Removed from HUB, service no longer exists, Facilities data available on WPRDC through other sources
+#                        http://maps.pittsburghpa.gov//arcgis/rest/services/OpenData/PGHODCityFacilities/FeatureServer
+# Pittsburgh Traffic Signals (Removed)
+#               Removed from HUB, service no longer exists, Traffic Signals data available on WPRDC through other sources
+#                        http://maps.pittsburghpa.gov/arcgis/rest/services/OpenData/PGHODTrafficSignals/FeatureServer
+# Pittsburgh City Trees (Removed)
+#                Removed from HUB, service no longer exists, City tree data available on WPRDC through other sources
+#                        http://maps.pittsburghpa.gov//arcgis/rest/services/OpenData/PGHODCityTrees/FeatureServer
+# Pittsburgh Parks (Removed)
+#                Service Still exists, but removed it from our HUB page since there were 2 copies of Parks data there
+#                        https://services1.arcgis.com/YZCmUqbcsUpOKfj7/arcgis/rest/services/PGHWebParks/FeatureServer
+# Pittsburgh Wards (Removed)
+#               Service Still exists, but removed it from our HUB page since there were 2 copies of Wards data there
+#                       https://services1.arcgis.com/YZCmUqbcsUpOKfj7/arcgis/rest/services/PGHWards/FeatureServer
+# Pittsburgh Greenways (Removed)
+#               Service Still exists, but removed it from our HUB page since there were 2 copies of Greenways data there
+#                       https://services1.arcgis.com/YZCmUqbcsUpOKfj7/arcgis/rest/services/PGHODGreenways/FeatureServer
+# Pittsburgh City Council Districts 2012 (Removed)
+#               Service Still exists, but removed it from our HUB page since there were 2 copies of Council Districts data there
+#                       https://services1.arcgis.com/YZCmUqbcsUpOKfj7/arcgis/rest/services/PGH_CityCouncilOD/FeatureServer
+# Pittsburgh Fire Zones (Removed)
+#                Service No longer exists, removed it from our HUB page since there were 2 copies of Fire Zones data there and the other service still works
+#                        http://maps.pittsburghpa.gov/arcgis/rest/services/OpenData/PGHODFireZones/FeatureServer
+# Pittsburgh DPW Divisions (Title Change)
+#                Changed Title to "2018 to 2020 DPW Divisions" - This data set is not current, changed title to reflect that
+#                        https://services1.arcgis.com/YZCmUqbcsUpOKfj7/arcgis/rest/services/PGH_DPWDivisions/FeatureServer
+# Pittsburgh Undermined Areas (Removed)
+#                Service No longer exists, removed it from our HUB page since there were 2 copies of Undermined data there and the other service still works
+#                        http://maps.pittsburghpa.gov//arcgis/rest/services/OpenData/PGHODUndermined/FeatureServer
+# Pittsburgh DPW Environmental Services Divisions (Removed)
+#                Removed from HUB, service no longer exists, Republishing this as a new service with same data, see one line below
+#                       http://maps.pittsburghpa.gov//arcgis/rest/services/OpenData/PGHODDPWESDivisions/FeatureServer
+# DPW Environmental Services Divisions (Created)
+#                New Service Created to replace the broken ES Division Service
+#                        https://services1.arcgis.com/YZCmUqbcsUpOKfj7/arcgis/rest/services/DPWEnvironmentalServicesDivisions/FeatureServer
+
+
+####
+# Also addressed
+# City Designated Historic Districts
+# Planning Sectors
+# City Designated Individual Historic Sites
+# Zoning
+# Slopes
+# Undermined Areas
+
 assert len(job_dicts) == len({d['job_code'] for d in job_dicts}) # Verify that all job codes are unique.
