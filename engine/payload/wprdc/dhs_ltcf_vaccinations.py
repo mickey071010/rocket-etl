@@ -75,9 +75,8 @@ class CovidData:
             if re.search('xlsx', url) is not None:
                 doh_dates.append(link.next_sibling)
 
-        dhs_last_updated = doh_dates[2]
-        a = dhs_last_updated.split()
-        self.dhs_last_updated = a[1]
+        matches = re.search('(\d\d/\d\d/\d\d\d\d)', doh_dates[1])
+        self.dhs_last_updated = matches.group(1)
         self.addFPPData()
 
     def addFPPData(self):
@@ -112,7 +111,7 @@ class CovidData:
                     self.fields = set(facility.keys()) | self.fields
                     break
 
-                    
+
         print("Done Adding FPP Data")
 
     def writeToFile(self, output_path):
@@ -134,9 +133,9 @@ def get_raw_data_and_save_to_local_csv_file(jobject, **kwparameters):
                 dhs_dates.append(link.next_sibling)
                 doc_urls.append(url)
 
-        assert len(doc_urls) == 4  # Verify that the web site only lists four XSLX files.
-        dhs_last_updated = dhs_dates[2]
-        fullurl = "https://www.health.pa.gov" + doc_urls[2]
+        assert len(doc_urls) == 3  # Verify that the web site only lists threeXSLX files.
+        dhs_last_updated = dhs_dates[1]
+        fullurl = "https://www.health.pa.gov" + doc_urls[1]
 
         r = requests.get(fullurl)
         open('DHS_Data.xlsx', 'wb').write(r.content)

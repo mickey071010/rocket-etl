@@ -97,9 +97,16 @@ class CovidData:
             if re.search('xlsx', url) is not None:
                 doh_dates.append(link.next_sibling)
 
-        doh_last_updated = doh_dates[0]
-        a = doh_last_updated.split()
-        self.doh_last_updated = a[1]
+        # Format changed to this:
+        # ic| doh_dates: [' (final update 10/26/2021 at 2:30 p.m. - \r
+        #        '\xa0(updated 10/29/2021 at 12:00 pm.\xa0',
+        #        '\xa0(updated 10/19/2021 at 4:00 pm.\xa0']
+        matches = re.search('(\d\d/\d\d/\d\d\d\d)', doh_dates[0])
+
+        #doh_last_updated = doh_dates[0]
+        #a = doh_last_updated.split()
+        #self.doh_last_updated = a[1]
+        self.doh_last_updated = matches.group(1)
         if dohData is not None:
             self.addDOHData()
         self.addFPPData()
@@ -126,12 +133,12 @@ class CovidData:
                     facility['DOH_Data_Last_Updated'] = self.doh_last_updated
 
         print("Done Adding DOH COVID Data\n")
-        
+
     def addFPPData(self):
         print("Adding FPP Data\n")
         for index, fpp in enumerate(self.fppdf):
             tempStr = str(fpp['Long Term Care Facility Name'])
-    
+
             for i, facility in enumerate(self.ltcfdf):
                 Str1 = str(facility['FACILITY_N'])
                 ratio = fuzz.ratio(Str1.lower(), tempStr.lower())
@@ -155,7 +162,7 @@ class CovidData:
                     facility['Total Staff Doses Administered'] = fpp['Total Staff Doses Administered']
                     self.fields = set(facility.keys()) | self.fields
                     break
-    
+
         #  self.ltcfdf['FPP_Data_Last_Updated'] = self.fpp_last_updated
         print("Done Adding FPP Data")
 
@@ -198,7 +205,7 @@ def get_raw_data_and_save_to_local_csv_file(jobject, **kwparameters):
                 doh_dates.append(link.next_sibling)
                 doc_urls.append(url)
 
-        assert len(doc_urls) == 4  # Verify that the web site only lists four XSLX files.
+        assert len(doc_urls) == 3  # Verify that the web site only lists three XSLX files.
         fullurl = "https://www.health.pa.gov" + doc_urls[0]
 
         r = requests.get("https://data.pa.gov/api/views/iwiy-rwzp/rows.csv?accessType=DOWNLOAD&api_foundry=true")
