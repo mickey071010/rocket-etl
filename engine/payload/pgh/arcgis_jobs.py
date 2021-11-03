@@ -540,7 +540,289 @@ seeds.append({
         })
 
 job_dicts += standard_arcgis_job_dicts(data_json_url, data_json_content, **seeds[-1])
-##########3
+#####
+class ParkingPermitAreasSchema(pl.BaseSchema):
+    _objectid = fields.String(load_from='\ufeffobjectid'.lower(), dump_to='objectid')
+    area = fields.Float(load_from='area'.lower(), dump_to='area', allow_none=True)
+    perimeter = fields.Float(load_from='perimeter'.lower(), dump_to='perimeter', allow_none=True)
+    permitpk_ = fields.String(load_from='permitpk_'.lower(), dump_to='permitpk', allow_none=True)
+    permitpk_i = fields.String(load_from='permitpk_i'.lower(), dump_to='permitpk_i', allow_none=True)
+    code = fields.String(load_from='code'.lower(), dump_to='code')
+    neighborho = fields.String(load_from='neighborho'.lower(), dump_to='neighborhood', allow_none=True)
+    number = fields.Integer(load_from='number'.lower(), dump_to='number', allow_none=True)
+    acres = fields.Float(load_from='acres'.lower(), dump_to='acres', allow_none=True)
+    sqmiles = fields.Float(load_from='sqmiles'.lower(), dump_to='sqmiles', allow_none=True)
+    uniqueid = fields.String(load_from='uniqueid'.lower(), dump_to='uniqueid', allow_none=True)
+    status = fields.String(load_from='status'.lower(), dump_to='status', allow_none=True)
+    enforcement = fields.String(load_from='enforcement'.lower(), dump_to='enforcement', allow_none=True)
+    grace_period = fields.String(load_from='grace_period'.lower(), dump_to='grace_period', allow_none=True)
+    visitor_pass = fields.String(load_from='visitor_pass'.lower(), dump_to='visitor_pass', allow_none=True)
+    monday = fields.String(load_from='monday'.lower(), dump_to='monday', allow_none=True)
+    tuesday = fields.String(load_from='tuesday'.lower(), dump_to='tuesday', allow_none=True)
+    wednesday = fields.String(load_from='wednesday'.lower(), dump_to='wednesday', allow_none=True)
+    thursday = fields.String(load_from='thursday'.lower(), dump_to='thursday', allow_none=True)
+    friday = fields.String(load_from='friday'.lower(), dump_to='friday', allow_none=True)
+    saturday = fields.String(load_from='saturday'.lower(), dump_to='saturday', allow_none=True)
+    sunday = fields.String(load_from='sunday'.lower(), dump_to='sunday', allow_none=True)
+    other_time = fields.String(load_from='other_time'.lower(), dump_to='other_time', allow_none=True)
+    hcmap = fields.String(load_from='hcmap'.lower(), dump_to='hcmap', allow_none=True)
+    district = fields.String(load_from='district'.lower(), dump_to='district', allow_none=True)
+    code_rpp = fields.String(load_from='code_rpp'.lower(), dump_to='code_rpp')
+    code_district = fields.String(load_from='code_district'.lower(), dump_to='code_district', allow_none=True)
+    created_user = fields.String(load_from='created_user'.lower(), dump_to='created_user')
+    created_date = fields.DateTime(load_from='created_date'.lower(), dump_to='created_date')
+    last_edited_user = fields.String(load_from='last_edited_user'.lower(), dump_to='last_edited_user')
+    last_edited_date = fields.DateTime(load_from='last_edited_date'.lower(), dump_to='last_edited_date')
+    expiration_date = fields.String(load_from='expiration_date'.lower(), dump_to='expiration_date', allow_none=True)
+    shape__area = fields.Float(load_from='Shape__Area'.lower(), dump_to='shape_area', allow_none=True)
+    shape__length = fields.Float(load_from='Shape__Length'.lower(), dump_to='shape_length', allow_none=True)
+
+    class Meta:
+        ordered = True
+
+    @pre_load
+    def fix_datetimes(self, data):
+        for f in ['created_date', 'last_edited_date']:
+            if data[f] not in ['', 'NA', None]:
+                data[f] = parser.parse(data[f]).isoformat()
+
+seeds.append({
+        'arcgis_dataset_title': 'Residential Permit Parking Program Areas',
+        'base_job_code': 'parking_permits',
+        'package_id': '72f4488a-9eec-4cc3-be3b-f13a8c6dc72d', # Production package ID for Residential Permit Parking Program Areas
+        'schema': ParkingPermitAreasSchema,
+        'new_wave_format': False
+        })
+
+job_dicts += standard_arcgis_job_dicts(data_json_url, data_json_content, **seeds[-1])
+#####
+class CensusTracts2010Schema(pl.BaseSchema):
+    _objectid = fields.String(load_from='\ufeffobjectid'.lower(), dump_to='objectid')
+    statefp10 = fields.String(load_from='statefp10'.lower(), dump_to='statefp10')
+    countyfp10 = fields.String(load_from='countyfp10'.lower(), dump_to='countyfp10')
+    tractce10 = fields.String(load_from='tractce10'.lower(), dump_to='tractce10')
+    blkgrpce10 = fields.String(load_from='blkgrpce10'.lower(), dump_to='blkgrpce10')
+    geoid10 = fields.String(load_from='geoid10'.lower(), dump_to='geoid10')
+    namelsad10 = fields.String(load_from='namelsad10'.lower(), dump_to='namelsad10')
+    mtfcc10 = fields.String(load_from='mtfcc10'.lower(), dump_to='mtfcc10')
+    funcstat10 = fields.String(load_from='funcstat10'.lower(), dump_to='funcstat10')
+    aland10 = fields.Integer(load_from='aland10'.lower(), dump_to='aland10')
+    awater10 = fields.Integer(load_from='awater10'.lower(), dump_to='awater10')
+    intptlat10 = fields.String(load_from='intptlat10'.lower(), dump_to='intptlat10')
+    intptlon10 = fields.String(load_from='intptlon10'.lower(), dump_to='intptlon10')
+    hood = fields.String(load_from='hood'.lower(), dump_to='hood')
+    hood_no = fields.String(load_from='hood_no'.lower(), dump_to='hood_no')
+    acres = fields.Float(load_from='acres'.lower(), dump_to='acres')
+    sqmiles = fields.Float(load_from='sqmiles'.lower(), dump_to='sqmiles')
+    sectors = fields.Integer(load_from='sectors'.lower(), dump_to='sectors')
+    tract = fields.String(load_from='tract'.lower(), dump_to='tract')
+    cdbg2014 = fields.String(load_from='cdbg2014'.lower(), dump_to='cdbg2014')
+    tracttext = fields.String(load_from='tracttext'.lower(), dump_to='tracttext')
+    objectid_1 = fields.String(load_from='objectid_1'.lower(), dump_to='objectid_1')
+    tractce10_1 = fields.String(load_from='tractce10_1'.lower(), dump_to='tractce10_1')
+    cnt_tractce10 = fields.Integer(load_from='cnt_tractce10'.lower(), dump_to='cnt_tractce10')
+    sum_lowmod2018 = fields.Integer(load_from='sum_lowmod2018'.lower(), dump_to='sum_lowmod2018')
+    sum_lowmoduniv = fields.Integer(load_from='sum_lowmoduniv'.lower(), dump_to='sum_lowmoduniv')
+    lowmodperct = fields.Float(load_from='lowmodperct'.lower(), dump_to='lowmodperct')
+    lowmodpercanno = fields.Float(load_from='lowmodpercanno'.lower(), dump_to='lowmodpercanno')
+    cdbg2018 = fields.String(load_from='cdbg2018'.lower(), dump_to='cdbg2018')
+    shape__area = fields.Float(load_from='Shape__Area'.lower(), dump_to='shape_area')
+    shape__length = fields.Float(load_from='Shape__Length'.lower(), dump_to='shape_length')
+
+    class Meta:
+        ordered = True
+
+seeds.append({
+        'arcgis_dataset_title': '2010 Census Tracts',
+        'base_job_code': '2010_tracts',
+        'package_id': '4699bc46-8a74-44ed-9bef-f22dd595a964', # Production package ID for 2010 Census Tracts
+        'schema': CensusTracts2010Schema,
+        'new_wave_format': False
+        })
+
+job_dicts += standard_arcgis_job_dicts(data_json_url, data_json_content, **seeds[-1])
+#####
+class NeighborhoodsSchema(pl.BaseSchema):
+    _objectid = fields.String(load_from='\ufeffobjectid'.lower(), dump_to='objectid')
+    fid_blockg = fields.String(load_from='fid_blockg'.lower(), dump_to='fid_blockg')
+    statefp10 = fields.String(load_from='statefp10'.lower(), dump_to='statefp10')
+    countyfp10 = fields.String(load_from='countyfp10'.lower(), dump_to='countyfp10')
+    tractce10 = fields.String(load_from='tractce10'.lower(), dump_to='tractce10')
+    blkgrpce10 = fields.String(load_from='blkgrpce10'.lower(), dump_to='blkgrpce10')
+    geoid10 = fields.String(load_from='geoid10'.lower(), dump_to='geoid10')
+    namelsad10 = fields.String(load_from='namelsad10'.lower(), dump_to='namelsad10')
+    mtfcc10 = fields.String(load_from='mtfcc10'.lower(), dump_to='mtfcc10')
+    funcstat10 = fields.String(load_from='funcstat10'.lower(), dump_to='funcstat10')
+    aland10 = fields.Integer(load_from='aland10'.lower(), dump_to='aland10')
+    awater10 = fields.Integer(load_from='awater10'.lower(), dump_to='awater10')
+    intptlat10 = fields.String(load_from='intptlat10'.lower(), dump_to='intptlat10')
+    intptlon10 = fields.String(load_from='intptlon10'.lower(), dump_to='intptlon10')
+    shape_leng = fields.Float(load_from='shape_leng'.lower(), dump_to='shape_leng')
+    fid_neighb = fields.String(load_from='fid_neighb'.lower(), dump_to='fid_neighb')
+    area = fields.Float(load_from='area'.lower(), dump_to='area', allow_none=True)
+    perimeter = fields.Float(load_from='perimeter'.lower(), dump_to='perimeter')
+    neighbor_ = fields.String(load_from='neighbor_'.lower(), dump_to='neighbor')
+    neighbor_i = fields.String(load_from='neighbor_i'.lower(), dump_to='neighbor_i')
+    hood = fields.String(load_from='hood'.lower(), dump_to='hood')
+    hood_no = fields.String(load_from='hood_no'.lower(), dump_to='hood_no')
+    acres = fields.Float(load_from='acres'.lower(), dump_to='acres')
+    sqmiles = fields.Float(load_from='sqmiles'.lower(), dump_to='sqmiles')
+    dpwdiv = fields.String(load_from='dpwdiv'.lower(), dump_to='dpwdiv')
+    unique_id = fields.String(load_from='unique_id'.lower(), dump_to='unique_id')
+    sectors = fields.Integer(load_from='sectors'.lower(), dump_to='sectors')
+    shape_le_1 = fields.Float(load_from='shape_le_1'.lower(), dump_to='shape_le_1')
+    shape_ar_1 = fields.Float(load_from='shape_ar_1'.lower(), dump_to='shape_ar_1')
+    page_number = fields.Integer(load_from='page_number'.lower(), dump_to='page_number')
+    plannerassign = fields.String(load_from='plannerassign'.lower(), dump_to='plannerassign')
+    created_user = fields.String(load_from='created_user'.lower(), dump_to='created_user')
+    created_date = fields.DateTime(load_from='created_date'.lower(), dump_to='created_date')
+    last_edited_user = fields.String(load_from='last_edited_user'.lower(), dump_to='last_edited_user')
+    last_edited_date = fields.DateTime(load_from='last_edited_date'.lower(), dump_to='last_edited_date')
+    temp = fields.String(load_from='temp'.lower(), dump_to='temp', allow_none=True)
+    shape__area = fields.Float(load_from='Shape__Area'.lower(), dump_to='shape_area')
+    shape__length = fields.Float(load_from='Shape__Length'.lower(), dump_to='shape_length')
+
+    class Meta:
+        ordered = True
+
+    @pre_load
+    def fix_datetimes(self, data):
+        for f in ['created_date', 'last_edited_date']:
+            if data[f] not in ['', 'NA', None]:
+                data[f] = parser.parse(data[f]).isoformat()
+
+seeds.append({
+        'arcgis_dataset_title': 'Neighborhoods ',
+        'base_job_code': 'neighborhoods',
+        'package_id': 'e672f13d-71c4-4a66-8f38-710e75ed80a4', # Production package ID for Neighborhoods
+        'schema': NeighborhoodsSchema,
+        'new_wave_format': False
+        })
+
+job_dicts += standard_arcgis_job_dicts(data_json_url, data_json_content, **seeds[-1])
+#####
+class DPWStreetDivisionsSchema(pl.BaseSchema):
+    _objectid_1 = fields.String(load_from='\ufeffobjectid_1'.lower(), dump_to='objectid_1')
+    objectid = fields.String(load_from='objectid'.lower(), dump_to='objectid')
+    perimeter = fields.Float(load_from='perimeter'.lower(), dump_to='perimeter')
+    division = fields.String(load_from='division'.lower(), dump_to='division')
+    area_sqm = fields.Float(load_from='area_sqm'.lower(), dump_to='area_sqm')
+    area_sqft = fields.Float(load_from='area_sqft'.lower(), dump_to='area_sqft')
+    shape_leng = fields.Float(load_from='shape_leng'.lower(), dump_to='shape_leng')
+    shape__area = fields.Float(load_from='Shape__Area'.lower(), dump_to='shape_area')
+    shape__length = fields.Float(load_from='Shape__Length'.lower(), dump_to='shape_length')
+
+    class Meta:
+        ordered = True
+
+seeds.append({
+        'arcgis_dataset_title': 'Department of Public Works Street Divisions',
+        'base_job_code': 'dpw_street_divs',
+        'package_id': 'e07ba390-7483-4f16-a695-0b6367ef9164', # Production package ID for DPW Street Divisions
+        'schema': DPWStreetDivisionsSchema,
+        'new_wave_format': False
+        })
+
+job_dicts += standard_arcgis_job_dicts(data_json_url, data_json_content, **seeds[-1])
+#####
+class PoliceZonesSchema(pl.BaseSchema):
+    _fid = fields.String(load_from='\ufeffFID'.lower(), dump_to='fid')
+    zone = fields.String(load_from='zone'.lower(), dump_to='zone')
+    shape_length = fields.Float(load_from='SHAPE_Length'.lower(), dump_to='shape_length')
+    shape_area = fields.Float(load_from='SHAPE_Area'.lower(), dump_to='shape_area')
+
+    class Meta:
+        ordered = True
+
+seeds.append({
+        'arcgis_dataset_title': 'Police Zones',
+        'base_job_code': 'police_zones',
+        'package_id': '412a036d-cf8c-4b72-8525-878b533a2641', # Production package ID for Police Zones
+        'schema': PoliceZonesSchema,
+        'new_wave_format': False
+        })
+
+job_dicts += standard_arcgis_job_dicts(data_json_url, data_json_content, **seeds[-1])
+#####
+class PoliceSectorsSchema(pl.BaseSchema):
+    _fid = fields.String(load_from='\ufeffFID'.lower(), dump_to='fid')
+    perimeter = fields.Float(load_from='perimeter'.lower(), dump_to='perimeter')
+    zone = fields.String(load_from='zone'.lower(), dump_to='zone')
+    sectors = fields.Integer(load_from='sectors'.lower(), dump_to='sectors')
+    anno = fields.String(load_from='anno'.lower(), dump_to='anno')
+    shape_length = fields.Float(load_from='SHAPE_Length'.lower(), dump_to='shape_length')
+    shape_area = fields.Float(load_from='SHAPE_Area'.lower(), dump_to='shape_area')
+
+    class Meta:
+        ordered = True
+
+seeds.append({
+        'arcgis_dataset_title': 'Police Sectors',
+        'base_job_code': 'police_sectors',
+        'package_id': '8039a2c9-fc4d-464d-bb21-e43738be94cc', # Production package ID for Police Sectors
+        'schema': PoliceSectorsSchema,
+        'new_wave_format': False
+        })
+
+job_dicts += standard_arcgis_job_dicts(data_json_url, data_json_content, **seeds[-1])
+#####
+class FloodZonesSchema(pl.BaseSchema):
+    _fid = fields.String(load_from='\ufeffFID'.lower(), dump_to='fid')
+    fld_ar_id = fields.String(load_from='fld_ar_id'.lower(), dump_to='fld_ar_id')
+    fld_zone = fields.String(load_from='fld_zone'.lower(), dump_to='fld_zone')
+    floodway = fields.String(load_from='floodway'.lower(), dump_to='floodway')
+    sfha_tf = fields.String(load_from='sfha_tf'.lower(), dump_to='sfha_tf')
+    static_bfe = fields.Integer(load_from='static_bfe'.lower(), dump_to='static_bfe')
+    v_datum = fields.String(load_from='v_datum'.lower(), dump_to='v_datum')
+    depth = fields.Integer(load_from='depth'.lower(), dump_to='depth')
+    len_unit = fields.String(load_from='len_unit'.lower(), dump_to='len_unit')
+    velocity = fields.Integer(load_from='velocity'.lower(), dump_to='velocity')
+    vel_unit = fields.String(load_from='vel_unit'.lower(), dump_to='vel_unit')
+    ar_revert = fields.String(load_from='ar_revert'.lower(), dump_to='ar_revert')
+    bfe_revert = fields.Integer(load_from='bfe_revert'.lower(), dump_to='bfe_revert')
+    dep_revert = fields.Integer(load_from='dep_revert'.lower(), dump_to='dep_revert')
+    source_cit = fields.String(load_from='source_cit'.lower(), dump_to='source_cit')
+    shape_length = fields.Float(load_from='SHAPE_Length'.lower(), dump_to='shape_length')
+    shape_area = fields.Float(load_from='SHAPE_Area'.lower(), dump_to='shape_area')
+
+    class Meta:
+        ordered = True
+
+seeds.append({
+        'arcgis_dataset_title': '2014 FEMA Flood Zones',
+        'base_job_code': 'flood_zones',
+        'package_id': '4c9b78ee-d044-418d-97c9-130ccdcb3435', # Production package ID for 2014 FEMA Flood Zones
+        'schema': FloodZonesSchema,
+        'new_wave_format': False
+        })
+
+job_dicts += standard_arcgis_job_dicts(data_json_url, data_json_content, **seeds[-1])
+#####
+class EMSDistrictsSchema(pl.BaseSchema):
+    _objectid = fields.String(load_from='\ufeffobjectid'.lower(), dump_to='objectid')
+    area = fields.Float(load_from='area'.lower(), dump_to='area')
+    perimeter = fields.Float(load_from='perimeter'.lower(), dump_to='perimeter')
+    rams_ = fields.String(load_from='rams_'.lower(), dump_to='rams')
+    rams_id = fields.String(load_from='rams_id'.lower(), dump_to='rams_id')
+    acres = fields.Float(load_from='acres'.lower(), dump_to='acres')
+    sqmiles = fields.Float(load_from='sqmiles'.lower(), dump_to='sqmiles')
+    district = fields.String(load_from='district'.lower(), dump_to='district')
+    shape__area = fields.Float(load_from='Shape__Area'.lower(), dump_to='shape_area')
+    shape__length = fields.Float(load_from='Shape__Length'.lower(), dump_to='shape_length')
+
+    class Meta:
+        ordered = True
+
+seeds.append({
+        'arcgis_dataset_title': 'Emergency Medical Service Districts',
+        'base_job_code': 'ems',
+        'package_id': '7bd99c7c-e824-4710-894b-73721bef6f88', # Production package ID for Emergency Medical Service Districts
+        'schema': EMSDistrictsSchema,
+        'new_wave_format': False
+        })
+
+job_dicts += standard_arcgis_job_dicts(data_json_url, data_json_content, **seeds[-1])
+##########3dfg
 # DONE
 #Dataset         Note      Service URL
 # Pittsburgh Steps (Removed)
@@ -598,5 +880,12 @@ job_dicts += standard_arcgis_job_dicts(data_json_url, data_json_content, **seeds
 # Zoning
 # Slopes
 # Undermined Areas
+# Residential Parking Permit Program Areas
+# 2010 Census Tracts
+# Neighborhoods
+# Police Zones
+# Police Sectors
+# 2014 FEMA Flood Zones
+# EMS Districts
 
 assert len(job_dicts) == len({d['job_code'] for d in job_dicts}) # Verify that all job codes are unique.
