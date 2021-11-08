@@ -75,7 +75,7 @@ class CovidData:
             if re.search('xlsx', url) is not None:
                 doh_dates.append(link.next_sibling)
 
-        matches = re.search('(\d\d/\d\d/\d\d\d\d)', doh_dates[1])
+        matches = re.search('(\d{1,2}/\d{1,2}/\d\d\d\d)', doh_dates[1])
         self.dhs_last_updated = matches.group(1)
         self.addFPPData()
 
